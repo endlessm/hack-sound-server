@@ -1,0 +1,27 @@
+{
+    "app-id": "com.endlessm.HackSoundServer",
+    "branch": "@BRANCH@",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "3.30",
+    "sdk": "org.gnome.Sdk",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=pulseaudio"
+    ],
+    "modules": [
+        {
+            "name": "hack-sound-server",
+            "buildsystem": "meson",
+            "config-opts" : [
+                "-Dsession-bus-services-dir=/app/share/dbus-1/services"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "path": ".",
+                    "branch": "@GIT_CLONE_BRANCH@"
+                }
+            ]
+        }
+    ]
+}

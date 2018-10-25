@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+
+import gi
+import logging
+import json
+import os
+import signal
+import uuid
+import sys
+gi.require_version('GLib', '2.0')  # noqa
+gi.require_version('Gst', '1.0')   # noqa
+gi.require_version('Json', '1.0')  # noqa
+from gi.repository import Gio
+from gi.repository import GLib
+from gi.repository import GObject
+from gi.repository import Gst
+from gi.repository import Json
+
+
+_logger = logging.getLogger(__name__)
+
+
+def get_datadir():
+    return os.path.join(GLib.get_user_data_dir(), "hack-sound-server")
+
+def get_metadata_path():
+    return os.path.join(get_datadir(), "metadata.json")
+
+def get_sounds_dir():
+    return os.path.join(get_datadir(), "sounds")
+
+
+class HackSoundPlayer(GObject.Object):
+    __gsignals__ = {
+        'eos': (GObject.SignalFlags.RUN_FIRST, None, ()),
+        'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
+    }
+
+    def __init__(self, metadata, sender):
+        GObject.Object.__init__(self)
+        self.metadata = metadata
+        self.sender = sender
+        self.pipeline = self._build_pipeline()
+        bus = self.pipeline.get_bus()
+        bus.add_signal_watch()
+        bus.connect("message", self.__bus_message_cb)
+
+    def play(self):
+        self.pipeline.set_state(Gst.State.PLAYING)
+
+    @property
+    def sound_location(self):
+        return os.path.join(get_sounds_dir(), self.metadata["sound-file"])
+
+    def _build_pipeline(self):
+        spipeline = "filesrc location=\"%s\" ! decodebin ! autoaudiosink" % self.sound_location
+        return Gst.parse_launch(spipeline)
+
+    def __bus_message_cb(self, unused_bus, message):
+        if message.type == Gst.MessageType.EOS:
+            self.emit("eos")
+        elif message.type == Gst.MessageType.ERROR:
+            error, debug = message.parse_error()
+            _logger.warning("Error from %s: %s (%s)", message.src, error, debug)
+            self.emit("error", error, debug)
+
+class HackSoundServer(Gio.Application):
+
+    _DBUS_NAME = "com.endlessm.HackSoundServer"
+    _DBUS_UNKNOWN_SOUND_EVENT_ID = "com.endlessm.HackSoundServer.UnknownSoundEventID"
+    _DBUS_GST_ERROR = "com.endlessm.HackSoundServer.GStreamerError"
+    _DBUS_XML = """
+    <node>
+      <interface name='com.endlessm.HackSoundServer'>
+        <method name='PlaySound'>
+          <arg type='s' name='sound_event' direction='in'/>
+          <arg type='s' name='uuid' direction='out'/>
+        </method>
+        <signal name='Error'>
+          <arg type='s' name='uuid'/>
+          <arg type='s' name='error_message'/>
+          <arg type='s' name='error_domain'/>
+          <arg type='i' name='error_code'/>
+          <arg type='s' name='debug'/>
+        </signal>
+      </interface>
+    </node>
+    """
+
+    def __init__(self, metadata):
+        super().__init__(application_id=self._DBUS_NAME,
+                         flags=Gio.ApplicationFlags.IS_SERVICE)
+        self._dbus_id = None
+        self.metadata = metadata
+        self.hold()
+        self.players = {}
+
+    def do_dbus_register(self, connection, path):
+        info = Gio.DBusNodeInfo.new_for_xml(self._DBUS_XML)
+        self._dbus_id = connection.register_object(path,
+                                                   info.interfaces[0],
+                                                   self.__method_called_cb)
+        return Gio.Application.do_dbus_register(self, connection, path)
+
+    def do_dbus_unregister(self, connection, path):
+        Gio.Application.do_dbus_unregister(self, connection, path)
+        if not self._dbus_id:
+            return
+        connection.unregister_object(self._dbus_id)
+        self._dbus_id = None
+
+    def play_sound(self, sound_event_id, connection, sender, path, iface,
+                   invocation):
+        if sound_event_id not in self.metadata:
+            invocation.return_dbus_error(self._DBUS_UNKNOWN_SOUND_EVENT_ID,
+                "sound event with id %s does not exist" % sound_event_id)
+            return
+
+        uuid_ = str(uuid.uuid4())
+        self.players[uuid_] = HackSoundPlayer(self.metadata[sound_event_id],
+                                              sender)
+        self.players[uuid_].connect("eos", self.__player_eos_cb, uuid_)
+        self.players[uuid_].connect("error", self.__player_error_cb, uuid_,
+                                    connection, path, iface)
+        self.players[uuid_].play()
+        invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+
+    def __method_called_cb(self, connection, sender, path, iface,
+                           method, params, invocation):
+        if method == "PlaySound":
+            self.play_sound(params[0], connection, sender, path, iface,
+                            invocation)
+        invocation.return_error_literal(Gio.dbus_error_quark(),
+                                        Gio.DBusError.UNKNOWN_METHOD,
+                                        "Method '%s' not available" % method)
+
+    def __player_eos_cb(self, unused_player, uuid_):
+        del self.players[uuid_]
+
+    def __player_error_cb(self, player, error, debug, uuid_, connection,
+                          path, iface):
+        data = (uuid_, error.message, error.domain, error.code, debug)
+        vdata = GLib.Variant("(sssis)", data)
+        if uuid_ in self.players:
+            del self.players[uuid_]
+            connection.emit_signal(None, path, iface, 'Error', vdata)
+
+
+if __name__ == "__main__":
+    metadata_path = get_metadata_path()
+    if not os.path.exists(metadata_path):
+        _logger.error("The metadata file at '%s' does not exist" % metadata_path)
+        sys.exit(1)
+
+    with open(get_metadata_path(), "r") as metadata_file:
+        # TODO
+        # Check valid JSON schema.
+        metadata = json.load(metadata_file)
+        Gst.init(None)
+        server = HackSoundServer(metadata)
+        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, server.quit)
+        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGTERM, server.release)
+        server.run(sys.argv)
