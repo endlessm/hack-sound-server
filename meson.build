@@ -1,5 +1,8 @@
 project('hack-sound-server', version: '0.0.0')
 
+python = find_program('python3')
+pkgdatadir = join_paths(get_option('datadir'), meson.project_name())
+
 session_bus_services_dir = get_option('session-bus-services-dir')
 
 if session_bus_services_dir == ''
@@ -7,13 +10,56 @@ if session_bus_services_dir == ''
 endif
 
 install_data(
-    'com.endlessm.HackSoundServer.service',
+    join_paths('service', 'com.endlessm.HackSoundServer.service'),
     install_dir: session_bus_services_dir
 )
 
+conf = configuration_data()
+conf.set('DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
+conf.set('LIBDIR', join_paths(get_option('prefix'), get_option('libdir')))
+conf.set('PACKAGE', meson.project_name())
+
+pkglibdir = join_paths(get_option('libdir'), meson.project_name())
+install_dir = join_paths(pkglibdir, 'python', 'hack_sound_server')
+
+run_command(
+    python, '-m', 'compileall',
+    join_paths(meson.current_source_dir(), 'hack_sound_server')
+)
+
+install_subdir(
+    'src',
+    exclude_files: 'configure.py.in',
+    install_dir: install_dir,
+    strip_directory: true
+)
+
+configure_file(
+    input: join_paths('src', 'configure.py.in'),
+    output: 'configure.py',
+    install: true,
+    install_dir: install_dir,
+    configuration: conf
+)
+
+bin = join_paths(meson.current_build_dir(), meson.project_name())
+
+configure_file(
+    input: join_paths('bin', 'hack-sound-server.in'),
+    output: meson.project_name(),
+    configuration: conf
+)
+
 install_data(
-    'hack-sound-server',
-    install_dir: get_option('bindir')
+    bin,
+    install_dir: get_option('bindir'),
+    install_mode: 'rwxr-xr-x'
+)
+
+install_subdir(
+    'data',
+    install_dir: pkgdatadir,
+    strip_directory: true
 )
 
 message('\n'.join([
