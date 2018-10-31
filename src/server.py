@@ -30,6 +30,10 @@ class HackSoundPlayer(GObject.Object):
     def play(self):
         self.pipeline.set_state(Gst.State.PLAYING)
 
+    def stop(self):
+        self.pipeline.set_state(Gst.State.READY)
+        self.emit('eos')
+
     @property
     def sound_location(self):
         return self.metadata["sound-file"]
@@ -60,6 +64,9 @@ class HackSoundServer(Gio.Application):
         <method name='PlaySound'>
           <arg type='s' name='sound_event' direction='in'/>
           <arg type='s' name='uuid' direction='out'/>
+        </method>
+        <method name='StopSound'>
+          <arg type='s' name='uuid' direction='in'/>
         </method>
         <signal name='Error'>
           <arg type='s' name='uuid'/>
@@ -111,14 +118,26 @@ class HackSoundServer(Gio.Application):
         self.players[uuid_].play()
         invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
+    def stop_sound(self, uuid_, connection, sender, path, iface, invocation):
+        if uuid_ not in self.players:
+            _logger.info('Sound {} was supposed to be stopped, '
+                         'but did not exist'.format(uuid_))
+        else:
+            self.players[uuid_].stop()
+        invocation.return_value(None)
+
     def __method_called_cb(self, connection, sender, path, iface,
                            method, params, invocation):
         if method == "PlaySound":
             self.play_sound(params[0], connection, sender, path, iface,
                             invocation)
-        invocation.return_error_literal(Gio.dbus_error_quark(),
-                                        Gio.DBusError.UNKNOWN_METHOD,
-                                        "Method '%s' not available" % method)
+        elif method == 'StopSound':
+            self.stop_sound(params[0], connection, sender, path, iface,
+                            invocation)
+        else:
+            invocation.return_error_literal(
+                Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
+                "Method '%s' not available" % method)
 
     def __player_eos_cb(self, unused_player, uuid_):
         del self.players[uuid_]
