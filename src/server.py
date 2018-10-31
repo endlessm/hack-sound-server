@@ -121,6 +121,8 @@ class HackSoundServer(Gio.Application):
 
     def __player_eos_cb(self, unused_player, uuid_):
         del self.players[uuid_]
+        if not self.players:
+            self.release()
 
     def __player_error_cb(self, player, error, debug, uuid_, connection,
                           path, iface):
