@@ -33,6 +33,15 @@ class HackSoundPlayer(GObject.Object):
     def play(self):
         self.pipeline.set_state(Gst.State.PLAYING)
 
+    def seek(self, position):
+        self.pipeline.seek_simple(Gst.Format.TIME,
+                                  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
+                                  0)
+
+    @property
+    def loop(self):
+        return "loop" in self.metadata and self.metadata["loop"]
+
     @property
     def sound_location(self):
         return self.metadata["sound-file"]
@@ -43,6 +52,9 @@ class HackSoundPlayer(GObject.Object):
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
+            if self.loop:
+                self.seek(0.0)
+                return
             self.emit("eos")
         elif message.type == Gst.MessageType.ERROR:
             error, debug = message.parse_error()
