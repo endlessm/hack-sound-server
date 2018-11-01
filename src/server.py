@@ -1,33 +1,18 @@
-#!/usr/bin/env python3
-
 import gi
-import logging
 import json
+import logging
 import os
-import signal
 import uuid
 import sys
 gi.require_version('GLib', '2.0')  # noqa
 gi.require_version('Gst', '1.0')   # noqa
-gi.require_version('Json', '1.0')  # noqa
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gst
-from gi.repository import Json
 
 
 _logger = logging.getLogger(__name__)
-
-
-def get_datadir():
-    return os.path.join(GLib.get_user_data_dir(), "hack-sound-server")
-
-def get_metadata_path():
-    return os.path.join(get_datadir(), "metadata.json")
-
-def get_sounds_dir():
-    return os.path.join(get_datadir(), "sounds")
 
 
 class HackSoundPlayer(GObject.Object):
@@ -50,7 +35,7 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def sound_location(self):
-        return os.path.join(get_sounds_dir(), self.metadata["sound-file"])
+        return self.metadata["sound-file"]
 
     def _build_pipeline(self):
         spipeline = "filesrc location=\"%s\" ! decodebin ! autoaudiosink" % self.sound_location
@@ -64,11 +49,11 @@ class HackSoundPlayer(GObject.Object):
             _logger.warning("Error from %s: %s (%s)", message.src, error, debug)
             self.emit("error", error, debug)
 
+
 class HackSoundServer(Gio.Application):
 
     _DBUS_NAME = "com.endlessm.HackSoundServer"
     _DBUS_UNKNOWN_SOUND_EVENT_ID = "com.endlessm.HackSoundServer.UnknownSoundEventID"
-    _DBUS_GST_ERROR = "com.endlessm.HackSoundServer.GStreamerError"
     _DBUS_XML = """
     <node>
       <interface name='com.endlessm.HackSoundServer'>
@@ -136,6 +121,8 @@ class HackSoundServer(Gio.Application):
 
     def __player_eos_cb(self, unused_player, uuid_):
         del self.players[uuid_]
+        if not self.players:
+            self.release()
 
     def __player_error_cb(self, player, error, debug, uuid_, connection,
                           path, iface):
@@ -144,20 +131,3 @@ class HackSoundServer(Gio.Application):
         if uuid_ in self.players:
             del self.players[uuid_]
             connection.emit_signal(None, path, iface, 'Error', vdata)
-
-
-if __name__ == "__main__":
-    metadata_path = get_metadata_path()
-    if not os.path.exists(metadata_path):
-        _logger.error("The metadata file at '%s' does not exist" % metadata_path)
-        sys.exit(1)
-
-    with open(get_metadata_path(), "r") as metadata_file:
-        # TODO
-        # Check valid JSON schema.
-        metadata = json.load(metadata_file)
-        Gst.init(None)
-        server = HackSoundServer(metadata)
-        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, server.quit)
-        GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGTERM, server.release)
-        server.run(sys.argv)
