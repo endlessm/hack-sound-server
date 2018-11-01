@@ -1,9 +1,6 @@
 import gi
-import json
 import logging
-import os
 import uuid
-import sys
 gi.require_version('GLib', '2.0')  # noqa
 gi.require_version('Gst', '1.0')   # noqa
 from gi.repository import Gio
@@ -38,7 +35,8 @@ class HackSoundPlayer(GObject.Object):
         return self.metadata["sound-file"]
 
     def _build_pipeline(self):
-        spipeline = "filesrc location=\"%s\" ! decodebin ! autoaudiosink" % self.sound_location
+        spipeline = ("filesrc location=\"%s\" ! decodebin ! autoaudiosink" %
+                     self.sound_location)
         return Gst.parse_launch(spipeline)
 
     def __bus_message_cb(self, unused_bus, message):
@@ -46,14 +44,16 @@ class HackSoundPlayer(GObject.Object):
             self.emit("eos")
         elif message.type == Gst.MessageType.ERROR:
             error, debug = message.parse_error()
-            _logger.warning("Error from %s: %s (%s)", message.src, error, debug)
+            _logger.warning("Error from %s: %s (%s)", message.src, error,
+                            debug)
             self.emit("error", error, debug)
 
 
 class HackSoundServer(Gio.Application):
 
     _DBUS_NAME = "com.endlessm.HackSoundServer"
-    _DBUS_UNKNOWN_SOUND_EVENT_ID = "com.endlessm.HackSoundServer.UnknownSoundEventID"
+    _DBUS_UNKNOWN_SOUND_EVENT_ID = \
+        "com.endlessm.HackSoundServer.UnknownSoundEventID"
     _DBUS_XML = """
     <node>
       <interface name='com.endlessm.HackSoundServer'>
@@ -97,7 +97,8 @@ class HackSoundServer(Gio.Application):
     def play_sound(self, sound_event_id, connection, sender, path, iface,
                    invocation):
         if sound_event_id not in self.metadata:
-            invocation.return_dbus_error(self._DBUS_UNKNOWN_SOUND_EVENT_ID,
+            invocation.return_dbus_error(
+                self._DBUS_UNKNOWN_SOUND_EVENT_ID,
                 "sound event with id %s does not exist" % sound_event_id)
             return
 
