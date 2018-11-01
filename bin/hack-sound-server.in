@@ -6,8 +6,8 @@ import signal
 import sys
 gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
-from gi.repository import Gst
-from gi.repository import GLib
+from gi.repository import Gst  # noqa
+from gi.repository import GLib  # noqa
 
 
 LIBDIR = "@LIBDIR@"
@@ -21,7 +21,6 @@ def _add_hack_sound_server_path():
 
 
 def _run_server():
-    from hack_sound_server.server import HackSoundPlayer
     from hack_sound_server.server import HackSoundServer
     from hack_sound_server.utils.metadata import read_and_parse_metadata
 
