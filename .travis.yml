@@ -1,0 +1,10 @@
+---
+language: python
+python:
+  - '3.5'
+sudo: required
+install:
+  - pip install flake8
+
+script:
+  - flake8 bin/hack-sound-server.in .
