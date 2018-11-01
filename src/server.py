@@ -23,6 +23,7 @@ class HackSoundPlayer(GObject.Object):
         self.metadata = metadata
         self.sender = sender
         self.pipeline = self._build_pipeline()
+        self._stop_loop = False
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -31,7 +32,17 @@ class HackSoundPlayer(GObject.Object):
         self.pipeline.set_state(Gst.State.PLAYING)
 
     def stop(self):
+        self._stop_loop = True
         self.pipeline.send_event(Gst.Event.new_eos())
+
+    def seek(self, position):
+        self.pipeline.seek_simple(Gst.Format.TIME,
+                                  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
+                                  position)
+
+    @property
+    def loop(self):
+        return "loop" in self.metadata and self.metadata["loop"]
 
     @property
     def sound_location(self):
@@ -44,8 +55,11 @@ class HackSoundPlayer(GObject.Object):
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
-            self.pipeline.set_state(Gst.State.NULL)
-            self.emit("eos")
+            if self.loop and not self._stop_loop:
+                self.seek(0.0)
+            else:
+                self.pipeline.set_state(Gst.State.NULL)
+                self.emit("eos")
         elif message.type == Gst.MessageType.ERROR:
             error, debug = message.parse_error()
             _logger.warning("Error from %s: %s (%s)", message.src, error,
