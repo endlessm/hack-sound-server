@@ -55,7 +55,7 @@ class HackSoundPlayer(GObject.Object):
 
 
 class HackSoundServer(Gio.Application):
-
+    _TIMEOUT_S = 10
     _DBUS_NAME = "com.endlessm.HackSoundServer"
     _DBUS_UNKNOWN_SOUND_EVENT_ID = \
         "com.endlessm.HackSoundServer.UnknownSoundEventID"
@@ -85,7 +85,7 @@ class HackSoundServer(Gio.Application):
                          flags=Gio.ApplicationFlags.IS_SERVICE)
         self._dbus_id = None
         self.metadata = metadata
-        self.hold()
+        self._countdown_id = None
         self.players = {}
 
     def do_dbus_register(self, connection, path):
@@ -103,6 +103,21 @@ class HackSoundServer(Gio.Application):
         connection.unregister_object(self._dbus_id)
         self._dbus_id = None
 
+    def _cancel_countdown(self):
+        if self._countdown_id:
+            self.release()
+            GLib.Source.remove(self._countdown_id)
+            self._countdown_id = None
+            _logger.info('Timeout cancelled')
+
+    def _ensure_release_countdown(self):
+        self._cancel_countdown()
+        self.hold()
+        _logger.info('All sounds done; starting timeout of {} seconds'.format(
+            self._TIMEOUT_S))
+        self._countdown_id = GLib.timeout_add_seconds(
+            self._TIMEOUT_S, self.release, priority=GLib.PRIORITY_LOW)
+
     def play_sound(self, sound_event_id, connection, sender, path, iface,
                    invocation):
         if sound_event_id not in self.metadata:
@@ -110,6 +125,9 @@ class HackSoundServer(Gio.Application):
                 self._DBUS_UNKNOWN_SOUND_EVENT_ID,
                 "sound event with id %s does not exist" % sound_event_id)
             return
+
+        self._cancel_countdown()
+        self.hold()
 
         uuid_ = str(uuid.uuid4())
         self.players[uuid_] = HackSoundPlayer(self.metadata[sound_event_id],
@@ -144,7 +162,8 @@ class HackSoundServer(Gio.Application):
     def __player_eos_cb(self, unused_player, uuid_):
         del self.players[uuid_]
         if not self.players:
-            self.release()
+            self._ensure_release_countdown()
+        self.release()
 
     def __player_error_cb(self, player, error, debug, uuid_, connection,
                           path, iface):
@@ -152,4 +171,7 @@ class HackSoundServer(Gio.Application):
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
             del self.players[uuid_]
+            if not self.players:
+                self._ensure_release_countdown()
+            self.release()
             connection.emit_signal(None, path, iface, 'Error', vdata)
