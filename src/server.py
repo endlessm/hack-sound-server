@@ -31,8 +31,7 @@ class HackSoundPlayer(GObject.Object):
         self.pipeline.set_state(Gst.State.PLAYING)
 
     def stop(self):
-        self.pipeline.set_state(Gst.State.READY)
-        self.emit('eos')
+        self.pipeline.send_event(Gst.Event.new_eos())
 
     @property
     def sound_location(self):
@@ -45,11 +44,13 @@ class HackSoundPlayer(GObject.Object):
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
+            self.pipeline.set_state(Gst.State.NULL)
             self.emit("eos")
         elif message.type == Gst.MessageType.ERROR:
             error, debug = message.parse_error()
             _logger.warning("Error from %s: %s (%s)", message.src, error,
                             debug)
+            self.pipeline.set_state(Gst.State.NULL)
             self.emit("error", error, debug)
 
 
