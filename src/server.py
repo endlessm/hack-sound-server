@@ -89,11 +89,12 @@ class HackSoundServer(Gio.Application):
         self.players = {}
 
     def do_dbus_register(self, connection, path):
+        Gio.Application.do_dbus_register(self, connection, path)
         info = Gio.DBusNodeInfo.new_for_xml(self._DBUS_XML)
         self._dbus_id = connection.register_object(path,
                                                    info.interfaces[0],
                                                    self.__method_called_cb)
-        return Gio.Application.do_dbus_register(self, connection, path)
+        return True
 
     def do_dbus_unregister(self, connection, path):
         Gio.Application.do_dbus_unregister(self, connection, path)
