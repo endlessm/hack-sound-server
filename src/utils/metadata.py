@@ -36,7 +36,7 @@ def load_metadata(user_type):
         if user_type == "system":
             _logger.error(msg)
         elif user_type == "user":
-            _logger.warning(msg)
+            _logger.info(msg)
     return ret
 
 
