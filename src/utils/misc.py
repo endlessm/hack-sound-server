@@ -6,7 +6,7 @@ from hack_sound_server.configure import PACKAGE
 
 def get_datadir(user_type):
     if user_type == "user":
-        return os.path.join(GLib.get_user_data_dir(), PACKAGE)
+        return GLib.get_user_data_dir()
     elif user_type == "system":
         return os.path.join(DATADIR, PACKAGE)
 
