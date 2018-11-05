@@ -1,4 +1,10 @@
 {
+    "codeview/code-error-appearance": {
+        "sound-file": "codeview/Code_error.wav"
+    },
+    "codeview/code-error-disappearance": {
+        "sound-file": "codeview/Code_solution.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
