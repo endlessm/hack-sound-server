@@ -23,6 +23,15 @@
     "codeview/keypress/delete-selection": {
         "sound-file": "codeview/key - delete big.wav"
     },
+    "codeview/action/cut": {
+        "sound-file": "codeview/keyCombo - cut.wav"
+    },
+    "codeview/action/copy": {
+        "sound-file": "codeview/keyCombo - copy.wav"
+    },
+    "codeview/action/paste": {
+        "sound-file": "codeview/keyCombo - paste.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
