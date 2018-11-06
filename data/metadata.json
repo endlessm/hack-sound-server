@@ -127,5 +127,23 @@
         "sound-file": "scifi/90030__tewell__oneascendingquack.wav",
         "license": "CC-BY",
         "source": "freesound.org"
+    },
+    "shell/tracking-button/flip/hover": {
+        "sound-file": "Hover_Flip.wav"
+    },
+    "shell/tracking-button/flip-inverse/hover": {
+        "sound-file": "Hover_InverseFlip.wav"
+    },
+    "shell/tracking-button/flip/click": {
+        "sound-file": "MouseClick_Flip.wav"
+    },
+    "shell/tracking-button/flip-inverse/click": {
+        "sound-file": "MouseClick_Invert.wav"
+    },
+    "shell/tracking-button/flip/enter": {
+        "sound-file": "MouseEnter_Flip.wav"
+    },
+    "shell/tracking-button/flip-inverse/enter": {
+        "sound-file": "MouseEnter_Inverse.wav"
     }
 }
