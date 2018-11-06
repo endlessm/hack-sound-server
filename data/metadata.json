@@ -5,6 +5,24 @@
     "codeview/code-error-disappearance": {
         "sound-file": "codeview/Code_solution.wav"
     },
+    "codeview/keypress/equals": {
+        "sound-file": "codeview/key - equals.wav"
+    },
+    "codeview/keypress/return": {
+        "sound-file": "codeview/key - return.wav"
+    },
+    "codeview/keypress/slash": {
+        "sound-file": "codeview/key - slash.wav"
+    },
+    "codeview/keypress/space": {
+        "sound-file": "codeview/key - space.wav"
+    },
+    "codeview/keypress/delete": {
+        "sound-file": "codeview/key - delete.wav"
+    },
+    "codeview/keypress/delete-selection": {
+        "sound-file": "codeview/key - delete big.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
