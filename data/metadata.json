@@ -17,6 +17,12 @@
     "codeview/keypress/space": {
         "sound-file": "codeview/key - space.wav"
     },
+    "codeview/keypress/delete": {
+        "sound-file": "codeview/key - delete.wav"
+    },
+    "codeview/keypress/delete-selection": {
+        "sound-file": "codeview/key - delete big.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
