@@ -38,6 +38,9 @@
     "codeview/action/redo": {
         "sound-file": "codeview/keyCombo - redo.wav"
     },
+    "codeview/action/selection-drag": {
+        "sound-file": "codeview/selectionDrag (per character).wav"
+    },
     "codeview/popup/open": {
         "sound-file": "codeview/errorPopup - open.wav"
     },
