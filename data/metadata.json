@@ -32,6 +32,12 @@
     "codeview/action/paste": {
         "sound-file": "codeview/keyCombo - paste.wav"
     },
+    "codeview/action/undo": {
+        "sound-file": "codeview/keyCombo - undo.wav"
+    },
+    "codeview/action/redo": {
+        "sound-file": "codeview/keyCombo - redo.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
