@@ -149,6 +149,12 @@
     "hack-toolbox/reset/click": {
         "sound-file": "toolbox/reset - commit.wav"
     },
+    "hack-toolbox/update-codeview": {
+        "sound-file": "toolbox/liveGUItoText.wav"
+    },
+    "hack-toolbox/update-gui": {
+        "sound-file": "toolbox/liveTextToGUI.wav"
+    },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav"
     },
