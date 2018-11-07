@@ -137,6 +137,12 @@
         "license": "CC-BY",
         "source": "freesound.org"
     },
+    "hack-toolbox/minimize": {
+        "sound-file": "toolbox/minimizePanel.wav"
+    },
+    "hack-toolbox/unminimize": {
+        "sound-file": "toolbox/maximizePanel.wav"
+    },
     "hack-toolbox/reset/click": {
         "sound-file": "toolbox/reset - commit.wav"
     },
