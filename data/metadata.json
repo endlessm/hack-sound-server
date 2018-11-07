@@ -38,6 +38,15 @@
     "codeview/action/redo": {
         "sound-file": "codeview/keyCombo - redo.wav"
     },
+    "codeview/popup/open": {
+        "sound-file": "codeview/errorPopup - open.wav"
+    },
+    "codeview/popup/close": {
+        "sound-file": "codeview/errorPopup - closed.wav"
+    },
+    "codeview/popup/fix": {
+        "sound-file": "codeview/errorPopup - fixitButtonPress.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
