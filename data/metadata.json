@@ -128,6 +128,9 @@
         "license": "CC-BY",
         "source": "freesound.org"
     },
+    "hack-toolbox/reset/click": {
+        "sound-file": "toolbox/reset - commit.wav"
+    },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav"
     },
