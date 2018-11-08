@@ -34,12 +34,25 @@ class HackSoundPlayer(GObject.Object):
         self.pipeline.send_event(Gst.Event.new_eos())
 
     @property
+    def volume(self):
+        if "volume" in self.metadata:
+            return self.metadata["volume"]
+        return None
+
+    @property
     def sound_location(self):
         return self.metadata["sound-file"]
 
     def _build_pipeline(self):
-        spipeline = ("filesrc location=\"%s\" ! decodebin ! autoaudiosink" %
-                     self.sound_location)
+        elements = [
+            "filesrc name=src location=\"{}\"".format(self.sound_location),
+            "decodebin"
+        ]
+        if self.volume is not None:
+            elements.append("volume volume={}".format(self.volume))
+        elements.append("autoaudiosink")
+        spipeline = " ! ".join(elements)
+
         return Gst.parse_launch(spipeline)
 
     def __bus_message_cb(self, unused_bus, message):
