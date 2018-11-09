@@ -51,6 +51,12 @@ class HackSoundPlayer(GObject.Object):
         return None
 
     @property
+    def speed(self):
+        if "speed" in self.metadata:
+            return self.metadata["speed"]
+        return None
+
+    @property
     def sound_location(self):
         return self.metadata["sound-file"]
 
@@ -79,6 +85,22 @@ class HackSoundPlayer(GObject.Object):
                             debug)
             self.pipeline.set_state(Gst.State.NULL)
             self.emit("error", error, debug)
+        elif message.type == Gst.MessageType.STATE_CHANGED:
+            if message.src != self.pipeline:
+                return
+            if self.speed is None:
+                return
+            st = message.get_structure()
+            old_state = st.get_value("old-state")
+            new_state = st.get_value("new-state")
+            if old_state == Gst.State.READY and new_state == Gst.State.PAUSED:
+                event = Gst.Event.new_seek(
+                    self.speed, Gst.Format.TIME,
+                    Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
+                    Gst.SeekType.SET, 0.0,
+                    Gst.SeekType.NONE, 0.0
+                )
+                self.pipeline.send_event(event)
 
 
 class HackSoundServer(Gio.Application):
