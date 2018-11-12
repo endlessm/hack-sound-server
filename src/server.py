@@ -57,6 +57,12 @@ class HackSoundPlayer(GObject.Object):
         return None
 
     @property
+    def pitch(self):
+        if "pitch" in self.metadata:
+            return self.metadata["pitch"]
+        return None
+
+    @property
     def sound_location(self):
         return self.metadata["sound-file"]
 
@@ -67,6 +73,9 @@ class HackSoundPlayer(GObject.Object):
         ]
         if self.volume is not None:
             elements.append("volume volume={}".format(self.volume))
+        if self.pitch is not None:
+            elements.append("audioconvert")
+            elements.append("pitch pitch={}".format(self.pitch))
         elements.append("autoaudiosink")
         spipeline = " ! ".join(elements)
 
