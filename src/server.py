@@ -24,9 +24,10 @@ class HackSoundPlayer(GObject.Object):
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
-    def __init__(self, metadata, sender):
+    def __init__(self, metadata, sender, metadata_extras=None):
         GObject.Object.__init__(self)
         self.metadata = metadata
+        self.metadata_extras = metadata_extras or {}
         self.sender = sender
         self.pipeline = self._build_pipeline()
         self._stop_loop = False
@@ -64,15 +65,11 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def volume(self):
-        if "volume" in self.metadata:
-            return self.metadata["volume"]
-        return None
+        return self._get_multipliable_prop("volume")
 
     @property
     def pitch(self):
-        if "pitch" in self.metadata:
-            return self.metadata["pitch"]
-        return None
+        return self._get_multipliable_prop("pitch")
 
     @property
     def fade_in(self):
@@ -118,6 +115,15 @@ class HackSoundPlayer(GObject.Object):
             raise ValueError('bad start time')
         if not self._fade_control.set(current_time + time_ns, 0):
             raise ValueError('bad end time')
+
+    def _get_multipliable_prop(self, prop_name):
+        value = self.metadata.get(prop_name, None)
+        if prop_name in self.metadata_extras:
+            if value is None:
+                value = self.metadata_extras[prop_name]
+            else:
+                value *= self.metadata_extras[prop_name]
+        return value
 
     def _build_pipeline(self):
         pipeline_volume = self._DEFAULT_VOLUME
@@ -183,6 +189,11 @@ class HackSoundServer(Gio.Application):
           <arg type='s' name='sound_event' direction='in'/>
           <arg type='s' name='uuid' direction='out'/>
         </method>
+        <method name='PlayFull'>
+          <arg type='s' name='sound_event' direction='in'/>
+          <arg type='a{sv}' name='options' direction='in'/>
+          <arg type='s' name='uuid' direction='out'/>
+        </method>
         <method name='StopSound'>
           <arg type='s' name='uuid' direction='in'/>
         </method>
@@ -236,19 +247,18 @@ class HackSoundServer(Gio.Application):
             self._TIMEOUT_S, self.release, priority=GLib.PRIORITY_LOW)
 
     def play_sound(self, sound_event_id, connection, sender, path, iface,
-                   invocation):
+                   invocation, options=None):
         if sound_event_id not in self.metadata:
             invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_SOUND_EVENT_ID,
                 "sound event with id %s does not exist" % sound_event_id)
             return
-
         self._cancel_countdown()
         self.hold()
 
         uuid_ = str(uuid.uuid4())
-        self.players[uuid_] = HackSoundPlayer(self.metadata[sound_event_id],
-                                              sender)
+        metadata = self.metadata[sound_event_id]
+        self.players[uuid_] = HackSoundPlayer(metadata, sender, options)
         self.players[uuid_].connect("eos", self.__player_eos_cb, uuid_)
         self.players[uuid_].connect("error", self.__player_error_cb, uuid_,
                                     connection, path, iface)
@@ -268,6 +278,9 @@ class HackSoundServer(Gio.Application):
         if method == "PlaySound":
             self.play_sound(params[0], connection, sender, path, iface,
                             invocation)
+        if method == "PlayFull":
+            self.play_sound(params[0], connection, sender, path,
+                            iface, invocation, params[1])
         elif method == 'StopSound':
             self.stop_sound(params[0], connection, sender, path, iface,
                             invocation)
