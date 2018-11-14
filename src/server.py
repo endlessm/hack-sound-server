@@ -57,6 +57,18 @@ class HackSoundPlayer(GObject.Object):
         return None
 
     @property
+    def fade_in(self):
+        if "fade-in" in self.metadata:
+            return self.metadata["fade-in"]
+        return None
+
+    @property
+    def fade_out(self):
+        if "fade-out" in self.metadata:
+            return self.metadata["fade-out"]
+        return None
+
+    @property
     def sound_location(self):
         return self.metadata["sound-file"]
 
