@@ -7,6 +7,7 @@ from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gst
+from gi.repository import GstController
 
 
 _logger = logging.getLogger(__name__)
@@ -51,6 +52,18 @@ class HackSoundPlayer(GObject.Object):
         return None
 
     @property
+    def fade_in(self):
+        if "fade-in" in self.metadata:
+            return self.metadata["fade-in"]
+        return None
+
+    @property
+    def fade_out(self):
+        if "fade-out" in self.metadata:
+            return self.metadata["fade-out"]
+        return None
+
+    @property
     def sound_location(self):
         return self.metadata["sound-file"]
 
@@ -59,12 +72,28 @@ class HackSoundPlayer(GObject.Object):
             "filesrc name=src location=\"{}\"".format(self.sound_location),
             "decodebin"
         ]
-        if self.volume is not None:
-            elements.append("volume volume={}".format(self.volume))
+        if (self.volume is not None or
+            (self.loop and (self.fade_in != 0 or self.fade_out != 0))):
+            elements.append(
+                "volume name=volume volume={}".format(self.volume or 1.0))
         elements.append("autoaudiosink")
         spipeline = " ! ".join(elements)
 
-        return Gst.parse_launch(spipeline)
+        pipeline = Gst.parse_launch(spipeline)
+        if self.loop:
+            volume = pipeline.get_by_name("volume")
+            if volume is not None and self.fade_in != 0:
+                volume_control = GstController.InterpolationControlSource()
+                volume_control.props.mode =\
+                    GstController.InterpolationMode.LINEAR
+                volume_control_binding =\
+                    GstController.DirectControlBinding.new(volume, "volume",
+                                                           volume_control)
+                volume.add_control_binding(volume_control_binding)
+                volume_control.set(0, 0)
+                volume_control.set(self.fade_in * Gst.SECOND / 1000,
+                                   self.volume or 1.0)
+        return pipeline
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
