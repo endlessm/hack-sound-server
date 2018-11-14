@@ -161,6 +161,23 @@
     "hack-toolbox/update-gui": {
         "sound-file": "toolbox/liveTextToGUI.wav"
     },
+    "HackUnlock/ambient/front": {
+        "sound-file": "HackUnlock/Ambient_Front.wav",
+        "loop": true
+    },
+    "HackUnlock/ambient/back": {
+        "sound-file": "HackUnlock/Ambient_Back.wav",
+        "loop": true
+    },
+    "HackUnlock/landing": {
+        "sound-file": "HackUnlock/Landing_front.wav"
+    },
+    "HackUnlock/solution": {
+        "sound-file": "HackUnlock/Success_Back.wav"
+    },
+    "HackUnlock/success": {
+        "sound-file": "HackUnlock/Success_Front.wav"
+    },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav"
     },
