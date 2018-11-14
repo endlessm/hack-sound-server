@@ -3,16 +3,22 @@ import logging
 import uuid
 gi.require_version('GLib', '2.0')  # noqa
 gi.require_version('Gst', '1.0')   # noqa
+gi.require_version('GstController', '1.0')  # noqa
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gst
+from gi.repository import GstController
 
 
 _logger = logging.getLogger(__name__)
 
 
 class HackSoundPlayer(GObject.Object):
+    _DEFAULT_VOLUME = 1.0
+    _DEFAULT_FADE_IN_MS = 1000
+    _DEFAULT_FADE_OUT_MS = 1000
+
     __gsignals__ = {
         'eos': (GObject.SignalFlags.RUN_FIRST, None, ()),
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
@@ -32,8 +38,20 @@ class HackSoundPlayer(GObject.Object):
         self.pipeline.set_state(Gst.State.PLAYING)
 
     def stop(self):
+        if not self.loop:
+            # Just stop immediately
+            self.pipeline.send_event(Gst.Event.new_eos())
+            return
+
+        pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
+        if self.fade_out is not None:
+            pipeline_fade_out = self.fade_out
+
+        volume_elem = self.pipeline.get_by_name('volume')
+        self._add_fade_out(volume_elem, pipeline_fade_out)
+
         self._stop_loop = True
-        self.pipeline.send_event(Gst.Event.new_eos())
+        # Stop at the end of the current loop
 
     def seek(self, position):
         self.pipeline.seek_simple(Gst.Format.TIME,
@@ -57,27 +75,90 @@ class HackSoundPlayer(GObject.Object):
         return None
 
     @property
+    def fade_in(self):
+        if "fade-in" in self.metadata:
+            return self.metadata["fade-in"]
+        return None
+
+    @property
+    def fade_out(self):
+        if "fade-out" in self.metadata:
+            return self.metadata["fade-out"]
+        return None
+
+    @property
     def sound_location(self):
         return self.metadata["sound-file"]
 
+    def _add_fade_in(self, element, time_ms, volume):
+        if not self._fade_control.set(0, 0):
+            raise ValueError('bad start time')
+        if not self._fade_control.set(time_ms * Gst.MSECOND, volume):
+            raise ValueError('bad end time')
+
+    def _remove_fade_in(self):
+        self._fade_control.unset_all()
+
+    def _add_fade_out(self, element, time_ms):
+        current_volume = element.props.volume
+        ok, duration = self.pipeline.query_duration(Gst.Format.TIME)
+        if not ok:
+            raise ValueError('error querying duration')
+        ok, current_time = self.pipeline.query_position(Gst.Format.TIME)
+        if not ok:
+            raise ValueError('error querying position')
+
+        # Rather than deal with the case where we have to split the fade out
+        # over the sound's loop; if there is less than the fade out time
+        # remaining in the current loop, we just fade out for the rest of this
+        # loop instead.
+        time_ns = min(time_ms * Gst.MSECOND, duration - current_time)
+
+        if not self._fade_control.set(current_time, current_volume):
+            raise ValueError('bad start time')
+        if not self._fade_control.set(current_time + time_ns, 0):
+            raise ValueError('bad end time')
+
     def _build_pipeline(self):
+        pipeline_volume = self._DEFAULT_VOLUME
+        if self.volume is not None:
+            pipeline_volume = self.volume
+        pipeline_fade_in = self._DEFAULT_FADE_IN_MS
+        if self.fade_in is not None:
+            pipeline_fade_in = self.fade_in
+
         elements = [
             "filesrc name=src location=\"{}\"".format(self.sound_location),
-            "decodebin"
+            "decodebin",
+            "volume name=volume volume={}".format(pipeline_volume),
         ]
-        if self.volume is not None:
-            elements.append("volume volume={}".format(self.volume))
+
         if self.pitch is not None:
             elements.append("audioconvert")
             elements.append("pitch pitch={}".format(self.pitch))
+
         elements.append("autoaudiosink")
         spipeline = " ! ".join(elements)
+        pipeline = Gst.parse_launch(spipeline)
 
-        return Gst.parse_launch(spipeline)
+        volume_elem = pipeline.get_by_name("volume")
+        assert volume_elem is not None
+        self._fade_control = GstController.InterpolationControlSource(
+            mode=GstController.InterpolationMode.LINEAR)
+        binding = GstController.DirectControlBinding.new_absolute(
+            volume_elem, "volume", self._fade_control)
+        if not volume_elem.add_control_binding(binding):
+            raise ValueError('bad control binding')
+
+        if pipeline_fade_in != 0:
+            self._add_fade_in(volume_elem, pipeline_fade_in, pipeline_volume)
+
+        return pipeline
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
             if self.loop and not self._stop_loop:
+                self._remove_fade_in()
                 self.seek(0.0)
             else:
                 self.pipeline.set_state(Gst.State.NULL)
