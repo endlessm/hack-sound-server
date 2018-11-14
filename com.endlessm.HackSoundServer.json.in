@@ -11,6 +11,13 @@
     "modules": [
         {
             "name": "soundtouch",
+            "cleanup": [
+                "/bin/soundstretch",
+                "/include",
+                "/lib/pkgconfig/soundtouch.pc",
+                "/share/aclocal/soundtouch.m4",
+                "/share/doc/soundtouch"
+            ],
             "sources": [
                 {
                     "type": "archive",
@@ -20,12 +27,44 @@
             ]
         },
         {
-            "name": "gstreamer-plugins-bad",
+            "name": "gstreamer-plugin-soundtouch",
             "config-opts": [
-                "--enable-experimental",
-                "--enable-orc",
-                "--enable-wayland",
-                "--enable-introspection"
+                "--disable-nls",
+                "--disable-introspection",
+                "--disable-gtk-doc",
+                "--enable-soundtouch",
+                "--with-plugins=none",
+                "--disable-shm",
+                "--disable-ipcpipeline",
+                "--disable-vcd",
+                "--disable-bz2",
+                "--disable-curl",
+                "--disable-dash",
+                "--disable-decklink",
+                "--disable-wayland",
+                "--disable-webp",
+                "--disable-fbdev",
+                "--disable-fdk-aac",
+                "--disable-kms",
+                "--disable-lcms2",
+                "--disable-dtls",
+                "--disable-ttml",
+                "--disable-openal",
+                "--disable-opus",
+                "--disable-rsvg",
+                "--disable-gl",
+                "--disable-vulkan",
+                "--disable-smoothstreaming",
+                "--disable-sndfile",
+                "--disable-dvb",
+                "--disable-vdpau",
+                "--disable-hls"
+            ],
+            "cleanup": [
+                "/include",
+                "/lib/libgst*-1.0.*",
+                "/lib/pkgconfig/gstreamer-*.pc",
+                "/share/gtk-doc"
             ],
             "sources": [
                  {
