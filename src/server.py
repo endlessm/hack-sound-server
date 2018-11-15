@@ -16,6 +16,8 @@ _logger = logging.getLogger(__name__)
 
 class HackSoundPlayer(GObject.Object):
     _DEFAULT_VOLUME = 1.0
+    _DEFAULT_PITCH = 1.0
+    _DEFAULT_RATE = 1.0
     _DEFAULT_FADE_IN_MS = 1000
     _DEFAULT_FADE_OUT_MS = 1000
 
@@ -77,6 +79,15 @@ class HackSoundPlayer(GObject.Object):
     @property
     def pitch(self):
         return self._get_multipliable_prop("pitch")
+
+    @property
+    def rate(self):
+        """
+        Changes tempo and pitch.
+        """
+        if "rate" in self.metadata:
+            return self.metadata["rate"]
+        return None
 
     @property
     def fade_in(self):
@@ -152,9 +163,11 @@ class HackSoundPlayer(GObject.Object):
             "volume name=volume volume={}".format(pipeline_volume),
         ]
 
-        if self.pitch is not None:
+        if self.pitch is not None or self.rate is not None:
+            pitch_args = (self.pitch or self._DEFAULT_PITCH,
+                          self.rate or self._DEFAULT_RATE)
             elements.append("audioconvert")
-            elements.append("pitch pitch={}".format(self.pitch))
+            elements.append("pitch pitch={} rate={}".format(*pitch_args))
 
         elements.append("autoaudiosink")
         spipeline = " ! ".join(elements)
