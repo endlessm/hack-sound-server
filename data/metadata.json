@@ -1,4 +1,8 @@
 {
+    "codeview/ambient/hacking": {
+        "sound-file": "codeiew/Hacking_music1.wav",
+        "loop": true
+    },
     "codeview/code-error-appearance": {
         "sound-file": "codeview/Code_error.wav"
     },
