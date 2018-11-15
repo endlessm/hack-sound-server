@@ -78,6 +78,9 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def pitch(self):
+        """
+        Changes pitch while keeping the tempo.
+        """
         return self._get_multipliable_prop("pitch")
 
     @property
