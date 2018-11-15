@@ -179,10 +179,12 @@
         "sound-file": "HackUnlock/Success_Front.wav"
     },
     "shell/tracking-button/flip/hover": {
-        "sound-file": "Hover_Flip.wav"
+        "sound-file": "Hover_Flip.wav",
+        "loop": true
     },
     "shell/tracking-button/flip-inverse/hover": {
-        "sound-file": "Hover_InverseFlip.wav"
+        "sound-file": "Hover_InverseFlip.wav",
+        "loop": true
     },
     "shell/tracking-button/flip/click": {
         "sound-file": "MouseClick_Flip.wav"
