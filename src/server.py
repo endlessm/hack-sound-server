@@ -35,7 +35,14 @@ class HackSoundPlayer(GObject.Object):
         bus.connect("message", self.__bus_message_cb)
 
     def play(self):
+        if self.delay is None:
+            self._play()
+        else:
+            GLib.timeout_add(self.delay, self._play)
+
+    def _play(self):
         self.pipeline.set_state(Gst.State.PLAYING)
+        return GLib.SOURCE_REMOVE
 
     def stop(self):
         if not self.loop:
@@ -84,6 +91,12 @@ class HackSoundPlayer(GObject.Object):
     def fade_out(self):
         if "fade-out" in self.metadata:
             return self.metadata["fade-out"]
+        return None
+
+    @property
+    def delay(self):
+        if "delay" in self.metadata:
+            return self.metadata["delay"]
         return None
 
     @property
