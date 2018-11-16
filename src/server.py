@@ -70,17 +70,26 @@ class HackSoundPlayer(GObject.Object):
 
     def update_properties(self, transition_time_ms, options):
         if "volume" in options:
-            self._update_volume(transition_time_ms, options["volume"])
+            self._update_property_with_keyframes("volume", self._fade_control,
+                                                 transition_time_ms, "volume",
+                                                 options["volume"])
+        if "rate" in options:
+            self._update_property_with_keyframes("pitch", self._rate_control,
+                                                 transition_time_ms, "rate",
+                                                 options["rate"])
 
-    def _update_volume(self, transition_time_ms, volume):
-        element = self.pipeline.get_by_name("volume")
-        current_volume = element.props.volume
-        self._remove_fade_in()
+    def _update_property_with_keyframes(self, element_name, control,
+                                        transition_time_ms, prop_name,
+                                        prop_value):
+        element = self.pipeline.get_by_name(element_name)
+        if element is None:
+            return
+        current_value = element.get_property(prop_name)
+        control.unset_all()
         current_time = self.get_current_position()
         time_end = current_time + transition_time_ms * Gst.MSECOND
-
-        self._add_fade_keyframe_pair(current_time, current_volume,
-                                     time_end, volume)
+        self._add_keyframe_pair(control, current_time, current_value,
+                                time_end, prop_value)
 
     def seek(self, position):
         self.pipeline.seek_simple(Gst.Format.TIME,
@@ -145,35 +154,35 @@ class HackSoundPlayer(GObject.Object):
     def sound_location(self):
         return self.metadata["sound-file"]
 
-    def _add_fade_keyframe_pair(self, time_start_ns, volume_start, time_end_ns,
-                                volume_end):
-        if not self._add_fade_keyframe(time_start_ns, volume_start):
+    def _add_keyframe_pair(self, control, time_start_ns, volume_start,
+                           time_end_ns, volume_end, consider_duration=True):
+        if not self._add_keyframe(control, time_start_ns, volume_start):
             raise ValueError('bad start time')
-        if not self._add_fade_keyframe(time_end_ns, volume_end):
+        # Rather than deal with the case where we have to split the keyframes
+        # over the sound's loop; if the end keyframe is greater than the sound
+        # file duration, we just apply the end keyframe to the end.
+        if consider_duration:
+            duration = self.get_duration()
+            time_end_ns = min(time_end_ns, duration)
+        if not self._add_keyframe(control, time_end_ns, volume_end):
             raise ValueError('bad end time')
 
-    def _add_fade_keyframe(self, time_ns, volume):
-        return self._fade_control.set(time_ns, volume)
+    def _add_keyframe(self, control, time_ns, volume):
+        return control.set(time_ns, volume)
 
     def _add_fade_in(self, time_ms_end, volume_end):
-        self._add_fade_keyframe_pair(0, 0, time_ms_end * Gst.MSECOND,
-                                     volume_end)
+        self._add_keyframe_pair(self._fade_control, 0, 0,
+                                time_ms_end * Gst.MSECOND, volume_end, False)
 
     def _remove_fade_in(self):
         self._fade_control.unset_all()
 
     def _add_fade_out(self, element, time_ms):
         current_volume = element.props.volume
-        duration = self.get_duration()
         current_time = self.get_current_position()
-
-        # Rather than deal with the case where we have to split the fade out
-        # over the sound's loop; if there is less than the fade out time
-        # remaining in the current loop, we just fade out for the rest of this
-        # loop instead.
-        time_ns = min(time_ms * Gst.MSECOND, duration - current_time)
-        self._add_fade_keyframe_pair(current_time, current_volume,
-                                     current_time + time_ns, 0)
+        self._add_keyframe_pair(self._fade_control,
+                                current_time, current_volume,
+                                current_time + time_ms * Gst.MSECOND, 0)
 
     def _get_multipliable_prop(self, prop_name):
         value = self.metadata.get(prop_name, None)
@@ -183,6 +192,15 @@ class HackSoundPlayer(GObject.Object):
             else:
                 value *= self.metadata_extras[prop_name]
         return value
+
+    def _create_control(self, element, prop):
+        fade_control = GstController.InterpolationControlSource(
+            mode=GstController.InterpolationMode.LINEAR)
+        binding = GstController.DirectControlBinding.new_absolute(
+            element, prop, fade_control)
+        if not element.add_control_binding(binding):
+            raise ValueError('bad control binding')
+        return fade_control
 
     def _build_pipeline(self):
         pipeline_volume = self._DEFAULT_VOLUME
@@ -199,7 +217,7 @@ class HackSoundPlayer(GObject.Object):
             "decodebin",
             "volume name=volume volume={}".format(pipeline_volume),
             "audioconvert",
-            "pitch pitch={} rate={}".format(*pitch_args),
+            "pitch name=pitch pitch={} rate={}".format(*pitch_args),
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
@@ -207,12 +225,11 @@ class HackSoundPlayer(GObject.Object):
 
         volume_elem = pipeline.get_by_name("volume")
         assert volume_elem is not None
-        self._fade_control = GstController.InterpolationControlSource(
-            mode=GstController.InterpolationMode.LINEAR)
-        binding = GstController.DirectControlBinding.new_absolute(
-            volume_elem, "volume", self._fade_control)
-        if not volume_elem.add_control_binding(binding):
-            raise ValueError('bad control binding')
+        self._fade_control = self._create_control(volume_elem, "volume")
+
+        pitch_elem = pipeline.get_by_name("pitch")
+        assert pitch_elem is not None
+        self._rate_control = self._create_control(pitch_elem, "rate")
 
         if pipeline_fade_in != 0:
             self._add_fade_in(pipeline_fade_in, pipeline_volume)
