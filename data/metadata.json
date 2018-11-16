@@ -182,6 +182,10 @@
     "HackUnlock/success": {
         "sound-file": "HackUnlock/Success_Front.wav"
     },
+    "HackUnlock/wave": {
+        "sound-file": "HackUnlock/Wave_Back.wav",
+        "loop": true
+    },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav",
         "loop": true,
