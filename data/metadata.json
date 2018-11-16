@@ -180,11 +180,15 @@
     },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav",
-        "loop": true
+        "loop": true,
+        "fade-in": 100,
+        "fade-out": 100
     },
     "shell/tracking-button/flip-inverse/hover": {
         "sound-file": "Hover_InverseFlip.wav",
-        "loop": true
+        "loop": true,
+        "fade-in": 100,
+        "fade-out": 100
     },
     "shell/tracking-button/flip/click": {
         "sound-file": "MouseClick_Flip.wav"
