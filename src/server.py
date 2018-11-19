@@ -165,19 +165,16 @@ class HackSoundPlayer(GObject.Object):
         if self.fade_in is not None:
             pipeline_fade_in = self.fade_in
 
+        pitch_args = (self.pitch or self._DEFAULT_PITCH,
+                      self.rate or self._DEFAULT_RATE)
         elements = [
             "filesrc name=src location=\"{}\"".format(self.sound_location),
             "decodebin",
             "volume name=volume volume={}".format(pipeline_volume),
+            "audioconvert",
+            "pitch pitch={} rate={}".format(*pitch_args),
+            "autoaudiosink"
         ]
-
-        if self.pitch is not None or self.rate is not None:
-            pitch_args = (self.pitch or self._DEFAULT_PITCH,
-                          self.rate or self._DEFAULT_RATE)
-            elements.append("audioconvert")
-            elements.append("pitch pitch={} rate={}".format(*pitch_args))
-
-        elements.append("autoaudiosink")
         spipeline = " ! ".join(elements)
         pipeline = Gst.parse_launch(spipeline)
 
