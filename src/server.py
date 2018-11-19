@@ -26,8 +26,9 @@ class HackSoundPlayer(GObject.Object):
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
-    def __init__(self, metadata, sender, metadata_extras=None):
+    def __init__(self, uuid_, metadata, sender, metadata_extras=None):
         GObject.Object.__init__(self)
+        self.uuid = uuid_
         self.metadata = metadata
         self.metadata_extras = metadata_extras or {}
         self.sender = sender
@@ -58,10 +59,14 @@ class HackSoundPlayer(GObject.Object):
             pipeline_fade_out = self.fade_out
 
         volume_elem = self.pipeline.get_by_name('volume')
-        self._add_fade_out(volume_elem, pipeline_fade_out)
-
-        self._stop_loop = True
+        try:
+            self._add_fade_out(volume_elem, pipeline_fade_out)
+        except ValueError as ex:
+            _logger.error(ex)
+            _logger.warning("{}: Fade out effect could not be applied. "
+                            "Stop.".format(self.uuid))
         # Stop at the end of the current loop
+        self._stop_loop = True
 
     def seek(self, position):
         self.pipeline.seek_simple(Gst.Format.TIME,
@@ -204,6 +209,15 @@ class HackSoundPlayer(GObject.Object):
                             debug)
             self.pipeline.set_state(Gst.State.NULL)
             self.emit("error", error, debug)
+        elif message.type == Gst.MessageType.STATE_CHANGED:
+            if message.src != self.pipeline:
+                return
+            st = message.get_structure()
+            old_state = st.get_value("old-state")
+            new_state = st.get_value("new-state")
+            if (old_state == Gst.State.READY and new_state == Gst.State.PAUSED
+                    and self._stop_loop):
+                self.pipeline.send_event(Gst.Event.new_eos())
 
 
 class HackSoundServer(Gio.Application):
@@ -287,7 +301,7 @@ class HackSoundServer(Gio.Application):
 
         uuid_ = str(uuid.uuid4())
         metadata = self.metadata[sound_event_id]
-        self.players[uuid_] = HackSoundPlayer(metadata, sender, options)
+        self.players[uuid_] = HackSoundPlayer(uuid_, metadata, sender, options)
         self.players[uuid_].connect("eos", self.__player_eos_cb, uuid_)
         self.players[uuid_].connect("error", self.__player_error_cb, uuid_,
                                     connection, path, iface)
