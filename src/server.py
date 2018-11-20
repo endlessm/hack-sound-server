@@ -68,10 +68,45 @@ class HackSoundPlayer(GObject.Object):
         # Stop at the end of the current loop
         self._stop_loop = True
 
+    def update_properties(self, transition_time_ms, options):
+        if "volume" in options:
+            self._update_property_with_keyframes("volume", self._fade_control,
+                                                 transition_time_ms, "volume",
+                                                 options["volume"])
+        if "rate" in options:
+            self._update_property_with_keyframes("pitch", self._rate_control,
+                                                 transition_time_ms, "rate",
+                                                 options["rate"])
+
+    def _update_property_with_keyframes(self, element_name, control,
+                                        transition_time_ms, prop_name,
+                                        prop_value):
+        element = self.pipeline.get_by_name(element_name)
+        if element is None:
+            return
+        current_value = element.get_property(prop_name)
+        control.unset_all()
+        current_time = self.get_current_position()
+        time_end = current_time + transition_time_ms * Gst.MSECOND
+        self._add_keyframe_pair(control, current_time, current_value,
+                                time_end, prop_value)
+
     def seek(self, position):
         self.pipeline.seek_simple(Gst.Format.TIME,
                                   Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
                                   position)
+
+    def get_current_position(self):
+        ok, current_time = self.pipeline.query_position(Gst.Format.TIME)
+        if not ok:
+            raise ValueError('error querying position')
+        return current_time
+
+    def get_duration(self):
+        ok, duration = self.pipeline.query_duration(Gst.Format.TIME)
+        if not ok:
+            raise ValueError('error querying duration')
+        return duration
 
     @property
     def loop(self):
@@ -119,34 +154,35 @@ class HackSoundPlayer(GObject.Object):
     def sound_location(self):
         return self.metadata["sound-file"]
 
-    def _add_fade_in(self, element, time_ms, volume):
-        if not self._fade_control.set(0, 0):
+    def _add_keyframe_pair(self, control, time_start_ns, volume_start,
+                           time_end_ns, volume_end, consider_duration=True):
+        if not self._add_keyframe(control, time_start_ns, volume_start):
             raise ValueError('bad start time')
-        if not self._fade_control.set(time_ms * Gst.MSECOND, volume):
+        # Rather than deal with the case where we have to split the keyframes
+        # over the sound's loop; if the end keyframe is greater than the sound
+        # file duration, we just apply the end keyframe to the end.
+        if consider_duration:
+            duration = self.get_duration()
+            time_end_ns = min(time_end_ns, duration)
+        if not self._add_keyframe(control, time_end_ns, volume_end):
             raise ValueError('bad end time')
+
+    def _add_keyframe(self, control, time_ns, volume):
+        return control.set(time_ns, volume)
+
+    def _add_fade_in(self, time_ms_end, volume_end):
+        self._add_keyframe_pair(self._fade_control, 0, 0,
+                                time_ms_end * Gst.MSECOND, volume_end, False)
 
     def _remove_fade_in(self):
         self._fade_control.unset_all()
 
     def _add_fade_out(self, element, time_ms):
         current_volume = element.props.volume
-        ok, duration = self.pipeline.query_duration(Gst.Format.TIME)
-        if not ok:
-            raise ValueError('error querying duration')
-        ok, current_time = self.pipeline.query_position(Gst.Format.TIME)
-        if not ok:
-            raise ValueError('error querying position')
-
-        # Rather than deal with the case where we have to split the fade out
-        # over the sound's loop; if there is less than the fade out time
-        # remaining in the current loop, we just fade out for the rest of this
-        # loop instead.
-        time_ns = min(time_ms * Gst.MSECOND, duration - current_time)
-
-        if not self._fade_control.set(current_time, current_volume):
-            raise ValueError('bad start time')
-        if not self._fade_control.set(current_time + time_ns, 0):
-            raise ValueError('bad end time')
+        current_time = self.get_current_position()
+        self._add_keyframe_pair(self._fade_control,
+                                current_time, current_volume,
+                                current_time + time_ms * Gst.MSECOND, 0)
 
     def _get_multipliable_prop(self, prop_name):
         value = self.metadata.get(prop_name, None)
@@ -157,6 +193,15 @@ class HackSoundPlayer(GObject.Object):
                 value *= self.metadata_extras[prop_name]
         return value
 
+    def _create_control(self, element, prop):
+        fade_control = GstController.InterpolationControlSource(
+            mode=GstController.InterpolationMode.LINEAR)
+        binding = GstController.DirectControlBinding.new_absolute(
+            element, prop, fade_control)
+        if not element.add_control_binding(binding):
+            raise ValueError('bad control binding')
+        return fade_control
+
     def _build_pipeline(self):
         pipeline_volume = self._DEFAULT_VOLUME
         if self.volume is not None:
@@ -165,33 +210,29 @@ class HackSoundPlayer(GObject.Object):
         if self.fade_in is not None:
             pipeline_fade_in = self.fade_in
 
+        pitch_args = (self.pitch or self._DEFAULT_PITCH,
+                      self.rate or self._DEFAULT_RATE)
         elements = [
             "filesrc name=src location=\"{}\"".format(self.sound_location),
             "decodebin",
             "volume name=volume volume={}".format(pipeline_volume),
+            "audioconvert",
+            "pitch name=pitch pitch={} rate={}".format(*pitch_args),
+            "autoaudiosink"
         ]
-
-        if self.pitch is not None or self.rate is not None:
-            pitch_args = (self.pitch or self._DEFAULT_PITCH,
-                          self.rate or self._DEFAULT_RATE)
-            elements.append("audioconvert")
-            elements.append("pitch pitch={} rate={}".format(*pitch_args))
-
-        elements.append("autoaudiosink")
         spipeline = " ! ".join(elements)
         pipeline = Gst.parse_launch(spipeline)
 
         volume_elem = pipeline.get_by_name("volume")
         assert volume_elem is not None
-        self._fade_control = GstController.InterpolationControlSource(
-            mode=GstController.InterpolationMode.LINEAR)
-        binding = GstController.DirectControlBinding.new_absolute(
-            volume_elem, "volume", self._fade_control)
-        if not volume_elem.add_control_binding(binding):
-            raise ValueError('bad control binding')
+        self._fade_control = self._create_control(volume_elem, "volume")
+
+        pitch_elem = pipeline.get_by_name("pitch")
+        assert pitch_elem is not None
+        self._rate_control = self._create_control(pitch_elem, "rate")
 
         if pipeline_fade_in != 0:
-            self._add_fade_in(volume_elem, pipeline_fade_in, pipeline_volume)
+            self._add_fade_in(pipeline_fade_in, pipeline_volume)
 
         return pipeline
 
@@ -236,6 +277,11 @@ class HackSoundServer(Gio.Application):
           <arg type='s' name='sound_event' direction='in'/>
           <arg type='a{sv}' name='options' direction='in'/>
           <arg type='s' name='uuid' direction='out'/>
+        </method>
+        <method name='UpdateProperties'>
+          <arg type='s' name='uuid' direction='in'/>
+          <arg type='i' name='transition_time_ms' direction='in'/>
+          <arg type='a{sv}' name='options' direction='in'/>
         </method>
         <method name='StopSound'>
           <arg type='s' name='uuid' direction='in'/>
@@ -316,6 +362,15 @@ class HackSoundServer(Gio.Application):
             self.players[uuid_].stop()
         invocation.return_value(None)
 
+    def update_properties(self, uuid_, transition_time_ms, options, connection,
+                          sender, path, iface, invocation):
+        if uuid_ not in self.players:
+            _logger.info('Properties of sound {} was supposed to be updated, '
+                         'but did not exist'.format(uuid_))
+        else:
+            self.players[uuid_].update_properties(transition_time_ms, options)
+        invocation.return_value(None)
+
     def __method_called_cb(self, connection, sender, path, iface,
                            method, params, invocation):
         if method == "PlaySound":
@@ -327,6 +382,9 @@ class HackSoundServer(Gio.Application):
         elif method == 'StopSound':
             self.stop_sound(params[0], connection, sender, path, iface,
                             invocation)
+        elif method == "UpdateProperties":
+            self.update_properties(params[0], params[1], params[2], connection,
+                                   sender, path, iface, invocation)
         else:
             invocation.return_error_literal(
                 Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
