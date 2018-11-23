@@ -209,5 +209,8 @@
     },
     "shell/tracking-button/flip-inverse/enter": {
         "sound-file": "MouseEnter_Inverse.wav"
+    },
+    "FBE/startup": {
+        "sound-file": "FBE/OS_startup_jingle.wav"
     }
 }
