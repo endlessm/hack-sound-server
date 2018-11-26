@@ -34,6 +34,8 @@ class HackSoundPlayer(GObject.Object):
         self.sender = sender
         self.pipeline = self._build_pipeline()
         self._stop_loop = False
+        self._n_loop = 0
+        self._is_initial_seek = False
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -85,16 +87,19 @@ class HackSoundPlayer(GObject.Object):
         if element is None:
             return
         current_value = element.get_property(prop_name)
-        control.unset_all()
         current_time = self.get_current_position()
         time_end = current_time + transition_time_ms * Gst.MSECOND
         self._add_keyframe_pair(control, current_time, current_value,
                                 time_end, prop_value)
 
-    def seek(self, position):
-        self.pipeline.seek_simple(Gst.Format.TIME,
-                                  Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
-                                  position)
+    def seek(self, position=None, flags=None):
+        if flags is None:
+            flags = Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT
+        if position is None:
+            self.pipeline.seek(self._DEFAULT_RATE, Gst.Format.TIME, flags,
+                               Gst.SeekType.NONE, -1, Gst.SeekType.NONE, -1)
+        else:
+            self.pipeline.seek_simple(Gst.Format.TIME, flags, position)
 
     def get_current_position(self):
         ok, current_time = self.pipeline.query_position(Gst.Format.TIME)
@@ -163,7 +168,7 @@ class HackSoundPlayer(GObject.Object):
         # file duration, we just apply the end keyframe to the end.
         if consider_duration:
             duration = self.get_duration()
-            time_end_ns = min(time_end_ns, duration)
+            time_end_ns = min(time_end_ns, duration * (self._n_loop + 1))
         if not self._add_keyframe(control, time_end_ns, volume_end):
             raise ValueError('bad end time')
 
@@ -173,9 +178,6 @@ class HackSoundPlayer(GObject.Object):
     def _add_fade_in(self, time_ms_end, volume_end):
         self._add_keyframe_pair(self._fade_control, 0, 0,
                                 time_ms_end * Gst.MSECOND, volume_end, False)
-
-    def _remove_fade_in(self):
-        self._fade_control.unset_all()
 
     def _add_fade_out(self, element, time_ms):
         current_volume = element.props.volume
@@ -215,9 +217,10 @@ class HackSoundPlayer(GObject.Object):
         elements = [
             "filesrc name=src location=\"{}\"".format(self.sound_location),
             "decodebin",
-            "volume name=volume volume={}".format(pipeline_volume),
+            "identity single-segment=true",
             "audioconvert",
             "pitch name=pitch pitch={} rate={}".format(*pitch_args),
+            "volume name=volume volume={}".format(pipeline_volume),
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
@@ -238,12 +241,26 @@ class HackSoundPlayer(GObject.Object):
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
+            self.pipeline.set_state(Gst.State.NULL)
+            self.emit("eos")
+        elif message.type == Gst.MessageType.SEGMENT_DONE:
+            if message.src != self.pipeline:
+                return
             if self.loop and not self._stop_loop:
-                self._remove_fade_in()
-                self.seek(0.0)
+                self._n_loop += 1
+                self.seek(0.0, flags=Gst.SeekFlags.SEGMENT)
             else:
-                self.pipeline.set_state(Gst.State.NULL)
-                self.emit("eos")
+                # Cancel the SEGMENT seek.
+                self.seek()
+                self.pipeline.send_event(Gst.Event.new_eos())
+        elif message.type == Gst.MessageType.ASYNC_DONE:
+            if message.src != self.pipeline:
+                return
+            if self.loop and not self._is_initial_seek:
+                flags = Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT |\
+                        Gst.SeekFlags.SEGMENT
+                self.seek(0.0, flags=flags)
+                self._is_initial_seek = True
         elif message.type == Gst.MessageType.ERROR:
             error, debug = message.parse_error()
             _logger.warning("Error from %s: %s (%s)", message.src, error,
