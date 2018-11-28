@@ -60,6 +60,135 @@
     "codeview/popup/fix": {
         "sound-file": "codeview/errorPopup - fixitButtonPress.wav"
     },
+    "fizzics/moveTool": {
+        "sound-file": "fizzics/Tool_Move.wav"
+    },
+    "fizzics/flingTool": {
+        "sound-file": "fizzics/Tool_Fling.wav"
+    },
+    "fizzics/createTool": {
+        "sound-file": "fizzics/Tool_Create.wav"
+    },
+    "fizzics/trashTool": {
+        "sound-file": "fizzics/Tool_Trash.wav"
+    },
+    "fizzics/create0": {
+        "sound-file": "fizzics/Tool_Species1.wav"
+    },
+    "fizzics/create1": {
+        "sound-file": "fizzics/Tool_Species2.wav"
+    },
+    "fizzics/create2": {
+        "sound-file": "fizzics/Tool_Species3.wav"
+    },
+    "fizzics/buttonClick": {
+        "sound-file": "fizzics/ButtonClick.wav"
+    },
+    "fizzics/background1": {
+        "sound-file": "fizzics/BG_1.wav",
+        "loop": true
+    },
+    "fizzics/background2": {
+        "sound-file": "fizzics/BG_2.wav",
+        "loop": true
+    },
+    "fizzics/select1a": {
+        "sound-file": "fizzics/Select_Species1_a.wav"
+    },
+    "fizzics/select1b": {
+        "sound-file": "fizzics/Select_Species1_b.wav"
+    },
+    "fizzics/select1c": {
+        "sound-file": "fizzics/Select_Species1_c.wav"
+    },
+    "fizzics/select2a": {
+        "sound-file": "fizzics/Select_Species2_a.wav"
+    },
+    "fizzics/select2b": {
+        "sound-file": "fizzics/Select_Species2_b.wav"
+    },
+    "fizzics/select2c": {
+        "sound-file": "fizzics/Select_Species2_c.wav"
+    },
+    "fizzics/select3a": {
+        "sound-file": "fizzics/Select_Species3_a.wav"
+    },
+    "fizzics/select3b": {
+        "sound-file": "fizzics/Select_Species3_b.wav"
+    },
+    "fizzics/select3c": {
+        "sound-file": "fizzics/Select_Species3_c.wav"
+    },
+    "fizzics/noGrab": {
+        "sound-file": "fizzics/Cannot_Grab.wav"
+    },
+    "fizzics/success0": {
+        "sound-file": "fizzics/Success_Species1.wav"
+    },
+    "fizzics/success1": {
+        "sound-file": "fizzics/Success_Species2.wav"
+    },
+    "fizzics/success2": {
+        "sound-file": "fizzics/Success_Species3.wav"
+    },
+    "fizzics/delete0": {
+        "sound-file": "fizzics/Death_Species1.wav"
+    },
+    "fizzics/delete1": {
+        "sound-file": "fizzics/Death_Species2.wav"
+    },
+    "fizzics/delete2": {
+        "sound-file": "fizzics/Death_Species3.wav"
+    },
+    "fizzics/death0": {
+        "sound-file": "fizzics/Death_1.wav"
+    },
+    "fizzics/death1": {
+        "sound-file": "fizzics/Death_2.wav"
+    },
+    "fizzics/death2": {
+        "sound-file": "fizzics/Death_3.wav"
+    },
+    "fizzics/death3": {
+        "sound-file": "fizzics/Death_4.wav"
+    },
+    "fizzics/moveFling": {
+        "sound-file": "fizzics/Slingshot_Grab.wav"
+    },
+    "fizzics/unGrab": {
+        "sound-file": "fizzics/Slingshot_Ungrab.wav"
+    },
+    "fizzics/pullFling": {
+        "sound-file": "fizzics/Slingshot_Pull_Loop.wav",
+        "loop": true
+    },
+    "fizzics/fling": {
+        "sound-file": "fizzics/Slingshot_Release.wav"
+    },
+    "fizzics/fly0": {
+        "sound-file": "fizzics/Fly_Species1.wav"
+    },
+    "fizzics/fly1": {
+        "sound-file": "fizzics/Fly_Species2.wav"
+    },
+    "fizzics/fly2": {
+        "sound-file": "fizzics/Fly_Species3.wav"
+    },
+    "fizzics/tool0": {
+        "sound-file": "fizzics/CreateBall_Species1.wav"
+    },
+    "fizzics/tool1": {
+        "sound-file": "fizzics/CreateBall_Species2.wav"
+    },
+    "fizzics/tool2": {
+        "sound-file": "fizzics/CreateBall_Species3.wav"
+    },
+    "fizzics/collision": {
+        "sound-file": "fizzics/Collision.wav"
+    },
+    "fizzics/tooManyBalls": {
+        "sound-file": "fizzics/Too_Many_Balls.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
         "license": "CC-BY",
