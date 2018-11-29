@@ -90,7 +90,7 @@ class HackSoundPlayer(GObject.Object):
         current_time = self.get_current_position()
         time_end = current_time + transition_time_ms * Gst.MSECOND
         self._add_keyframe_pair(control, current_time, current_value,
-                                time_end, prop_value)
+                                time_end, prop_value, consider_duration=False)
 
     def seek(self, position=None, flags=None):
         if flags is None:
