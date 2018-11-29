@@ -159,9 +159,9 @@ class HackSoundPlayer(GObject.Object):
     def sound_location(self):
         return self.metadata["sound-file"]
 
-    def _add_keyframe_pair(self, control, time_start_ns, volume_start,
-                           time_end_ns, volume_end, consider_duration=True):
-        if not self._add_keyframe(control, time_start_ns, volume_start):
+    def _add_keyframe_pair(self, control, time_start_ns, value_start,
+                           time_end_ns, value_end, consider_duration=True):
+        if not self._add_keyframe(control, time_start_ns, value_start):
             raise ValueError('bad start time')
         # Rather than deal with the case where we have to split the keyframes
         # over the sound's loop; if the end keyframe is greater than the sound
@@ -169,11 +169,11 @@ class HackSoundPlayer(GObject.Object):
         if consider_duration:
             duration = self.get_duration()
             time_end_ns = min(time_end_ns, duration * (self._n_loop + 1))
-        if not self._add_keyframe(control, time_end_ns, volume_end):
+        if not self._add_keyframe(control, time_end_ns, value_end):
             raise ValueError('bad end time')
 
-    def _add_keyframe(self, control, time_ns, volume):
-        return control.set(time_ns, volume)
+    def _add_keyframe(self, control, time_ns, value):
+        return control.set(time_ns, value)
 
     def _add_fade_in(self, time_ms_end, volume_end):
         self._add_keyframe_pair(self._fade_control, 0, 0,
