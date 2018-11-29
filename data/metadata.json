@@ -315,6 +315,18 @@
         "sound-file": "HackUnlock/Wave_Back.wav",
         "loop": true
     },
+    "quests/quest-given": {
+        "sound-file": "quests/CollectItem_1.wav"
+    },
+    "quests/challenge-given": {
+        "sound-file": "quests/CollectItem_1.wav"
+    },
+    "quests/new-icon": {
+        "sound-file": "quests/CollectItem_1.wav"
+    },
+    "quests/riley-intro": {
+        "sound-file": "quests/CollectItem_1.wav"
+    },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav",
         "loop": true,
