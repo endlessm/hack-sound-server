@@ -1,4 +1,61 @@
 {
+    "clubhouse/entry/hover": {
+        "sound-file": "clubhouse/entry_hover.wav",
+        "loop": true,
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/entry/open": {
+        "sound-file": "clubhouse/entry_open.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/entry/close": {
+        "sound-file": "clubhouse/entry_close.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/ambient": {
+        "sound-file": "clubhouse/clubhouse_ambient.wav",
+        "loop": true,
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/dialog/open": {
+        "sound-file": "clubhouse/dialog_open.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/dialog/close": {
+        "sound-file": "clubhouse/dialog_close.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/dialog/next": {
+        "sound-file": "clubhouse/dialog_next.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/character/mood/happy": {
+        "sound-file": "clubhouse/Character_happy.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/character/mood/irate": {
+        "sound-file": "clubhouse/Character_irate.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/character/dialog/invite": {
+        "sound-file": "clubhouse/character_invite.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
+    "clubhouse/character/dialog/dismiss": {
+        "sound-file": "clubhouse/character_dismiss.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
     "codeview/ambient/hacking": {
         "sound-file": "codeiew/Hacking_music1.wav",
         "loop": true
