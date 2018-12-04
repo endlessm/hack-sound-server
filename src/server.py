@@ -56,9 +56,15 @@ class HackSoundPlayer(GObject.Object):
             self.pipeline.send_event(Gst.Event.new_eos())
             return
 
-        pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
+        pipeline_fade_out = 0
+        if self.loop:
+            pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
         if self.fade_out is not None:
             pipeline_fade_out = self.fade_out
+
+        if pipeline_fade_out == 0:
+            self._stop_loop = True
+            return
 
         volume_elem = self.pipeline.get_by_name('volume')
         try:
@@ -208,7 +214,9 @@ class HackSoundPlayer(GObject.Object):
         pipeline_volume = self._DEFAULT_VOLUME
         if self.volume is not None:
             pipeline_volume = self.volume
-        pipeline_fade_in = self._DEFAULT_FADE_IN_MS
+        pipeline_fade_in = 0
+        if self.loop:
+            pipeline_fade_in = self._DEFAULT_FADE_IN_MS
         if self.fade_in is not None:
             pipeline_fade_in = self.fade_in
 
