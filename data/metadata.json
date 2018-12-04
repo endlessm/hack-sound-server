@@ -129,14 +129,20 @@
     "fizzics/trashTool": {
         "sound-file": "fizzics/Tool_Trash.wav"
     },
-    "fizzics/create0": {
+    "fizzics/tool0": {
         "sound-file": "fizzics/Tool_Species1.wav"
     },
-    "fizzics/create1": {
+    "fizzics/tool1": {
         "sound-file": "fizzics/Tool_Species2.wav"
     },
-    "fizzics/create2": {
+    "fizzics/tool2": {
         "sound-file": "fizzics/Tool_Species3.wav"
+    },
+    "fizzics/tool3": {
+        "sound-file": "fizzics/Tool_Species4.wav"
+    },
+    "fizzics/tool4": {
+        "sound-file": "fizzics/Tool_Species5.wav"
     },
     "fizzics/buttonClick": {
         "sound-file": "fizzics/ButtonClick.wav"
@@ -147,6 +153,10 @@
     },
     "fizzics/background2": {
         "sound-file": "fizzics/BG_2.wav",
+        "loop": true
+    },
+    "fizzics/background3": {
+        "sound-file": "fizzics/BG_3.wav",
         "loop": true
     },
     "fizzics/select1a": {
@@ -176,6 +186,24 @@
     "fizzics/select3c": {
         "sound-file": "fizzics/Select_Species3_c.wav"
     },
+    "fizzics/select4a": {
+        "sound-file": "fizzics/Select_Species4_a.wav"
+    },
+    "fizzics/select4b": {
+        "sound-file": "fizzics/Select_Species4_b.wav"
+    },
+    "fizzics/select4c": {
+        "sound-file": "fizzics/Select_Species4_c.wav"
+    },
+    "fizzics/select5a": {
+        "sound-file": "fizzics/Select_Species5_a.wav"
+    },
+    "fizzics/select5b": {
+        "sound-file": "fizzics/Select_Species5_b.wav"
+    },
+    "fizzics/select5c": {
+        "sound-file": "fizzics/Select_Species5_c.wav"
+    },
     "fizzics/noGrab": {
         "sound-file": "fizzics/Cannot_Grab.wav"
     },
@@ -188,6 +216,12 @@
     "fizzics/success2": {
         "sound-file": "fizzics/Success_Species3.wav"
     },
+    "fizzics/success3": {
+        "sound-file": "fizzics/Success_Species4.wav"
+    },
+    "fizzics/success4": {
+        "sound-file": "fizzics/Success_Species5.wav"
+    },
     "fizzics/delete0": {
         "sound-file": "fizzics/Death_Species1.wav"
     },
@@ -196,6 +230,12 @@
     },
     "fizzics/delete2": {
         "sound-file": "fizzics/Death_Species3.wav"
+    },
+    "fizzics/delete3": {
+        "sound-file": "fizzics/Death_Species4.wav"
+    },
+    "fizzics/delete4": {
+        "sound-file": "fizzics/Death_Species5.wav"
     },
     "fizzics/death0": {
         "sound-file": "fizzics/Death_1.wav"
@@ -231,14 +271,26 @@
     "fizzics/fly2": {
         "sound-file": "fizzics/Fly_Species3.wav"
     },
-    "fizzics/tool0": {
+    "fizzics/fly3": {
+        "sound-file": "fizzics/Fly_Species4.wav"
+    },
+    "fizzics/fly4": {
+        "sound-file": "fizzics/Fly_Species5.wav"
+    },
+    "fizzics/create0": {
         "sound-file": "fizzics/CreateBall_Species1.wav"
     },
-    "fizzics/tool1": {
+    "fizzics/create1": {
         "sound-file": "fizzics/CreateBall_Species2.wav"
     },
-    "fizzics/tool2": {
+    "fizzics/create2": {
         "sound-file": "fizzics/CreateBall_Species3.wav"
+    },
+    "fizzics/create3": {
+        "sound-file": "fizzics/CreateBall_Species4.wav"
+    },
+    "fizzics/create4": {
+        "sound-file": "fizzics/CreateBall_Species5.wav"
     },
     "fizzics/collision": {
         "sound-file": "fizzics/Collision.wav"
