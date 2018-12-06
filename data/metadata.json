@@ -388,6 +388,13 @@
         "license": "CC-BY",
         "source": "freesound.org"
     },
+    "hack-toolbox/lockscreen/active": {
+        "sound-file": "toolbox/lockscreenActive.wav",
+        "loop": true
+    },
+    "hack-toolbox/lockscreen/inactive": {
+        "sound-file": "toolbox/lockscreenInactive.wav"
+    },
     "hack-toolbox/minimize": {
         "sound-file": "toolbox/minimizePanel.wav"
     },
