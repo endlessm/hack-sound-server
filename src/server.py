@@ -64,6 +64,7 @@ class HackSoundPlayer(GObject.Object):
 
         if pipeline_fade_out == 0:
             self._stop_loop = True
+            self.pipeline.send_event(Gst.Event.new_eos())
             return
 
         volume_elem = self.pipeline.get_by_name('volume')
