@@ -10,6 +10,11 @@
         "fade-in": 0,
         "fade-out": 0
     },
+    "clubhouse/entry/pulse": {
+        "sound-file": "clubhouse/entry_pulse.wav",
+        "fade-in": 0,
+        "fade-out": 0
+    },
     "clubhouse/entry/close": {
         "sound-file": "clubhouse/entry_close.wav",
         "fade-in": 0,
