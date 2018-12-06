@@ -40,6 +40,10 @@ class HackSoundPlayer(GObject.Object):
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
 
+    def release(self):
+        self.pipeline.get_bus().remove_signal_watch()
+        self.pipeline = None
+
     def play(self):
         if self.delay is None:
             self._play()
@@ -417,6 +421,7 @@ class HackSoundServer(Gio.Application):
                 "Method '%s' not available" % method)
 
     def __player_eos_cb(self, unused_player, uuid_):
+        self.players[uuid_].release()
         del self.players[uuid_]
         if not self.players:
             self._ensure_release_countdown()
