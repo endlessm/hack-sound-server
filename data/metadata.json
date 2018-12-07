@@ -442,10 +442,16 @@
     "quests/quest-complete": {
         "sound-file": "quests/CollectItem_1.wav"
     },
+    "quests/quest-aborted": {
+        "sound-file": "quests/CollectItem_1.wav"
+    },
     "quests/new-icon": {
         "sound-file": "quests/CollectItem_1.wav"
     },
     "quests/riley-intro": {
+        "sound-file": "quests/CollectItem_1.wav"
+    },
+    "quests/saniel-intro": {
         "sound-file": "quests/CollectItem_1.wav"
     },
     "quests/reset-given": {
