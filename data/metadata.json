@@ -304,94 +304,112 @@
         "sound-file": "fizzics/Too_Many_Balls.wav"
     },
     "framework/drumkit/0": {
-        "sound-file": "drumkit/176980__snapper4298__kick-2-with-start.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+        "sound-file": "soundpacks/sfxgroup_drumkit1.wav"
     },
     "framework/drumkit/1": {
-        "sound-file": "drumkit/176997__snapper4298__snare-3.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+        "sound-file": "soundpacks/sfxgroup_drumkit2.wav"
     },
     "framework/drumkit/2": {
-        "sound-file": "drumkit/176977__snapper4298__closed-hat-1.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+        "sound-file": "soundpacks/sfxgroup_drumkit3.wav"
     },
     "framework/drumkit/3": {
-        "sound-file": "drumkit/176986__snapper4298__tom-low.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+        "sound-file": "soundpacks/sfxgroup_drumkit4.wav"
     },
     "framework/drumkit/4": {
-        "sound-file": "drumkit/176996__snapper4298__tom-hi.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+        "sound-file": "soundpacks/sfxgroup_drumkit5.wav"
     },
     "framework/drumkit/5": {
-        "sound-file": "drumkit/176979__snapper4298__crash-1.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+        "sound-file": "soundpacks/sfxgroup_drumkit6.wav"
     },
-    "framework/piano/0": {
-        "sound-file": "piano/39177__jobro__piano-ff-030.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/idm/0": {
+        "sound-file": "soundpacks/sfxgroup_idm1.wav"
     },
-    "framework/piano/1": {
-        "sound-file": "piano/39179__jobro__piano-ff-032.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/idm/1": {
+        "sound-file": "soundpacks/sfxgroup_idm2.wav"
     },
-    "framework/piano/2": {
-        "sound-file": "piano/39181__jobro__piano-ff-034.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/idm/2": {
+        "sound-file": "soundpacks/sfxgroup_idm3.wav"
     },
-    "framework/piano/3": {
-        "sound-file": "piano/39182__jobro__piano-ff-035.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/idm/3": {
+        "sound-file": "soundpacks/sfxgroup_idm4.wav"
     },
-    "framework/piano/4": {
-        "sound-file": "piano/39184__jobro__piano-ff-037.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/idm/4": {
+        "sound-file": "soundpacks/sfxgroup_idm5.wav"
     },
-    "framework/piano/5": {
-        "sound-file": "piano/39186__jobro__piano-ff-039.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/idm/5": {
+        "sound-file": "soundpacks/sfxgroup_idm6.wav"
     },
-    "framework/scifi/0": {
-        "sound-file": "scifi/112169__doffel__dief-omhoog.wav",
-        "license": "CC Sampling+",
-        "source": "freesound.org"
+    "framework/jingle/0": {
+        "sound-file": "soundpacks/sfxgroup_jingle1.wav"
     },
-    "framework/scifi/1": {
-        "sound-file": "scifi/117037__jamalboi101__no-glue-included.mp3",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/jingle/1": {
+        "sound-file": "soundpacks/sfxgroup_jingle2.wav"
     },
-    "framework/scifi/2": {
-        "sound-file": "scifi/35203__metamorphmuses__wierd-to-phonetone.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/jingle/2": {
+        "sound-file": "soundpacks/sfxgroup_jingle3.wav"
     },
-    "framework/scifi/3": {
-        "sound-file": "scifi/59552__kauaiboyrk__obsound-zipchopedvoice.wav",
-        "license": "CC Sampling+",
-        "source": "freesound.org"
+    "framework/jingle/3": {
+        "sound-file": "soundpacks/sfxgroup_jingle4.wav"
     },
-    "framework/scifi/4": {
-        "sound-file": "scifi/59553__kauaiboyrk__obsound-tremoloagressivebeep.wav",
-        "license": "CC Sampling+",
-        "source": "freesound.org"
+    "framework/jingle/4": {
+        "sound-file": "soundpacks/sfxgroup_jingle5.wav"
     },
-    "framework/scifi/5": {
-        "sound-file": "scifi/90030__tewell__oneascendingquack.wav",
-        "license": "CC-BY",
-        "source": "freesound.org"
+    "framework/jingle/5": {
+        "sound-file": "soundpacks/sfxgroup_jingle6.wav"
+    },
+    "framework/mallets/0": {
+        "sound-file": "soundpacks/sfxgroup_mallets1.wav"
+    },
+    "framework/mallets/1": {
+        "sound-file": "soundpacks/sfxgroup_mallets2.wav"
+    },
+    "framework/mallets/2": {
+        "sound-file": "soundpacks/sfxgroup_mallets3.wav"
+    },
+    "framework/mallets/3": {
+        "sound-file": "soundpacks/sfxgroup_mallets4.wav"
+    },
+    "framework/mallets/4": {
+        "sound-file": "soundpacks/sfxgroup_mallets5.wav"
+    },
+    "framework/mallets/5": {
+        "sound-file": "soundpacks/sfxgroup_mallets6.wav"
+    },
+    "framework/tchaik/0": {
+        "sound-file": "soundpacks/sfxgroup_tchaik1.wav"
+    },
+    "framework/tchaik/1": {
+        "sound-file": "soundpacks/sfxgroup_tchaik2.wav"
+    },
+    "framework/tchaik/2": {
+        "sound-file": "soundpacks/sfxgroup_tchaik3.wav"
+    },
+    "framework/tchaik/3": {
+        "sound-file": "soundpacks/sfxgroup_tchaik4.wav"
+    },
+    "framework/tchaik/4": {
+        "sound-file": "soundpacks/sfxgroup_tchaik5.wav"
+    },
+    "framework/tchaik/5": {
+        "sound-file": "soundpacks/sfxgroup_tchaik6.wav"
+    },
+    "framework/tower/0": {
+        "sound-file": "soundpacks/sfxgroup_tower1.wav"
+    },
+    "framework/tower/1": {
+        "sound-file": "soundpacks/sfxgroup_tower2.wav"
+    },
+    "framework/tower/2": {
+        "sound-file": "soundpacks/sfxgroup_tower3.wav"
+    },
+    "framework/tower/3": {
+        "sound-file": "soundpacks/sfxgroup_tower4.wav"
+    },
+    "framework/tower/4": {
+        "sound-file": "soundpacks/sfxgroup_tower5.wav"
+    },
+    "framework/tower/5": {
+        "sound-file": "soundpacks/sfxgroup_tower6.wav"
     },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.wav",
