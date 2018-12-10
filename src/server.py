@@ -1,5 +1,6 @@
 import gi
 import logging
+import random
 import uuid
 gi.require_version('GLib', '2.0')  # noqa
 gi.require_version('Gst', '1.0')   # noqa
@@ -168,7 +169,7 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def sound_location(self):
-        return self.metadata["sound-file"]
+        return random.choice(self.metadata["sound-files"])
 
     def _add_keyframe_pair(self, control, time_start_ns, value_start,
                            time_end_ns, value_end, consider_duration=True):

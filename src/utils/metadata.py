@@ -9,10 +9,16 @@ _logger = logging.getLogger(__name__)
 
 
 def _read_in_metadata(metadata, user_type):
+    sounds_dir = get_sounds_dir(user_type)
     for sound_event_id in metadata:
-        metadata[sound_event_id]["sound-file"] =\
-            os.path.join(get_sounds_dir(user_type),
-                         metadata[sound_event_id]["sound-file"])
+        sound_files = metadata[sound_event_id].get("sound-files", [])
+        # If both "sound-file" and "sound-files" are specified, we consider all
+        # the available sounds.
+        if "sound-file" in metadata[sound_event_id]:
+            sound_files.append(metadata[sound_event_id]["sound-file"])
+
+        metadata[sound_event_id]["sound-files"] =\
+            [os.path.join(sounds_dir, path) for path in set(sound_files)]
 
 
 def load_metadata(user_type):
