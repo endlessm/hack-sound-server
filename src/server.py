@@ -131,7 +131,10 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def volume(self):
-        return self._get_multipliable_prop("volume")
+        volume = self._get_multipliable_prop("volume")
+        if volume is None:
+            volume = self._DEFAULT_VOLUME
+        return volume
 
     @property
     def pitch(self):
@@ -151,9 +154,8 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def fade_in(self):
-        if "fade-in" in self.metadata:
-            return self.metadata["fade-in"]
-        return None
+        return self.metadata.get("fade-in",
+                                 self._DEFAULT_FADE_IN_MS if self.loop else 0)
 
     @property
     def fade_out(self):
@@ -217,15 +219,6 @@ class HackSoundPlayer(GObject.Object):
         return fade_control
 
     def _build_pipeline(self):
-        pipeline_volume = self._DEFAULT_VOLUME
-        if self.volume is not None:
-            pipeline_volume = self.volume
-        pipeline_fade_in = 0
-        if self.loop:
-            pipeline_fade_in = self._DEFAULT_FADE_IN_MS
-        if self.fade_in is not None:
-            pipeline_fade_in = self.fade_in
-
         pitch_args = (self.pitch or self._DEFAULT_PITCH,
                       self.rate or self._DEFAULT_RATE)
         elements = [
@@ -234,7 +227,7 @@ class HackSoundPlayer(GObject.Object):
             "identity single-segment=true",
             "audioconvert",
             "pitch name=pitch pitch={} rate={}".format(*pitch_args),
-            "volume name=volume volume={}".format(pipeline_volume),
+            "volume name=volume volume={}".format(self.volume),
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
@@ -248,8 +241,8 @@ class HackSoundPlayer(GObject.Object):
         assert pitch_elem is not None
         self._rate_control = self._create_control(pitch_elem, "rate")
 
-        if pipeline_fade_in != 0:
-            self._add_fade_in(pipeline_fade_in, pipeline_volume)
+        if self.volume != 0:
+            self._add_fade_in(self.fade_in, self.volume)
 
         return pipeline
 
