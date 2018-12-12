@@ -45,6 +45,9 @@ class HackSoundPlayer(GObject.Object):
         self.pipeline.get_bus().remove_signal_watch()
         self.pipeline = None
 
+    def get_state(self):
+        return self.pipeline.get_state(timeout=0).state
+
     def play(self):
         if self.delay is None:
             self._play()
@@ -81,6 +84,13 @@ class HackSoundPlayer(GObject.Object):
                             "Stop.".format(self.uuid))
         # Stop at the end of the current loop
         self._stop_loop = True
+
+    def reset(self):
+        self.seek(0.0)
+        # Reset keyframes.
+        self._fade_control.unset_all()
+        self._rate_control.unset_all()
+        self._add_fade_in(self.fade_in, self.volume)
 
     def update_properties(self, transition_time_ms, options):
         if "volume" in options:
@@ -287,9 +297,12 @@ class HackSoundPlayer(GObject.Object):
 
 class HackSoundServer(Gio.Application):
     _TIMEOUT_S = 10
+    _OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
     _DBUS_NAME = "com.endlessm.HackSoundServer"
     _DBUS_UNKNOWN_SOUND_EVENT_ID = \
         "com.endlessm.HackSoundServer.UnknownSoundEventID"
+    _DBUS_UNKNOWN_OVERLAP_BEHAVIOR = \
+        "com.endlessm.HackSoundServer.UnknownOverlapBehavior"
     _DBUS_XML = """
     <node>
       <interface name='com.endlessm.HackSoundServer'>
@@ -328,6 +341,8 @@ class HackSoundServer(Gio.Application):
         self.metadata = metadata
         self._countdown_id = None
         self.players = {}
+        # Only useful for sounds tagged with "overlap-behavior":
+        self._uuid_by_event_id = {}
 
     def do_dbus_register(self, connection, path):
         Gio.Application.do_dbus_register(self, connection, path)
@@ -366,17 +381,51 @@ class HackSoundServer(Gio.Application):
                 self._DBUS_UNKNOWN_SOUND_EVENT_ID,
                 "sound event with id %s does not exist" % sound_event_id)
             return
-        self._cancel_countdown()
-        self.hold()
 
-        uuid_ = str(uuid.uuid4())
-        metadata = self.metadata[sound_event_id]
-        self.players[uuid_] = HackSoundPlayer(uuid_, metadata, sender, options)
-        self.players[uuid_].connect("eos", self.__player_eos_cb, uuid_)
-        self.players[uuid_].connect("error", self.__player_error_cb, uuid_,
-                                    connection, path, iface)
-        self.players[uuid_].play()
-        invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+        overlap_behavior = \
+            self.metadata[sound_event_id].get("overlap-behavior", "overlap")
+        if overlap_behavior not in self._OVERLAP_BEHAVIOR_CHOICES:
+            return invocation.return_dbus_error(
+                self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
+                "'%s' is not a valid option." % overlap_behavior)
+
+        uuid_ = self._do_overlap_behaviour(sound_event_id, overlap_behavior)
+
+        if uuid_ is None:
+            self._cancel_countdown()
+            self.hold()
+
+            uuid_ = str(uuid.uuid4())
+            metadata = self.metadata[sound_event_id]
+            self.players[uuid_] = HackSoundPlayer(uuid_, metadata, sender,
+                                                  options)
+            # Insert the uuid in the dictionary organized by sound event id.
+            if overlap_behavior != "overlap":
+                self._uuid_by_event_id[sound_event_id] = uuid_
+
+            self.players[uuid_].connect("eos", self.__player_eos_cb,
+                                        sound_event_id, uuid_)
+            self.players[uuid_].connect("error", self.__player_error_cb,
+                                        sound_event_id, uuid_,
+                                        connection, path, iface)
+            self.players[uuid_].play()
+
+        return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+
+    def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
+        uuid_ = self._uuid_by_event_id.get(sound_event_id)
+        if uuid_ is None:
+            return None
+
+        if overlap_behavior == "restart":
+            # This behavior indicates to restart the sound.
+            self.players[uuid_].reset()
+            return uuid_
+        elif overlap_behavior == "ignore":
+            # If a sound is already playing, then ignore the new one.
+            if self.players[uuid_].get_state() == Gst.State.PLAYING:
+                return uuid_
+        return None
 
     def stop_sound(self, uuid_, connection, sender, path, iface, invocation):
         if uuid_ not in self.players:
@@ -414,19 +463,23 @@ class HackSoundServer(Gio.Application):
                 Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
                 "Method '%s' not available" % method)
 
-    def __player_eos_cb(self, unused_player, uuid_):
+    def __player_eos_cb(self, unused_player, sound_event_id, uuid_):
         self.players[uuid_].release()
         del self.players[uuid_]
+        if sound_event_id in self._uuid_by_event_id:
+            del self._uuid_by_event_id[sound_event_id]
         if not self.players:
             self._ensure_release_countdown()
         self.release()
 
-    def __player_error_cb(self, player, error, debug, uuid_, connection,
-                          path, iface):
+    def __player_error_cb(self, player, error, debug, sound_event_id, uuid_,
+                          connection, path, iface):
         data = (uuid_, error.message, error.domain, error.code, debug)
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
             del self.players[uuid_]
+            if sound_event_id in self._uuid_by_event_id:
+                del self._uuid_by_event_id[sound_event_id]
             if not self.players:
                 self._ensure_release_countdown()
             self.release()
