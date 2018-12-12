@@ -11,7 +11,7 @@ git clone https://github.com/endlessm/hack-sound-server/
 cd hack-sound-server/
 ```
 ## 2. Build and install the server
-To build and install you can use the build-flaytpak.sh script in the root directory. It will build the current branch and install the flatpak directly.
+To build and install you can use the build-flatpak.sh script in the root directory. It will build the current branch and install the flatpak directly.
 ```
 ./build-flatpak.sh
 ```
