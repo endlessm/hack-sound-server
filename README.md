@@ -70,7 +70,7 @@ This metadata file specifies two sound event ids: `framework/drumkit/0` and `fra
 ## Overriding the metadata file
 To override metadata files or add more sounds, you can create your own metadata file. **All the sounds specified there will have the highest priority**.
 
-Create a file in the following path `$HOME/.var/app/com.endlessm.HackSoundServer/data/hack-sound-server/metadata.json`.
+Create a file in the following path `$HOME/.var/app/com.endlessm.HackSoundServer/data/metadata.json`.
 >>> `$HOME` represents your home directory.
 >>> `.var` is a hidden directory. You can show hidden files with the keys `ctrl` + `h` in the Endless OS file browser.
 
@@ -87,7 +87,7 @@ Once you have created that file, you can add for example the following content:
 ```
 >>> Beware of closing curly braces properly.
 
-Then you should create the folder `sounds` in `$HOME/.var/app/com.endlessm.HackSoundServer/data/hack-sound-server/` and put your sounds files there. In this case, you would have to put the sound file `water.wav` and `beep.wav`.
+Then you should create the folder `sounds` in `$HOME/.var/app/com.endlessm.HackSoundServer/data/` and put your sounds files there. In this case, you would have to put the sound file `water.wav` and `beep.wav`.
 
 ### Playing sounds
 You can test the `water` sound event id when you input this command in a terminal:
