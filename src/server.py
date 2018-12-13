@@ -323,6 +323,9 @@ class HackSoundServer(Gio.Application):
         <method name='StopSound'>
           <arg type='s' name='uuid' direction='in'/>
         </method>
+        <method name='ListPlayingSounds'>
+          <arg type='a{sas}' name='uuid' direction='out'/>
+        </method>
         <signal name='Error'>
           <arg type='s' name='uuid'/>
           <arg type='s' name='error_message'/>
@@ -341,7 +344,6 @@ class HackSoundServer(Gio.Application):
         self.metadata = metadata
         self._countdown_id = None
         self.players = {}
-        # Only useful for sounds tagged with "overlap-behavior":
         self._uuid_by_event_id = {}
 
     def do_dbus_register(self, connection, path):
@@ -389,6 +391,8 @@ class HackSoundServer(Gio.Application):
                 self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
                 "'%s' is not a valid option." % overlap_behavior)
 
+        if not self._uuid_by_event_id.get(sound_event_id):
+            self._uuid_by_event_id[sound_event_id] = set()
         uuid_ = self._do_overlap_behaviour(sound_event_id, overlap_behavior)
 
         if uuid_ is None:
@@ -400,8 +404,7 @@ class HackSoundServer(Gio.Application):
             self.players[uuid_] = HackSoundPlayer(uuid_, metadata, sender,
                                                   options)
             # Insert the uuid in the dictionary organized by sound event id.
-            if overlap_behavior != "overlap":
-                self._uuid_by_event_id[sound_event_id] = uuid_
+            self._uuid_by_event_id[sound_event_id].add(uuid_)
 
             self.players[uuid_].connect("eos", self.__player_eos_cb,
                                         sound_event_id, uuid_)
@@ -413,10 +416,14 @@ class HackSoundServer(Gio.Application):
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
     def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
-        uuid_ = self._uuid_by_event_id.get(sound_event_id)
-        if uuid_ is None:
+        if overlap_behavior == "overlap":
+            return None
+        uuids = self._uuid_by_event_id.get(sound_event_id)
+        assert len(uuids) <= 1
+        if len(uuids) == 0:
             return None
 
+        uuid_ = next(iter(uuids))
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
             self.players[uuid_].reset()
@@ -434,6 +441,10 @@ class HackSoundServer(Gio.Application):
         else:
             self.players[uuid_].stop()
         invocation.return_value(None)
+
+    def list_playing_sounds(self, connection, sender, path, iface, invocation):
+        variant = GLib.Variant('(a{sas})', (self._uuid_by_event_id, ))
+        return invocation.return_value(variant)
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
@@ -455,6 +466,9 @@ class HackSoundServer(Gio.Application):
         elif method == 'StopSound':
             self.stop_sound(params[0], connection, sender, path, iface,
                             invocation)
+        elif method == "ListPlayingSounds":
+            self.list_playing_sounds(connection, sender, path, iface,
+                                     invocation)
         elif method == "UpdateProperties":
             self.update_properties(params[0], params[1], params[2], connection,
                                    sender, path, iface, invocation)
@@ -467,7 +481,9 @@ class HackSoundServer(Gio.Application):
         self.players[uuid_].release()
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
-            del self._uuid_by_event_id[sound_event_id]
+            self._uuid_by_event_id[sound_event_id].remove(uuid_)
+            if len(self._uuid_by_event_id[sound_event_id]) == 0:
+                del self._uuid_by_event_id[sound_event_id]
         if not self.players:
             self._ensure_release_countdown()
         self.release()
@@ -479,7 +495,9 @@ class HackSoundServer(Gio.Application):
         if uuid_ in self.players:
             del self.players[uuid_]
             if sound_event_id in self._uuid_by_event_id:
-                del self._uuid_by_event_id[sound_event_id]
+                self._uuid_by_event_id[sound_event_id].remove(uuid_)
+                if len(self._uuid_by_event_id[sound_event_id]) == 0:
+                    del self._uuid_by_event_id[sound_event_id]
             if not self.players:
                 self._ensure_release_countdown()
             self.release()
