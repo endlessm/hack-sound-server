@@ -453,8 +453,7 @@ class HackSoundServer(Gio.Application):
             return uuid_
         elif overlap_behavior == "ignore":
             # If a sound is already playing, then ignore the new one.
-            if self.players[uuid_].get_state() == Gst.State.PLAYING:
-                return uuid_
+            return uuid_
         return None
 
     def stop_sound(self, uuid_, connection, sender, path, iface, invocation):
