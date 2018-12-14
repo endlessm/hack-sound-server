@@ -62,7 +62,7 @@
         "fade-out": 0
     },
     "codeview/ambient/hacking": {
-        "sound-file": "codeiew/Hacking_music1.wav",
+        "sound-file": "codeview/Hacking_music1.wav",
         "loop": true
     },
     "codeview/code-error-appearance": {
