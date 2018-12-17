@@ -33,7 +33,7 @@ def load_metadata(user_type):
                 metadata = json.load(metadata_file)
                 _read_in_metadata(metadata, user_type)
                 ret = metadata
-            except json.decoder.JSONDecodeError as e:
+            except Exception as e:
                 _logger.error(
                     "Not possible to decode metadata file at '%s'.\n"
                     "%s" % (metadata_path, e))
