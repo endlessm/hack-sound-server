@@ -10,6 +10,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import GstController
+from collections import namedtuple
 
 
 _logger = logging.getLogger(__name__)
@@ -295,6 +296,9 @@ class HackSoundPlayer(GObject.Object):
                 self.pipeline.send_event(Gst.Event.new_eos())
 
 
+DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
+
+
 class HackSoundServer(Gio.Application):
     _TIMEOUT_S = 10
     _OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
@@ -341,6 +345,7 @@ class HackSoundServer(Gio.Application):
         self.metadata = metadata
         self._countdown_id = None
         self.players = {}
+        self._watcher_by_bus_name = {}
         # Only useful for sounds tagged with "overlap-behavior":
         self._uuid_by_event_id = {}
 
@@ -399,18 +404,43 @@ class HackSoundServer(Gio.Application):
             metadata = self.metadata[sound_event_id]
             self.players[uuid_] = HackSoundPlayer(uuid_, metadata, sender,
                                                   options)
+            self._watch_bus_name(sender, uuid_)
             # Insert the uuid in the dictionary organized by sound event id.
             if overlap_behavior != "overlap":
                 self._uuid_by_event_id[sound_event_id] = uuid_
 
-            self.players[uuid_].connect("eos", self.__player_eos_cb,
+            self.players[uuid_].connect("eos", self.__player_eos_cb, sender,
                                         sound_event_id, uuid_)
             self.players[uuid_].connect("error", self.__player_error_cb,
-                                        sound_event_id, uuid_,
+                                        sender, sound_event_id, uuid_,
                                         connection, path, iface)
             self.players[uuid_].play()
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+
+    def _watch_bus_name(self, bus_name, uuid_):
+        # Tracks a player UUID called by its respective DBus names.
+        if bus_name not in self._watcher_by_bus_name:
+            watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
+                                            bus_name,
+                                            Gio.DBusProxyFlags.NONE,
+                                            None,
+                                            self._bus_name_disconnect_cb)
+            self._watcher_by_bus_name[bus_name] = DBusWatcher(watcher_id,
+                                                              set())
+        self._watcher_by_bus_name[bus_name].uuids.add(uuid_)
+
+    def _bus_name_disconnect_cb(self, unused_connection, bus_name):
+        # When a dbus name dissappears (for example, when an application that
+        # requested to play a sound is killed/colsed), all the players created
+        # due to this application will be stopped.
+        if bus_name not in self._watcher_by_bus_name:
+            return
+        for uuid_ in self._watcher_by_bus_name[bus_name].uuids:
+            self.players[uuid_].stop()
+        # Remove the watcher.
+        Gio.bus_unwatch_name(self._watcher_by_bus_name[bus_name].watcher_id)
+        del self._watcher_by_bus_name[bus_name]
 
     def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
         uuid_ = self._uuid_by_event_id.get(sound_event_id)
@@ -463,23 +493,27 @@ class HackSoundServer(Gio.Application):
                 Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
                 "Method '%s' not available" % method)
 
-    def __player_eos_cb(self, unused_player, sound_event_id, uuid_):
+    def __player_eos_cb(self, unused_player, bus_name, sound_event_id, uuid_):
         self.players[uuid_].release()
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
             del self._uuid_by_event_id[sound_event_id]
+        if bus_name in self._watcher_by_bus_name:
+            self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
         if not self.players:
             self._ensure_release_countdown()
         self.release()
 
-    def __player_error_cb(self, player, error, debug, sound_event_id, uuid_,
-                          connection, path, iface):
+    def __player_error_cb(self, player, error, debug, bus_name, sound_event_id,
+                          uuid_, connection, path, iface):
         data = (uuid_, error.message, error.domain, error.code, debug)
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
             del self.players[uuid_]
             if sound_event_id in self._uuid_by_event_id:
                 del self._uuid_by_event_id[sound_event_id]
+            if bus_name in self._watcher_by_bus_name:
+                self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
             if not self.players:
                 self._ensure_release_countdown()
             self.release()
