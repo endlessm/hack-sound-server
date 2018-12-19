@@ -303,6 +303,24 @@
     "fizzics/tooManyBalls": {
         "sound-file": "fizzics/Too_Many_Balls.wav"
     },
+    "fizzics/collision/bad": {
+        "sound-file": "fizzics/Collision_bad.wav"
+    },
+    "fizzics/collision/gem": {
+        "sound-file": "fizzics/Collision_gem_get.wav"
+    },
+    "fizzics/collision/goal": {
+        "sound-file": "fizzics/Collision_goal.wav"
+    },
+    "fizzics/collision/neutral": {
+        "sound-file": "fizzics/Collision_neutral.wav"
+    },
+    "fizzics/collision/wall": {
+        "sound-file": "fizzics/Collision_neutral.wav"
+    },
+    "fizzics/collision/winning": {
+        "sound-file": "fizzics/Collision_winning.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "soundpacks/sfxgroup_drumkit1.wav"
     },
