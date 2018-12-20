@@ -361,6 +361,9 @@
     "fizzics/collision/winning": {
         "sound-file": "fizzics/Collision_winning.wav"
     },
+    "fizzics/NEXT-LEVEL/clicked": {
+        "sound-file": "fizzics/Next_Level.wav"
+    },
     "framework/drumkit/0": {
         "sound-file": "soundpacks/sfxgroup_drumkit1.wav"
     },
