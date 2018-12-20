@@ -294,6 +294,15 @@
     "fizzics/death3": {
         "sound-file": "fizzics/Death_4.wav"
     },
+    "fizzics/death4": {
+        "sound-file": "fizzics/Collision_goal.wav"
+    },
+    "fizzics/death5": {
+        "sound-file": "fizzics/Collision_gem_get.wav"
+    },
+    "fizzics/death6": {
+        "sound-file": "fizzics/Collision_bad.wav"
+    },
     "fizzics/moveFling": {
         "sound-file": "fizzics/Slingshot_Grab.wav"
     },
@@ -342,15 +351,6 @@
     },
     "fizzics/tooManyBalls": {
         "sound-file": "fizzics/Too_Many_Balls.wav"
-    },
-    "fizzics/collision/bad": {
-        "sound-file": "fizzics/Collision_bad.wav"
-    },
-    "fizzics/collision/gem": {
-        "sound-file": "fizzics/Collision_gem_get.wav"
-    },
-    "fizzics/collision/goal": {
-        "sound-file": "fizzics/Collision_goal.wav"
     },
     "fizzics/collision/neutral": {
         "sound-file": "fizzics/Collision_neutral.wav"
