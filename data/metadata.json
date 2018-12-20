@@ -364,6 +364,10 @@
     "fizzics/NEXT-LEVEL/clicked": {
         "sound-file": "fizzics/Next_Level.wav"
     },
+    "fizzics/you_won": {
+        "sound-file": "fizzics/you_won_loop.wav",
+        "loop": true
+    },
     "framework/drumkit/0": {
         "sound-file": "soundpacks/sfxgroup_drumkit1.wav"
     },
