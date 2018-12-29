@@ -95,6 +95,9 @@
     "codeview/keypress/down": {
         "sound-file": "codeview/cursorDown.wav"
     },
+    "codeview/keypress/other": {
+        "sound-file": "codeview/keyGeneric.wav"
+    },
     "codeview/action/cut": {
         "sound-file": "codeview/keyCombo - cut.wav"
     },
