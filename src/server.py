@@ -77,14 +77,14 @@ class HackSoundPlayer(GObject.Object):
             return
 
         volume_elem = self.pipeline.get_by_name('volume')
+        # Stop at the end of the current loop
+        self._stop_loop = True
         try:
             self._add_fade_out(volume_elem, pipeline_fade_out)
         except ValueError as ex:
             _logger.error(ex)
             _logger.warning("{}: Fade out effect could not be applied. "
                             "Stop.".format(self.uuid))
-        # Stop at the end of the current loop
-        self._stop_loop = True
 
     def reset(self):
         self.seek(0.0)
@@ -245,6 +245,7 @@ class HackSoundPlayer(GObject.Object):
         pipeline = Gst.parse_launch(spipeline)
 
         volume_elem = pipeline.get_by_name("volume")
+        volume_elem.connect("notify::volume", self.__volume_cb)
         assert volume_elem is not None
         self._fade_control = self._create_control(volume_elem, "volume")
 
@@ -256,6 +257,11 @@ class HackSoundPlayer(GObject.Object):
             self._add_fade_in(self.fade_in, self.volume)
 
         return pipeline
+
+    def __volume_cb(self, volume_element, unused_volume):
+        # In case of fade-out effects, send EOS as soon volume reaches 0.
+        if self._stop_loop and volume_element.props.volume == 0:
+            self.pipeline.send_event(Gst.Event.new_eos())
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
