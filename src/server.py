@@ -38,6 +38,7 @@ class HackSoundPlayer(GObject.Object):
         self._stop_loop = False
         self._n_loop = 0
         self._is_initial_seek = False
+        self.deprioritized = False
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -58,6 +59,14 @@ class HackSoundPlayer(GObject.Object):
     def _play(self):
         self.pipeline.set_state(Gst.State.PLAYING)
         return GLib.SOURCE_REMOVE
+
+    def pause(self):
+        if self.get_state() != Gst.State.PAUSED:
+            self.pipeline.set_state(Gst.State.PAUSED)
+
+    def resume(self):
+        if self.get_state() != Gst.State.PLAYING:
+            self._play()
 
     def stop(self):
         if not self.loop:
@@ -183,6 +192,10 @@ class HackSoundPlayer(GObject.Object):
     @property
     def sound_location(self):
         return random.choice(self.metadata["sound-files"])
+
+    @property
+    def priority(self):
+        return self.metadata.get("priority", False)
 
     def _add_keyframe_pair(self, control, time_start_ns, value_start,
                            time_end_ns, value_end, consider_duration=True):
@@ -356,6 +369,8 @@ class HackSoundServer(Gio.Application):
         self._watcher_by_bus_name = {}
         # Only useful for sounds tagged with "overlap-behavior":
         self._uuid_by_event_id = {}
+        # Only useful to track priority events
+        self._priority_count = 0
 
     def refcount(self, uuid_, bus_name=None):
         if bus_name is None:
@@ -411,6 +426,31 @@ class HackSoundServer(Gio.Application):
         self._countdown_id = GLib.timeout_add_seconds(
             self._TIMEOUT_S, self.release, priority=GLib.PRIORITY_LOW)
 
+    def _pause_loop(self, player):
+        player.pause()
+        player.deprioritized = True
+
+    def _resume_loop(self, player):
+        if not player.deprioritized:
+            return
+        # Resume only after the last priority stopped
+        if self._priority_count > 0:
+            return
+        player.resume()
+        player.deprioritized = False
+
+    def _apply_on_loops(self, method, uuid_to_skip, modify_count_by):
+        if not self.players[uuid_to_skip].priority:
+            return
+        self._priority_count += modify_count_by
+        for uuid_ in self.players:
+            if uuid_ == uuid_to_skip:
+                continue
+            player = self.players[uuid_]
+            if player.priority or not player.loop:
+                continue
+            method(player)
+
     def play_sound(self, sound_event_id, connection, sender, path, iface,
                    invocation, options=None):
         if sound_event_id not in self.metadata:
@@ -448,7 +488,16 @@ class HackSoundServer(Gio.Application):
             self.players[uuid_].connect("error", self.__player_error_cb,
                                         sound_event_id, uuid_,
                                         connection, path, iface)
-            self.players[uuid_].play()
+            self._apply_on_loops(self._pause_loop,
+                                 uuid_to_skip=uuid_,
+                                 modify_count_by=1)
+            # If a priority loop already playing, stay paused until stops
+            if (self.players[uuid_].loop and
+                    not self.players[uuid_].priority and
+                    self._priority_count > 0):
+                self._pause_loop(self.players[uuid_])
+            else:
+                self.players[uuid_].play()
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
@@ -539,6 +588,9 @@ class HackSoundServer(Gio.Application):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
+        self._apply_on_loops(self._resume_loop,
+                             uuid_to_skip=uuid_,
+                             modify_count_by=-1)
         self.players[uuid_].release()
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
@@ -559,6 +611,9 @@ class HackSoundServer(Gio.Application):
         data = (uuid_, error.message, error.domain, error.code, debug)
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
+            self._apply_on_loops(self._resume_loop,
+                                 uuid_to_skip=uuid_,
+                                 modify_count_by=-1)
             del self.players[uuid_]
             if sound_event_id in self._uuid_by_event_id:
                 del self._uuid_by_event_id[sound_event_id]
