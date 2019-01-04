@@ -518,6 +518,12 @@
     "HackUnlock/solution": {
         "sound-file": "HackUnlock/Success_Back.wav"
     },
+    "HackUnlock/success/back": {
+        "note": "This is a placeholder sound!",
+        "sound-file": "HackUnlock/Success_Back_loop.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
     "HackUnlock/success": {
         "sound-file": "HackUnlock/Success_Front.wav"
     },
