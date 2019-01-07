@@ -186,6 +186,7 @@ class HackSoundPlayer(GObject.Object):
 
     def _add_keyframe_pair(self, control, time_start_ns, value_start,
                            time_end_ns, value_end, consider_duration=True):
+        control.unset_all()
         if not self._add_keyframe(control, time_start_ns, value_start):
             raise ValueError('bad start time')
         # Rather than deal with the case where we have to split the keyframes
