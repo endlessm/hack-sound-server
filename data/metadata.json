@@ -571,6 +571,7 @@
         "sound-file": "MouseEnter_Inverse.wav"
     },
     "FBE/startup": {
-        "sound-file": "FBE/OS_startup_jingle.wav"
+        "sound-file": "FBE/Theater_backside.wav",
+        "loop": true
     }
 }
