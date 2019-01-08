@@ -573,5 +573,9 @@
     "FBE/startup": {
         "sound-file": "FBE/Theater_backside.wav",
         "loop": true
+    },
+    "FBE/page-changed": {
+        "sound-file": "FBE/juicy_button.wav",
+        "overlap-behavior": "restart"
     }
 }
