@@ -153,43 +153,53 @@
     },
     "fizzics/level/1/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/2/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/3/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/4/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/5/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/6/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/7/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/8/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/9/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/10/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/background1": {
         "sound-file": "fizzics/BG_1.wav",
