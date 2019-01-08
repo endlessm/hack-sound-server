@@ -310,8 +310,9 @@ class HackSoundPlayer(GObject.Object):
             st = message.get_structure()
             old_state = st.get_value("old-state")
             new_state = st.get_value("new-state")
-            if (old_state == Gst.State.READY and new_state == Gst.State.PAUSED
-                    and self._stop_loop):
+            if (old_state == Gst.State.READY and
+                    new_state == Gst.State.PAUSED and
+                    self._stop_loop):
                 self.pipeline.send_event(Gst.Event.new_eos())
 
 
