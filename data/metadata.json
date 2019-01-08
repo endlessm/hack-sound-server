@@ -1,14 +1,12 @@
 {
     "clubhouse/entry/hover": {
-        "sound-file": "clubhouse/entry_hover.wav",
+        "sound-file": "clubhouse/clubhouse_button_hover.wav",
         "loop": true,
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/entry/open": {
-        "sound-file": "clubhouse/entry_open.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/clubhouse_open.wav"
     },
     "clubhouse/entry/pulse": {
         "sound-file": "clubhouse/clubhouse_attract_event.wav"
@@ -18,9 +16,7 @@
         "loop": true
     },
     "clubhouse/entry/close": {
-        "sound-file": "clubhouse/entry_close.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/clubhouse_close.wav"
     },
     "clubhouse/ambient": {
         "sound-file": "clubhouse/clubhouse_ambient.wav",
@@ -29,19 +25,17 @@
         "fade-out": 0
     },
     "clubhouse/dialog/open": {
-        "sound-file": "clubhouse/dialog_open.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/dialog_popup.wav"
     },
     "clubhouse/dialog/close": {
-        "sound-file": "clubhouse/dialog_close.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/quest_deny.wav"
     },
     "clubhouse/dialog/next": {
-        "sound-file": "clubhouse/dialog_next.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-files": [
+            "clubhouse/CollectItem_1.wav",
+            "clubhouse/CollectItem_2.wav",
+            "clubhouse/CollectItem_3.wav"
+        ]
     },
     "clubhouse/character/mood/happy": {
         "sound-file": "clubhouse/Character_happy.wav",
