@@ -28,7 +28,7 @@
         "sound-file": "clubhouse/dialog_popup.wav"
     },
     "clubhouse/dialog/close": {
-        "sound-file": "clubhouse/quest_deny.wav"
+        "sound-file": "common/quest_deny.wav"
     },
     "clubhouse/dialog/next": {
         "sound-files": [
@@ -520,22 +520,22 @@
         "loop": true
     },
     "quests/quest-given": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/quest_accepted.wav"
     },
     "quests/quest-complete": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/quest_challenge_completed.wav"
     },
     "quests/quest-aborted": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "common/quest_deny.wav"
     },
     "quests/new-icon": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/juicy_button.wav"
     },
     "quests/riley-intro": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/Riley_intro.wav"
     },
     "quests/saniel-intro": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/Saniel_intro.wav"
     },
     "quests/reset-given": {
         "sound-file": "quests/CollectItem_1.wav"
