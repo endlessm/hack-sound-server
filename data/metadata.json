@@ -580,6 +580,10 @@
     "shell/tracking-button/flip-inverse/enter": {
         "sound-file": "MouseEnter_Inverse.wav"
     },
+    "system/background/front": {
+        "sound-file": "system/Theater_front.wav",
+        "loop": true
+    },
     "FBE/startup": {
         "sound-file": "FBE/Theater_backside.wav",
         "loop": true
