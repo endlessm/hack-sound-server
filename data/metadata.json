@@ -1,14 +1,12 @@
 {
     "clubhouse/entry/hover": {
-        "sound-file": "clubhouse/entry_hover.wav",
+        "sound-file": "clubhouse/clubhouse_button_hover.wav",
         "loop": true,
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/entry/open": {
-        "sound-file": "clubhouse/entry_open.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/clubhouse_open.wav"
     },
     "clubhouse/entry/pulse": {
         "sound-file": "clubhouse/clubhouse_attract_event.wav"
@@ -18,9 +16,7 @@
         "loop": true
     },
     "clubhouse/entry/close": {
-        "sound-file": "clubhouse/entry_close.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/clubhouse_close.wav"
     },
     "clubhouse/ambient": {
         "sound-file": "clubhouse/clubhouse_ambient.wav",
@@ -29,19 +25,17 @@
         "fade-out": 0
     },
     "clubhouse/dialog/open": {
-        "sound-file": "clubhouse/dialog_open.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "clubhouse/dialog_popup.wav"
     },
     "clubhouse/dialog/close": {
-        "sound-file": "clubhouse/dialog_close.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-file": "common/quest_deny.wav"
     },
     "clubhouse/dialog/next": {
-        "sound-file": "clubhouse/dialog_next.wav",
-        "fade-in": 0,
-        "fade-out": 0
+        "sound-files": [
+            "clubhouse/CollectItem_1.wav",
+            "clubhouse/CollectItem_2.wav",
+            "clubhouse/CollectItem_3.wav"
+        ]
     },
     "clubhouse/character/mood/happy": {
         "sound-file": "clubhouse/Character_happy.wav",
@@ -159,43 +153,53 @@
     },
     "fizzics/level/1/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/2/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/3/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/4/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/5/background": {
         "sound-file": "fizzics/Background_loop.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/6/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/7/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/8/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/9/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/level/10/background": {
         "sound-file": "fizzics/Background_loop2.wav",
-        "loop": true
+        "loop": true,
+        "volume": 0.4
     },
     "fizzics/background1": {
         "sound-file": "fizzics/BG_1.wav",
@@ -532,22 +536,22 @@
         "loop": true
     },
     "quests/quest-given": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/quest_accepted.wav"
     },
     "quests/quest-complete": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/quest_challenge_completed.wav"
     },
     "quests/quest-aborted": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "common/quest_deny.wav"
     },
     "quests/new-icon": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/juicy_button.wav"
     },
     "quests/riley-intro": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/Riley_intro.wav"
     },
     "quests/saniel-intro": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/Saniel_intro.wav"
     },
     "quests/reset-given": {
         "sound-file": "quests/CollectItem_1.wav"
