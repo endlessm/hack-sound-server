@@ -545,7 +545,7 @@
         "sound-file": "common/quest_deny.wav"
     },
     "quests/new-icon": {
-        "sound-file": "quests/juicy_button.wav"
+        "sound-file": "common/juicy_button.wav"
     },
     "quests/riley-intro": {
         "sound-file": "quests/Riley_intro.wav"
@@ -589,7 +589,7 @@
         "loop": true
     },
     "FBE/page-changed": {
-        "sound-file": "FBE/juicy_button.wav",
+        "sound-file": "common/juicy_button.wav",
         "overlap-behavior": "restart"
     }
 }
