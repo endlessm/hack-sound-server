@@ -664,6 +664,10 @@
     "shell/tracking-button/flip-inverse/enter": {
         "sound-file": "MouseEnter_Inverse.webm"
     },
+    "system/background/back": {
+        "sound-file": "system/Theater_backside.webm",
+        "loop": true
+    },
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
         "loop": true
