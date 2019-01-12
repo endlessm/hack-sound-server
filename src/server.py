@@ -370,10 +370,17 @@ class HackSoundServer(Gio.Application):
         self._refcount[uuid_][bus_name] += 1
 
     def unref(self, uuid_, bus_name, count=1):
+        if uuid_ not in self._refcount:
+            _logger.warning("{}: This uuid is not registered in the refcount "
+                            "registry.".format(uuid_))
+            return
+        if bus_name not in self._refcount[uuid_]:
+            _logger.warning("{}: Bus name '{}' is not registered in the "
+                            "refcount registry.".format(uuid_, bus_name))
+            return
         if self._refcount[uuid_][bus_name] == 0:
-            msg_args = (uuid_, bus_name)
             _logger.warning("{}: Cannot decrease refcount for bus name '{}'"
-                            "because it's already 0.".format(*msg_args))
+                            "because it's already 0.".format(uuid_, bus_name))
             return
         self._refcount[uuid_][bus_name] -= count
         if self.refcount(uuid_) == 0:
@@ -426,6 +433,8 @@ class HackSoundServer(Gio.Application):
             return invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
                 "'%s' is not a valid option." % overlap_behavior)
+        if not self._uuid_by_event_id.get(sound_event_id):
+            self._uuid_by_event_id[sound_event_id] = set()
 
         uuid_ = self._do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
@@ -441,8 +450,7 @@ class HackSoundServer(Gio.Application):
                                                   options)
             self._watch_bus_name(sender, uuid_)
             # Insert the uuid in the dictionary organized by sound event id.
-            if overlap_behavior != "overlap":
-                self._uuid_by_event_id[sound_event_id] = uuid_
+            self._uuid_by_event_id[sound_event_id].add(uuid_)
 
             self.players[uuid_].connect("eos", self.__player_eos_cb,
                                         sound_event_id, uuid_)
@@ -483,9 +491,13 @@ class HackSoundServer(Gio.Application):
         del self._watcher_by_bus_name[bus_name]
 
     def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
-        uuid_ = self._uuid_by_event_id.get(sound_event_id)
-        if uuid_ is None:
+        if overlap_behavior == "overlap":
             return None
+        uuids = self._uuid_by_event_id.get(sound_event_id)
+        assert len(uuids) <= 1
+        if len(uuids) == 0:
+            return None
+        uuid_ = next(iter(uuids))
 
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
@@ -497,15 +509,24 @@ class HackSoundServer(Gio.Application):
         return None
 
     def stop_sound(self, uuid_, connection, sender, path, iface, invocation):
-        if uuid_ not in self.players:
+        assert not (uuid_ in self.players and uuid_ in self._uuid_by_event_id)
+        # xor: With the exception that the case of both cases being True will
+        # never happen because we never define an UUID in the metadata file.
+        if not ((uuid_ not in self.players) ^
+                (uuid_ not in self._uuid_by_event_id)):
             _logger.info('Sound {} was supposed to be stopped, '
                          'but did not exist'.format(uuid_))
-        elif (uuid_ not in self._refcount or
-                sender not in self._refcount[uuid_]):
+        elif (uuid_ in self.players and (uuid_ not in self._refcount or
+                                         sender not in self._refcount[uuid_])):
             _logger.info('Sound {} was supposed to be refcounted by the bus, '
                          'name \'{}\' but it wasn\'t.'.format(uuid_, sender))
         else:
-            self.unref(uuid_, sender)
+            if uuid_ in self.players:
+                self.unref(uuid_, sender)
+            elif uuid_ in self._uuid_by_event_id:
+                sound_event_id = uuid_
+                for uuid_ in self._uuid_by_event_id[sound_event_id]:
+                    self.unref(uuid_, sender)
             invocation.return_value(None)
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
@@ -543,7 +564,9 @@ class HackSoundServer(Gio.Application):
         self.players[uuid_].release()
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
-            del self._uuid_by_event_id[sound_event_id]
+            self._uuid_by_event_id[sound_event_id].remove(uuid_)
+            if len(self._uuid_by_event_id[sound_event_id]) == 0:
+                del self._uuid_by_event_id[sound_event_id]
         for bus_name in self._refcount[uuid_]:
             if bus_name in self._watcher_by_bus_name:
                 self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
@@ -562,7 +585,9 @@ class HackSoundServer(Gio.Application):
         if uuid_ in self.players:
             del self.players[uuid_]
             if sound_event_id in self._uuid_by_event_id:
-                del self._uuid_by_event_id[sound_event_id]
+                self._uuid_by_event_id[sound_event_id].remove(uuid_)
+                if len(self._uuid_by_event_id[sound_event_id]) == 0:
+                    del self._uuid_by_event_id[sound_event_id]
             for bus_name in self._refcount[uuid_]:
                 if bus_name in self._watcher_by_bus_name:
                     self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
