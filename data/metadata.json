@@ -538,11 +538,31 @@
     "quests/ada-intro": {
         "sound-file": "quests/Ada_intro.wav"
     },
+    "quests/ada-theme-start": {
+        "sound-file": "quests/Ada.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
+    "quests/ada-variant-start": {
+        "sound-file": "quests/Ada_piano.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.wav"
     },
+    "quests/hi-hat-start": {
+        "sound-file": "quests/hihat-sneaker.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
     "quests/key-given": {
         "sound-file": "quests/key_given.wav"
+    },
+    "quests/pink-panther-start": {
+        "sound-file": "quests/quest_sneaky.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
     },
     "quests/quest-unavailable": {
         "sound-file": "common/lockscreenInactive.wav"
@@ -556,6 +576,11 @@
     "quests/quest-aborted": {
         "sound-file": "common/quest_deny.wav"
     },
+    "quests/quest-march-start": {
+        "sound-file": "quests/quest_march.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
     "quests/quest-proposed": {
         "sound-file": "quests/quest_proposed.wav"
     },
@@ -565,11 +590,26 @@
     "quests/riley-intro": {
         "sound-file": "quests/Riley_intro.wav"
     },
+    "quests/riley-theme": {
+        "sound-file": "quests/Rileys_song.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
     "quests/saniel-intro": {
         "sound-file": "quests/Saniel_intro.wav"
     },
+    "quests/saniel-theme-start": {
+        "sound-file": "quests/Saniel2.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
+    },
     "quests/reset-given": {
         "sound-file": "quests/CollectItem_1.wav"
+    },
+    "quests/shutdown-start": {
+        "sound-file": "quests/system_shutdown.wav",
+        "loop": true,
+        "overlap-behavior": "ignore"
     },
     "shell/tracking-button/flip/hover": {
         "sound-file": "Hover_Flip.wav",
