@@ -90,10 +90,10 @@ This metadata file specifies two sound event ids: `framework/drumkit/0` and `fra
 This example shows all the options that the metadata file accepts.
 
 - **`sound-file`**: Indicates the path to the sound file to be played.
-- **`sound-files`**: It's an array of paths, and indicates that one of these sounds should be picked up randomly to be played. If like in this example, `sound-file` and `sound-files` are set, then all the specified paths will be considered, in other words, for this example, one sound among "sound0.wav", "sound1.wav", "sound2.wav" and "sound3.wav" would be played.
+- **`sound-files`**: It's an array of paths, and indicates that one of these sounds should be picked up randomly to be played. If like in this example, `sound-file` and `sound-files` are set, then all the specified paths will be considered. In other words, for this example, one sound among "sound0.wav", "sound1.wav", "sound2.wav" and "sound3.wav" would be played.
 - **`loop`**: If set to `true` the sound will be played again when it finishes. *Defaults to `false`*.
 - **`fade-in`**: Indicates the time duration in which the volume of the sound should fade in from the start. The used unit is milliseconds. *Defaults to 1000 only if `loop` is set to `true`*.
-- **`fade-out`**: Indicates the time duration in which the volume of the sound should fade out after the sound is stopped. *The used unit is milliseconds. Defaults to 1000 only if `loop` is set to `true`*.
+- **`fade-out`**: Indicates the time duration in which the volume of the sound should fade out after the sound is stopped. The used unit is milliseconds. *Defaults to 1000 only if `loop` is set to `true`*.
 - **`volume`**: Indicates the volume level the sound you play at. *Defaults to 1.0 (the "normal" volume)*.
 - **`pitch`**: Sets the sound pitch while keeping the original tempo (speed). *Defaults to 1.0 (the "normal" pitch)*.
 - **`rate`**: Sets the tempo and pitch. *Defaults to 1.0 (the "normal" rate)*.
