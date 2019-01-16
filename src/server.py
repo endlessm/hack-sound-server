@@ -65,13 +65,7 @@ class HackSoundPlayer(GObject.Object):
             self.pipeline.send_event(Gst.Event.new_eos())
             return
 
-        pipeline_fade_out = 0
-        if self.loop:
-            pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
-        if self.fade_out is not None:
-            pipeline_fade_out = self.fade_out
-
-        if pipeline_fade_out == 0:
+        if self.fade_out == 0:
             self._stop_loop = True
             self.pipeline.send_event(Gst.Event.new_eos())
             return
@@ -80,7 +74,7 @@ class HackSoundPlayer(GObject.Object):
         # Stop at the end of the current loop
         self._stop_loop = True
         try:
-            self._add_fade_out(volume_elem, pipeline_fade_out)
+            self._add_fade_out(volume_elem, self.fade_out)
         except ValueError as ex:
             _logger.error(ex)
             _logger.warning("{}: Fade out effect could not be applied. "
@@ -170,9 +164,13 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def fade_out(self):
-        if "fade-out" in self.metadata:
-            return self.metadata["fade-out"]
-        return None
+        pipeline_fade_out = 0
+        if self.loop:
+            pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
+        metadata_fade_out = self.metadata.get("fade-out")
+        if metadata_fade_out is not None:
+            pipeline_fade_out = metadata_fade_out
+        return pipeline_fade_out
 
     @property
     def delay(self):
