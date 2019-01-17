@@ -1,16 +1,47 @@
 import logging
 
 
+_COLOR_TMPL = "\033[3{}m"
+(RED,
+ GREEN,
+ YELLOW,
+ BLUE,
+ VIOLET,
+ CYAN) = map(lambda x: _COLOR_TMPL.format(x), range(1, 7))
+
+BOLD = "\033[1m"
+ESC = "\033[0m"
+
+
+def apply_style(text, color=None, bold=False):
+    bold = BOLD if bold else ""
+    color = color or ""
+    return "{}{}{}{}".format(bold, color, text, ESC)
+
+
 class DefaultFormatter(logging.Formatter):
     _DEFAULT_FORMAT = ("%(levelname)s : %(asctime)s %(funcName)s"
                        " - %(message)s (%(filename)s:%(lineno)d)")
+    _DEFAULT_COLORS = {
+        "CRITICAL": VIOLET,
+        "ERROR": RED,
+        "WARNING": YELLOW,
+        "INFO": CYAN,
+        "DEBUG": BLUE
+    }
 
-    def __init__(self, obj):
+    def __init__(self, obj, beautify=True):
         super().__init__(self._DEFAULT_FORMAT)
         self.obj = obj
+        self.beautify = beautify
 
     def format(self, record):
-        record.levelname = record.levelname.ljust(8)
+        if self.beautify:
+            color = self._DEFAULT_COLORS[record.levelname]
+            record.levelname = apply_style(record.levelname, color, bold=True)
+            record.levelname = record.levelname.ljust(21)
+        else:
+            record.levelname = record.levelname.ljust(8)
         return super().format(record)
 
 
@@ -31,14 +62,21 @@ class ObjectFormatter(DefaultFormatter):
 
 
 class PlayerFormatter(ObjectFormatter):
-    def __init__(self, obj):
-        super().__init__(obj)
+    _DEFAULT_BUS_NAME = YELLOW
+    _DEFAULT_EVENT_ID_COLOR = VIOLET
+    _DEFAULT_UUID_COLOR = CYAN
+
+    def __init__(self, obj, beautify=True):
+        super().__init__(obj, beautify)
 
     def format(self, record):
         tmpl = "{}: {}: {}: {}"
-        bus_name = self.obj.bus_name
-        event_id = self.obj.sound_event_id
-        uuid = self.obj.uuid
+        bus_name = apply_style(self.obj.bus_name,
+                               self.beautify and self._DEFAULT_BUS_NAME)
+        event_id = apply_style(self.obj.sound_event_id,
+                               self.beautify and self._DEFAULT_EVENT_ID_COLOR)
+        uuid = apply_style(self.obj.uuid,
+                           self.beautify and self._DEFAULT_UUID_COLOR)
 
         record.msg = tmpl.format(bus_name, event_id, uuid, record.msg)
         msg = super().format(record)
@@ -58,8 +96,12 @@ class ServerFormatter(ObjectFormatter):
     Note: bus_name, sound_event_id and uuid are optional.
     """
 
-    def __init__(self, obj):
-        super().__init__(obj)
+    _DEFAULT_BUS_NAME = YELLOW
+    _DEFAULT_EVENT_ID_COLOR = VIOLET
+    _DEFAULT_UUID_COLOR = CYAN
+
+    def __init__(self, obj, beautify=True):
+        super().__init__(obj, beautify)
 
     def format(self, record):
         base_template = "{}: "
@@ -70,11 +112,14 @@ class ServerFormatter(ObjectFormatter):
 
         prefix = ""
         if bus_name is not None:
-            prefix += base_template.format(bus_name)
+            color = self.beautify and self._DEFAULT_BUS_NAME
+            prefix += base_template.format(apply_style(bus_name, color))
         if sound_event_id is not None:
-            prefix += base_template.format(sound_event_id)
+            color = self.beautify and self._DEFAULT_EVENT_ID_COLOR
+            prefix += base_template.format(apply_style(sound_event_id, color))
         if uuid is not None:
-            prefix += base_template.format(uuid)
+            color = self.beautify and self._DEFAULT_UUID_COLOR
+            prefix += base_template.format(apply_style(uuid, color))
         record.msg = "{}{}".format(prefix, record.msg)
         return super().format(record, show_object_id=False)
 
