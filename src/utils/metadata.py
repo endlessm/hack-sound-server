@@ -1,11 +1,8 @@
 import json
-import logging
 import os
 from hack_sound_server.utils.misc import get_metadata_path
 from hack_sound_server.utils.misc import get_sounds_dir
-
-
-_logger = logging.getLogger(__name__)
+from hack_sound_server.utils.loggable import logger
 
 
 def _read_in_metadata(metadata, user_type):
@@ -34,15 +31,15 @@ def load_metadata(user_type):
                 _read_in_metadata(metadata, user_type)
                 ret = metadata
             except Exception as e:
-                _logger.error(
+                logger.error(
                     "Not possible to decode metadata file at '%s'.\n"
                     "%s" % (metadata_path, e))
     else:
         msg = "The metadata file at '%s' does not exist." % metadata_path
         if user_type == "system":
-            _logger.error(msg)
+            logger.error(msg)
         elif user_type == "user":
-            _logger.info(msg)
+            logger.info(msg)
     return ret
 
 
