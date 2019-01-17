@@ -442,7 +442,12 @@ class HackSoundServer(Gio.Application):
 
     def ref(self, uuid_, bus_name):
         self._refcount[uuid_][bus_name] += 1
-        self.play(uuid_, fades_in=self._refcount[uuid_][bus_name] == 1)
+        refcount = self._refcount[uuid_][bus_name]
+        self.logger.debug("Reference. Refcount: %d", refcount,
+                          bus_name=bus_name,
+                          sound_event_id=self.get_player(uuid_).sound_event_id,
+                          uuid=uuid_)
+        self.play(uuid_, fades_in=refcount == 1)
 
     def unref(self, uuid_, bus_name, count=1):
         if uuid_ not in self._refcount:
@@ -460,6 +465,10 @@ class HackSoundServer(Gio.Application):
                                 uuid=uuid_)
             return
         self._refcount[uuid_][bus_name] -= count
+        self.logger.debug("Unreference. Refcount: %d",
+                          self._refcount[uuid_][bus_name], bus_name=bus_name,
+                          sound_event_id=self.get_player(uuid_).sound_event_id,
+                          uuid=uuid_)
         if self.refcount(uuid_) == 0:
             # Only stop the sound if the last bus name (application) referring
             # to it has been disconnected (closed). The stop method will,
@@ -499,6 +508,8 @@ class HackSoundServer(Gio.Application):
     def play_sound(self, sound_event_id, connection, sender, path, iface,
                    invocation, options=None):
         if sound_event_id not in self.metadata:
+            self.logger.info("This sound event id does not exist.",
+                             sound_event_id=sound_event_id)
             invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_SOUND_EVENT_ID,
                 "sound event with id %s does not exist" % sound_event_id)
@@ -507,9 +518,12 @@ class HackSoundServer(Gio.Application):
         overlap_behavior = \
             self.metadata[sound_event_id].get("overlap-behavior", "overlap")
         if overlap_behavior not in self._OVERLAP_BEHAVIOR_CHOICES:
+            msg = "'%s' is not a valid option for 'overlap-behavior'."
+            self.logger.info(msg, overlap_behavior,
+                             sound_event_id=sound_event_id)
             return invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
-                "'%s' is not a valid option." % overlap_behavior)
+                msg % overlap_behavior)
         if not self._uuid_by_event_id.get(sound_event_id):
             self._uuid_by_event_id[sound_event_id] = set()
 
@@ -658,6 +672,12 @@ class HackSoundServer(Gio.Application):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
+        self.logger.debug(
+            "Freeing structures because end-of-stream was reached.",
+            bus_name=self.get_player(uuid_).bus_name,
+            sound_event_id=self.get_player(uuid_).sound_event_id,
+            uuid=uuid_
+        )
         self._resume_last_bg_player(uuid_)
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
@@ -680,6 +700,12 @@ class HackSoundServer(Gio.Application):
         data = (uuid_, error.message, error.domain, error.code, debug)
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
+            self.logger.debug(
+                "Freeing structures because there was an error.",
+                bus_name=self.get_player(uuid_).bus_name,
+                sound_event_id=self.get_player(uuid_).sound_event_id,
+                uuid=uuid_
+            )
             self._resume_last_bg_player(uuid_)
             del self.players[uuid_]
             if sound_event_id in self._uuid_by_event_id:
