@@ -357,6 +357,13 @@ class HackSoundServer(Gio.Application, Loggable):
         # Only useful for sounds tagged with "overlap-behavior":
         self._uuid_by_event_id = {}
 
+    def get_player(self, uuid_):
+        try:
+            return self.players[uuid_]
+        except:
+            self.critical("This uuid is not assigned to any player.",
+                          uuid=uuid_)
+
     def refcount(self, uuid_, bus_name=None):
         if bus_name is None:
             refcount = 0
@@ -388,7 +395,7 @@ class HackSoundServer(Gio.Application, Loggable):
             # Only stop the sound if the last bus name (application) referring
             # to it has been disconnected (closed). The stop method will,
             # indirectly, take care for deleting self._refcount[uuid_].
-            self.players[uuid_].stop()
+            self.get_player(uuid_).stop()
 
     def do_dbus_register(self, connection, path):
         Gio.Application.do_dbus_register(self, connection, path)
@@ -502,7 +509,7 @@ class HackSoundServer(Gio.Application, Loggable):
 
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
-            self.players[uuid_].reset()
+            self.get_player(uuid_).reset()
             return uuid_
         elif overlap_behavior == "ignore":
             # If a sound is already playing, then ignore the new one.
@@ -536,7 +543,8 @@ class HackSoundServer(Gio.Application, Loggable):
             self.info("Properties of sound {} was supposed to be updated, "
                       "but did not exist".format(uuid_))
         else:
-            self.players[uuid_].update_properties(transition_time_ms, options)
+            player = self.get_player(uuid_)
+            player.update_properties(transition_time_ms, options)
         invocation.return_value(None)
 
     def __method_called_cb(self, connection, sender, path, iface,
@@ -562,7 +570,7 @@ class HackSoundServer(Gio.Application, Loggable):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
-        self.players[uuid_].release()
+        self.get_player(uuid_).release()
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
             self._uuid_by_event_id[sound_event_id].remove(uuid_)
