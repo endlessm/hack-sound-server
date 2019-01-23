@@ -75,6 +75,21 @@
             ]
         },
         {
+            "name": "python3-numpy",
+            "buildsystem": "simple",
+            "build-commands": [
+                "ls -al",
+                "pip3 install --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} numpy-1.16.0.zip"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://files.pythonhosted.org/packages/04/b6/d7faa70a3e3eac39f943cc6a6a64ce378259677de516bd899dd9eb8f9b32/numpy-1.16.0.zip",
+                    "sha256": "cb189bd98b2e7ac02df389b6212846ab20661f4bafe16b5a70a6f1728c1cc7cb"
+                }
+            ]
+        },
+        {
             "name": "hack-sound-server",
             "buildsystem": "meson",
             "config-opts" : [

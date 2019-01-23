@@ -68,16 +68,60 @@
         "sound-file": "codeview/Code_solution.wav"
     },
     "codeview/keypress/equals": {
-        "sound-file": "codeview/key - equals.wav"
+        "sound-file": "codeview/key - equals.wav",
+        "recalculate": {
+            "pitch": {
+                "degree": 1,
+                "points": [
+                    [0, 2],
+                    [1000, 0.5]
+                ],
+                "min": 0.5,
+                "max": 2
+            }
+        }
     },
     "codeview/keypress/return": {
-        "sound-file": "codeview/key - return.wav"
+        "sound-file": "codeview/key - return.wav",
+        "recalculate": {
+            "pitch": {
+                "degree": 1,
+                "points": [
+                    [0, 2],
+                    [1000, 0.5]
+                ],
+                "min": 0.5,
+                "max": 2
+            }
+        }
     },
     "codeview/keypress/slash": {
-        "sound-file": "codeview/key - slash.wav"
+        "sound-file": "codeview/key - slash.wav",
+        "recalculate": {
+            "pitch": {
+                "degree": 1,
+                "points": [
+                    [0, 2],
+                    [1000, 0.5]
+                ],
+                "min": 0.5,
+                "max": 2
+            }
+        }
     },
     "codeview/keypress/space": {
-        "sound-file": "codeview/key - space.wav"
+        "sound-file": "codeview/key - space.wav",
+        "recalculate": {
+            "pitch": {
+                "degree": 1,
+                "points": [
+                    [0, 2],
+                    [1000, 0.5]
+                ],
+                "min": 0.5,
+                "max": 2
+            }
+        }
     },
     "codeview/keypress/delete": {
         "sound-file": "codeview/key - delete.wav"
@@ -92,7 +136,18 @@
         "sound-file": "codeview/cursorDown.wav"
     },
     "codeview/keypress/other": {
-        "sound-file": "codeview/keyGeneric.wav"
+        "sound-file": "codeview/keyGeneric.wav",
+        "recalculate": {
+            "pitch": {
+                "degree": 1,
+                "points": [
+                    [0, 2],
+                    [1000, 0.5]
+                ],
+                "min": 0.5,
+                "max": 2
+            }
+        }
     },
     "codeview/action/cut": {
         "sound-file": "codeview/keyCombo - cut.wav"
