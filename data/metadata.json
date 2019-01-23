@@ -1,650 +1,650 @@
 {
     "clubhouse/entry/hover": {
-        "sound-file": "clubhouse/clubhouse_button_hover.wav",
+        "sound-file": "clubhouse/clubhouse_button_hover.webm",
         "loop": true,
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/entry/open": {
-        "sound-file": "clubhouse/clubhouse_open.wav"
+        "sound-file": "clubhouse/clubhouse_open.webm"
     },
     "clubhouse/entry/pulse": {
-        "sound-file": "clubhouse/clubhouse_attract_event.wav"
+        "sound-file": "clubhouse/clubhouse_attract_event.webm"
     },
     "clubhouse/entry/pulse-loop": {
-        "sound-file": "clubhouse/clubhouse_attract_loop.wav",
+        "sound-file": "clubhouse/clubhouse_attract_loop.webm",
         "loop": true
     },
     "clubhouse/entry/close": {
-        "sound-file": "clubhouse/clubhouse_close.wav"
+        "sound-file": "clubhouse/clubhouse_close.webm"
     },
     "clubhouse/ambient": {
-        "sound-file": "clubhouse/clubhouse_ambient.wav",
+        "sound-file": "clubhouse/clubhouse_ambient.webm",
         "loop": true,
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/dialog/open": {
-        "sound-file": "clubhouse/dialog_popup.wav"
+        "sound-file": "clubhouse/dialog_popup.webm"
     },
     "clubhouse/dialog/close": {
-        "sound-file": "common/quest_deny.wav"
+        "sound-file": "common/quest_deny.webm"
     },
     "clubhouse/dialog/next": {
         "sound-files": [
-            "clubhouse/CollectItem_1.wav",
-            "clubhouse/CollectItem_2.wav",
-            "clubhouse/CollectItem_3.wav"
+            "clubhouse/CollectItem_1.webm",
+            "clubhouse/CollectItem_2.webm",
+            "clubhouse/CollectItem_3.webm"
         ]
     },
     "clubhouse/character/mood/happy": {
-        "sound-file": "clubhouse/Character_happy.wav",
+        "sound-file": "clubhouse/Character_happy.webm",
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/character/mood/irate": {
-        "sound-file": "clubhouse/Character_irate.wav",
+        "sound-file": "clubhouse/Character_irate.webm",
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/character/dialog/invite": {
-        "sound-file": "clubhouse/character_invite.wav",
+        "sound-file": "clubhouse/character_invite.webm",
         "fade-in": 0,
         "fade-out": 0
     },
     "clubhouse/character/dialog/dismiss": {
-        "sound-file": "clubhouse/character_dismiss.wav",
+        "sound-file": "clubhouse/character_dismiss.webm",
         "fade-in": 0,
         "fade-out": 0
     },
     "codeview/ambient/hacking": {
-        "sound-file": "codeview/Hacking_music1.wav",
+        "sound-file": "codeview/Hacking_music1.webm",
         "loop": true
     },
     "codeview/code-error-appearance": {
-        "sound-file": "codeview/Code_error.wav"
+        "sound-file": "codeview/Code_error.webm"
     },
     "codeview/code-error-disappearance": {
-        "sound-file": "codeview/Code_solution.wav"
+        "sound-file": "codeview/Code_solution.webm"
     },
     "codeview/keypress/equals": {
-        "sound-file": "codeview/key - equals.wav"
+        "sound-file": "codeview/key - equals.webm"
     },
     "codeview/keypress/return": {
-        "sound-file": "codeview/key - return.wav"
+        "sound-file": "codeview/key - return.webm"
     },
     "codeview/keypress/slash": {
-        "sound-file": "codeview/key - slash.wav"
+        "sound-file": "codeview/key - slash.webm"
     },
     "codeview/keypress/space": {
-        "sound-file": "codeview/key - space.wav"
+        "sound-file": "codeview/key - space.webm"
     },
     "codeview/keypress/delete": {
-        "sound-file": "codeview/key - delete.wav"
+        "sound-file": "codeview/key - delete.webm"
     },
     "codeview/keypress/delete-selection": {
-        "sound-file": "codeview/key - delete big.wav"
+        "sound-file": "codeview/key - delete big.webm"
     },
     "codeview/keypress/up": {
-        "sound-file": "codeview/cursorUp.wav"
+        "sound-file": "codeview/cursorUp.webm"
     },
     "codeview/keypress/down": {
-        "sound-file": "codeview/cursorDown.wav"
+        "sound-file": "codeview/cursorDown.webm"
     },
     "codeview/keypress/other": {
-        "sound-file": "codeview/keyGeneric.wav"
+        "sound-file": "codeview/keyGeneric.webm"
     },
     "codeview/action/cut": {
-        "sound-file": "codeview/keyCombo - cut.wav"
+        "sound-file": "codeview/keyCombo - cut.webm"
     },
     "codeview/action/copy": {
-        "sound-file": "codeview/keyCombo - copy.wav"
+        "sound-file": "codeview/keyCombo - copy.webm"
     },
     "codeview/action/paste": {
-        "sound-file": "codeview/keyCombo - paste.wav"
+        "sound-file": "codeview/keyCombo - paste.webm"
     },
     "codeview/action/undo": {
-        "sound-file": "codeview/keyCombo - undo.wav"
+        "sound-file": "codeview/keyCombo - undo.webm"
     },
     "codeview/action/redo": {
-        "sound-file": "codeview/keyCombo - redo.wav"
+        "sound-file": "codeview/keyCombo - redo.webm"
     },
     "codeview/action/selection-drag": {
-        "sound-file": "codeview/selectionDrag (per character).wav"
+        "sound-file": "codeview/selectionDrag (per character).webm"
     },
     "codeview/popup/open": {
-        "sound-file": "codeview/errorPopup - open.wav"
+        "sound-file": "codeview/errorPopup - open.webm"
     },
     "codeview/popup/close": {
-        "sound-file": "codeview/errorPopup - closed.wav"
+        "sound-file": "codeview/errorPopup - closed.webm"
     },
     "codeview/popup/fix": {
-        "sound-file": "codeview/errorPopup - fixitButtonPress.wav"
+        "sound-file": "codeview/errorPopup - fixitButtonPress.webm"
     },
     "fizzics/moveTool": {
-        "sound-file": "fizzics/Tool_Move.wav"
+        "sound-file": "fizzics/Tool_Move.webm"
     },
     "fizzics/flingTool": {
-        "sound-file": "fizzics/Tool_Fling.wav"
+        "sound-file": "fizzics/Tool_Fling.webm"
     },
     "fizzics/createTool": {
-        "sound-file": "fizzics/Tool_Create.wav"
+        "sound-file": "fizzics/Tool_Create.webm"
     },
     "fizzics/trashTool": {
-        "sound-file": "fizzics/Tool_Trash.wav"
+        "sound-file": "fizzics/Tool_Trash.webm"
     },
     "fizzics/tool0": {
-        "sound-file": "fizzics/Tool_Species1.wav"
+        "sound-file": "fizzics/Tool_Species1.webm"
     },
     "fizzics/tool1": {
-        "sound-file": "fizzics/Tool_Species2.wav"
+        "sound-file": "fizzics/Tool_Species2.webm"
     },
     "fizzics/tool2": {
-        "sound-file": "fizzics/Tool_Species3.wav"
+        "sound-file": "fizzics/Tool_Species3.webm"
     },
     "fizzics/tool3": {
-        "sound-file": "fizzics/Tool_Species4.wav"
+        "sound-file": "fizzics/Tool_Species4.webm"
     },
     "fizzics/tool4": {
-        "sound-file": "fizzics/Tool_Species5.wav"
+        "sound-file": "fizzics/Tool_Species5.webm"
     },
     "fizzics/buttonClick": {
-        "sound-file": "fizzics/ButtonClick.wav"
+        "sound-file": "fizzics/ButtonClick.webm"
     },
     "fizzics/level/1/background": {
-        "sound-file": "fizzics/Background_loop.wav",
+        "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/2/background": {
-        "sound-file": "fizzics/Background_loop.wav",
+        "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/3/background": {
-        "sound-file": "fizzics/Background_loop.wav",
+        "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/4/background": {
-        "sound-file": "fizzics/Background_loop.wav",
+        "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/5/background": {
-        "sound-file": "fizzics/Background_loop.wav",
+        "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/6/background": {
-        "sound-file": "fizzics/Background_loop2.wav",
+        "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/7/background": {
-        "sound-file": "fizzics/Background_loop2.wav",
+        "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/8/background": {
-        "sound-file": "fizzics/Background_loop2.wav",
+        "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/9/background": {
-        "sound-file": "fizzics/Background_loop2.wav",
+        "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/10/background": {
-        "sound-file": "fizzics/Background_loop2.wav",
+        "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/background1": {
-        "sound-file": "fizzics/BG_1.wav",
+        "sound-file": "fizzics/BG_1.webm",
         "loop": true
     },
     "fizzics/background2": {
-        "sound-file": "fizzics/BG_2.wav",
+        "sound-file": "fizzics/BG_2.webm",
         "loop": true
     },
     "fizzics/background3": {
-        "sound-file": "fizzics/BG_3.wav",
+        "sound-file": "fizzics/BG_3.webm",
         "loop": true
     },
     "fizzics/select1a": {
-        "sound-file": "fizzics/Select_Species1_a.wav"
+        "sound-file": "fizzics/Select_Species1_a.webm"
     },
     "fizzics/select1b": {
-        "sound-file": "fizzics/Select_Species1_b.wav"
+        "sound-file": "fizzics/Select_Species1_b.webm"
     },
     "fizzics/select1c": {
-        "sound-file": "fizzics/Select_Species1_c.wav"
+        "sound-file": "fizzics/Select_Species1_c.webm"
     },
     "fizzics/select2a": {
-        "sound-file": "fizzics/Select_Species2_a.wav"
+        "sound-file": "fizzics/Select_Species2_a.webm"
     },
     "fizzics/select2b": {
-        "sound-file": "fizzics/Select_Species2_b.wav"
+        "sound-file": "fizzics/Select_Species2_b.webm"
     },
     "fizzics/select2c": {
-        "sound-file": "fizzics/Select_Species2_c.wav"
+        "sound-file": "fizzics/Select_Species2_c.webm"
     },
     "fizzics/select3a": {
-        "sound-file": "fizzics/Select_Species3_a.wav"
+        "sound-file": "fizzics/Select_Species3_a.webm"
     },
     "fizzics/select3b": {
-        "sound-file": "fizzics/Select_Species3_b.wav"
+        "sound-file": "fizzics/Select_Species3_b.webm"
     },
     "fizzics/select3c": {
-        "sound-file": "fizzics/Select_Species3_c.wav"
+        "sound-file": "fizzics/Select_Species3_c.webm"
     },
     "fizzics/select4a": {
-        "sound-file": "fizzics/Select_Species4_a.wav"
+        "sound-file": "fizzics/Select_Species4_a.webm"
     },
     "fizzics/select4b": {
-        "sound-file": "fizzics/Select_Species4_b.wav"
+        "sound-file": "fizzics/Select_Species4_b.webm"
     },
     "fizzics/select4c": {
-        "sound-file": "fizzics/Select_Species4_c.wav"
+        "sound-file": "fizzics/Select_Species4_c.webm"
     },
     "fizzics/select5a": {
-        "sound-file": "fizzics/Select_Species5_a.wav"
+        "sound-file": "fizzics/Select_Species5_a.webm"
     },
     "fizzics/select5b": {
-        "sound-file": "fizzics/Select_Species5_b.wav"
+        "sound-file": "fizzics/Select_Species5_b.webm"
     },
     "fizzics/select5c": {
-        "sound-file": "fizzics/Select_Species5_c.wav"
+        "sound-file": "fizzics/Select_Species5_c.webm"
     },
     "fizzics/noGrab": {
-        "sound-file": "fizzics/Cannot_Grab.wav"
+        "sound-file": "fizzics/Cannot_Grab.webm"
     },
     "fizzics/success0": {
-        "sound-file": "fizzics/Success_Species1.wav"
+        "sound-file": "fizzics/Success_Species1.webm"
     },
     "fizzics/success1": {
-        "sound-file": "fizzics/Success_Species2.wav"
+        "sound-file": "fizzics/Success_Species2.webm"
     },
     "fizzics/success2": {
-        "sound-file": "fizzics/Success_Species3.wav"
+        "sound-file": "fizzics/Success_Species3.webm"
     },
     "fizzics/success3": {
-        "sound-file": "fizzics/Success_Species4.wav"
+        "sound-file": "fizzics/Success_Species4.webm"
     },
     "fizzics/success4": {
-        "sound-file": "fizzics/Success_Species5.wav"
+        "sound-file": "fizzics/Success_Species5.webm"
     },
     "fizzics/delete0": {
-        "sound-file": "fizzics/Death_Species1.wav"
+        "sound-file": "fizzics/Death_Species1.webm"
     },
     "fizzics/delete1": {
-        "sound-file": "fizzics/Death_Species2.wav"
+        "sound-file": "fizzics/Death_Species2.webm"
     },
     "fizzics/delete2": {
-        "sound-file": "fizzics/Death_Species3.wav"
+        "sound-file": "fizzics/Death_Species3.webm"
     },
     "fizzics/delete3": {
-        "sound-file": "fizzics/Death_Species4.wav"
+        "sound-file": "fizzics/Death_Species4.webm"
     },
     "fizzics/delete4": {
-        "sound-file": "fizzics/Death_Species5.wav"
+        "sound-file": "fizzics/Death_Species5.webm"
     },
     "fizzics/death0": {
-        "sound-file": "fizzics/Death_1.wav"
+        "sound-file": "fizzics/Death_1.webm"
     },
     "fizzics/death1": {
-        "sound-file": "fizzics/Death_2.wav"
+        "sound-file": "fizzics/Death_2.webm"
     },
     "fizzics/death2": {
-        "sound-file": "fizzics/Death_3.wav"
+        "sound-file": "fizzics/Death_3.webm"
     },
     "fizzics/death3": {
-        "sound-file": "fizzics/Death_4.wav"
+        "sound-file": "fizzics/Death_4.webm"
     },
     "fizzics/death4": {
-        "sound-file": "fizzics/Collision_goal.wav"
+        "sound-file": "fizzics/Collision_goal.webm"
     },
     "fizzics/death5": {
-        "sound-file": "fizzics/Collision_gem_get.wav"
+        "sound-file": "fizzics/Collision_gem_get.webm"
     },
     "fizzics/death6": {
-        "sound-file": "fizzics/Collision_bad.wav"
+        "sound-file": "fizzics/Collision_bad.webm"
     },
     "fizzics/moveFling": {
-        "sound-file": "fizzics/Slingshot_Grab.wav"
+        "sound-file": "fizzics/Slingshot_Grab.webm"
     },
     "fizzics/unGrab": {
-        "sound-file": "fizzics/Slingshot_Ungrab.wav"
+        "sound-file": "fizzics/Slingshot_Ungrab.webm"
     },
     "fizzics/pullFling": {
-        "sound-file": "fizzics/Slingshot_Pull_Loop.wav",
+        "sound-file": "fizzics/Slingshot_Pull_Loop.webm",
         "loop": true
     },
     "fizzics/fling": {
-        "sound-file": "fizzics/Slingshot_Release.wav"
+        "sound-file": "fizzics/Slingshot_Release.webm"
     },
     "fizzics/fly0": {
-        "sound-file": "fizzics/Fly_Species1.wav"
+        "sound-file": "fizzics/Fly_Species1.webm"
     },
     "fizzics/fly1": {
-        "sound-file": "fizzics/Fly_Species2.wav"
+        "sound-file": "fizzics/Fly_Species2.webm"
     },
     "fizzics/fly2": {
-        "sound-file": "fizzics/Fly_Species3.wav"
+        "sound-file": "fizzics/Fly_Species3.webm"
     },
     "fizzics/fly3": {
-        "sound-file": "fizzics/Fly_Species4.wav"
+        "sound-file": "fizzics/Fly_Species4.webm"
     },
     "fizzics/fly4": {
-        "sound-file": "fizzics/Fly_Species5.wav"
+        "sound-file": "fizzics/Fly_Species5.webm"
     },
     "fizzics/create0": {
-        "sound-file": "fizzics/CreateBall_Species1.wav"
+        "sound-file": "fizzics/CreateBall_Species1.webm"
     },
     "fizzics/create1": {
-        "sound-file": "fizzics/CreateBall_Species2.wav"
+        "sound-file": "fizzics/CreateBall_Species2.webm"
     },
     "fizzics/create2": {
-        "sound-file": "fizzics/CreateBall_Species3.wav"
+        "sound-file": "fizzics/CreateBall_Species3.webm"
     },
     "fizzics/create3": {
-        "sound-file": "fizzics/CreateBall_Species4.wav"
+        "sound-file": "fizzics/CreateBall_Species4.webm"
     },
     "fizzics/create4": {
-        "sound-file": "fizzics/CreateBall_Species5.wav"
+        "sound-file": "fizzics/CreateBall_Species5.webm"
     },
     "fizzics/collision": {
-        "sound-file": "fizzics/Collision.wav"
+        "sound-file": "fizzics/Collision.webm"
     },
     "fizzics/tooManyBalls": {
-        "sound-file": "fizzics/Too_Many_Balls.wav"
+        "sound-file": "fizzics/Too_Many_Balls.webm"
     },
     "fizzics/collision/neutral": {
-        "sound-file": "fizzics/Collision_neutral.wav"
+        "sound-file": "fizzics/Collision_neutral.webm"
     },
     "fizzics/collision/wall": {
-        "sound-file": "fizzics/Collision_neutral.wav"
+        "sound-file": "fizzics/Collision_neutral.webm"
     },
     "fizzics/collision/winning": {
-        "sound-file": "fizzics/Collision_winning.wav"
+        "sound-file": "fizzics/Collision_winning.webm"
     },
     "fizzics/NEXT-LEVEL/clicked": {
-        "sound-file": "fizzics/Next_Level.wav"
+        "sound-file": "fizzics/Next_Level.webm"
     },
     "fizzics/you_won": {
-        "sound-file": "fizzics/you_won_loop.wav",
+        "sound-file": "fizzics/you_won_loop.webm",
         "loop": true
     },
     "framework/drumkit/0": {
-        "sound-file": "soundpacks/sfxgroup_drumkit1.wav"
+        "sound-file": "soundpacks/sfxgroup_drumkit1.webm"
     },
     "framework/drumkit/1": {
-        "sound-file": "soundpacks/sfxgroup_drumkit2.wav"
+        "sound-file": "soundpacks/sfxgroup_drumkit2.webm"
     },
     "framework/drumkit/2": {
-        "sound-file": "soundpacks/sfxgroup_drumkit3.wav"
+        "sound-file": "soundpacks/sfxgroup_drumkit3.webm"
     },
     "framework/drumkit/3": {
-        "sound-file": "soundpacks/sfxgroup_drumkit4.wav"
+        "sound-file": "soundpacks/sfxgroup_drumkit4.webm"
     },
     "framework/drumkit/4": {
-        "sound-file": "soundpacks/sfxgroup_drumkit5.wav"
+        "sound-file": "soundpacks/sfxgroup_drumkit5.webm"
     },
     "framework/drumkit/5": {
-        "sound-file": "soundpacks/sfxgroup_drumkit6.wav"
+        "sound-file": "soundpacks/sfxgroup_drumkit6.webm"
     },
     "framework/idm/0": {
-        "sound-file": "soundpacks/sfxgroup_idm1.wav"
+        "sound-file": "soundpacks/sfxgroup_idm1.webm"
     },
     "framework/idm/1": {
-        "sound-file": "soundpacks/sfxgroup_idm2.wav"
+        "sound-file": "soundpacks/sfxgroup_idm2.webm"
     },
     "framework/idm/2": {
-        "sound-file": "soundpacks/sfxgroup_idm3.wav"
+        "sound-file": "soundpacks/sfxgroup_idm3.webm"
     },
     "framework/idm/3": {
-        "sound-file": "soundpacks/sfxgroup_idm4.wav"
+        "sound-file": "soundpacks/sfxgroup_idm4.webm"
     },
     "framework/idm/4": {
-        "sound-file": "soundpacks/sfxgroup_idm5.wav"
+        "sound-file": "soundpacks/sfxgroup_idm5.webm"
     },
     "framework/idm/5": {
-        "sound-file": "soundpacks/sfxgroup_idm6.wav"
+        "sound-file": "soundpacks/sfxgroup_idm6.webm"
     },
     "framework/jingle/0": {
-        "sound-file": "soundpacks/sfxgroup_jingle1.wav"
+        "sound-file": "soundpacks/sfxgroup_jingle1.webm"
     },
     "framework/jingle/1": {
-        "sound-file": "soundpacks/sfxgroup_jingle2.wav"
+        "sound-file": "soundpacks/sfxgroup_jingle2.webm"
     },
     "framework/jingle/2": {
-        "sound-file": "soundpacks/sfxgroup_jingle3.wav"
+        "sound-file": "soundpacks/sfxgroup_jingle3.webm"
     },
     "framework/jingle/3": {
-        "sound-file": "soundpacks/sfxgroup_jingle4.wav"
+        "sound-file": "soundpacks/sfxgroup_jingle4.webm"
     },
     "framework/jingle/4": {
-        "sound-file": "soundpacks/sfxgroup_jingle5.wav"
+        "sound-file": "soundpacks/sfxgroup_jingle5.webm"
     },
     "framework/jingle/5": {
-        "sound-file": "soundpacks/sfxgroup_jingle6.wav"
+        "sound-file": "soundpacks/sfxgroup_jingle6.webm"
     },
     "framework/mallets/0": {
-        "sound-file": "soundpacks/sfxgroup_mallets1.wav"
+        "sound-file": "soundpacks/sfxgroup_mallets1.webm"
     },
     "framework/mallets/1": {
-        "sound-file": "soundpacks/sfxgroup_mallets2.wav"
+        "sound-file": "soundpacks/sfxgroup_mallets2.webm"
     },
     "framework/mallets/2": {
-        "sound-file": "soundpacks/sfxgroup_mallets3.wav"
+        "sound-file": "soundpacks/sfxgroup_mallets3.webm"
     },
     "framework/mallets/3": {
-        "sound-file": "soundpacks/sfxgroup_mallets4.wav"
+        "sound-file": "soundpacks/sfxgroup_mallets4.webm"
     },
     "framework/mallets/4": {
-        "sound-file": "soundpacks/sfxgroup_mallets5.wav"
+        "sound-file": "soundpacks/sfxgroup_mallets5.webm"
     },
     "framework/mallets/5": {
-        "sound-file": "soundpacks/sfxgroup_mallets6.wav"
+        "sound-file": "soundpacks/sfxgroup_mallets6.webm"
     },
     "framework/tchaik/0": {
-        "sound-file": "soundpacks/sfxgroup_tchaik1.wav"
+        "sound-file": "soundpacks/sfxgroup_tchaik1.webm"
     },
     "framework/tchaik/1": {
-        "sound-file": "soundpacks/sfxgroup_tchaik2.wav"
+        "sound-file": "soundpacks/sfxgroup_tchaik2.webm"
     },
     "framework/tchaik/2": {
-        "sound-file": "soundpacks/sfxgroup_tchaik3.wav"
+        "sound-file": "soundpacks/sfxgroup_tchaik3.webm"
     },
     "framework/tchaik/3": {
-        "sound-file": "soundpacks/sfxgroup_tchaik4.wav"
+        "sound-file": "soundpacks/sfxgroup_tchaik4.webm"
     },
     "framework/tchaik/4": {
-        "sound-file": "soundpacks/sfxgroup_tchaik5.wav"
+        "sound-file": "soundpacks/sfxgroup_tchaik5.webm"
     },
     "framework/tchaik/5": {
-        "sound-file": "soundpacks/sfxgroup_tchaik6.wav"
+        "sound-file": "soundpacks/sfxgroup_tchaik6.webm"
     },
     "framework/tower/0": {
-        "sound-file": "soundpacks/sfxgroup_tower1.wav"
+        "sound-file": "soundpacks/sfxgroup_tower1.webm"
     },
     "framework/tower/1": {
-        "sound-file": "soundpacks/sfxgroup_tower2.wav"
+        "sound-file": "soundpacks/sfxgroup_tower2.webm"
     },
     "framework/tower/2": {
-        "sound-file": "soundpacks/sfxgroup_tower3.wav"
+        "sound-file": "soundpacks/sfxgroup_tower3.webm"
     },
     "framework/tower/3": {
-        "sound-file": "soundpacks/sfxgroup_tower4.wav"
+        "sound-file": "soundpacks/sfxgroup_tower4.webm"
     },
     "framework/tower/4": {
-        "sound-file": "soundpacks/sfxgroup_tower5.wav"
+        "sound-file": "soundpacks/sfxgroup_tower5.webm"
     },
     "framework/tower/5": {
-        "sound-file": "soundpacks/sfxgroup_tower6.wav"
+        "sound-file": "soundpacks/sfxgroup_tower6.webm"
     },
     "hack-toolbox/lockscreen/active": {
-        "sound-file": "toolbox/lockscreenActive.wav",
+        "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "hack-toolbox/lockscreen/inactive": {
-        "sound-file": "common/lockscreenInactive.wav"
+        "sound-file": "common/lockscreenInactive.webm"
     },
     "hack-toolbox/minimize": {
-        "sound-file": "toolbox/minimizePanel.wav"
+        "sound-file": "toolbox/minimizePanel.webm"
     },
     "hack-toolbox/unminimize": {
-        "sound-file": "toolbox/maximizePanel.wav"
+        "sound-file": "toolbox/maximizePanel.webm"
     },
     "hack-toolbox/reset/click": {
-        "sound-file": "toolbox/reset - commit.wav"
+        "sound-file": "toolbox/reset - commit.webm"
     },
     "hack-toolbox/update-codeview": {
-        "sound-file": "toolbox/liveGUItoText.wav"
+        "sound-file": "toolbox/liveGUItoText.webm"
     },
     "hack-toolbox/update-gui": {
-        "sound-file": "toolbox/liveTextToGUI.wav"
+        "sound-file": "toolbox/liveTextToGUI.webm"
     },
     "HackUnlock/ambient/front": {
-        "sound-file": "HackUnlock/Ambient_Front.wav",
+        "sound-file": "HackUnlock/Ambient_Front.webm",
         "loop": true
     },
     "HackUnlock/ambient/back": {
-        "sound-file": "HackUnlock/Ambient_Back.wav",
+        "sound-file": "HackUnlock/Ambient_Back.webm",
         "loop": true
     },
     "HackUnlock/landing": {
-        "sound-file": "HackUnlock/Landing_front.wav"
+        "sound-file": "HackUnlock/Landing_front.webm"
     },
     "HackUnlock/solution": {
-        "sound-file": "HackUnlock/Success_Back.wav"
+        "sound-file": "HackUnlock/Success_Back.webm"
     },
     "HackUnlock/success/back": {
         "note": "This is a placeholder sound!",
-        "sound-file": "HackUnlock/Success_Back_loop.wav",
+        "sound-file": "HackUnlock/Success_Back_loop.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "HackUnlock/success": {
-        "sound-file": "HackUnlock/Success_Front.wav"
+        "sound-file": "HackUnlock/Success_Front.webm"
     },
-    "HackUnlock/wave": {
-        "sound-file": "HackUnlock/Wave_Back.wav",
+    "HackUnlock.webme": {
+        "sound-file": "HackUnlock.webme_Back.webm",
         "loop": true
     },
     "quests/ada-intro": {
-        "sound-file": "quests/Ada_intro.wav"
+        "sound-file": "quests/Ada_intro.webm"
     },
     "quests/ada-theme-start": {
-        "sound-file": "quests/Ada.wav",
+        "sound-file": "quests/Ada.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/ada-variant-start": {
-        "sound-file": "quests/Ada_piano.wav",
+        "sound-file": "quests/Ada_piano.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/end-sting": {
-        "sound-file": "quests/ricky_rescued.wav"
+        "sound-file": "quests/ricky_rescued.webm"
     },
     "quests/hi-hat-start": {
-        "sound-file": "quests/hihat-sneaker.wav",
+        "sound-file": "quests/hihat-sneaker.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/key-given": {
-        "sound-file": "quests/key_given.wav"
+        "sound-file": "quests/key_given.webm"
     },
     "quests/pink-panther-start": {
-        "sound-file": "quests/quest_sneaky.wav",
+        "sound-file": "quests/quest_sneaky.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/quest-unavailable": {
-        "sound-file": "common/lockscreenInactive.wav"
+        "sound-file": "common/lockscreenInactive.webm"
     },
     "quests/quest-given": {
-        "sound-file": "quests/quest_accepted.wav"
+        "sound-file": "quests/quest_accepted.webm"
     },
     "quests/quest-complete": {
-        "sound-file": "quests/quest_challenge_completed.wav"
+        "sound-file": "quests/quest_challenge_completed.webm"
     },
     "quests/quest-aborted": {
-        "sound-file": "common/quest_deny.wav"
+        "sound-file": "common/quest_deny.webm"
     },
     "quests/quest-march-start": {
-        "sound-file": "quests/quest_march.wav",
+        "sound-file": "quests/quest_march.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/quest-proposed": {
-        "sound-file": "quests/quest_proposed.wav"
+        "sound-file": "quests/quest_proposed.webm"
     },
     "quests/new-icon": {
-        "sound-file": "common/juicy_button.wav"
+        "sound-file": "common/juicy_button.webm"
     },
     "quests/riley-intro": {
-        "sound-file": "quests/Riley_intro.wav"
+        "sound-file": "quests/Riley_intro.webm"
     },
     "quests/riley-theme": {
-        "sound-file": "quests/Rileys_song.wav",
+        "sound-file": "quests/Rileys_song.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/saniel-intro": {
-        "sound-file": "quests/Saniel_intro.wav"
+        "sound-file": "quests/Saniel_intro.webm"
     },
     "quests/saniel-theme-start": {
-        "sound-file": "quests/Saniel2.wav",
+        "sound-file": "quests/Saniel2.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "quests/reset-given": {
-        "sound-file": "quests/CollectItem_1.wav"
+        "sound-file": "quests/CollectItem_1.webm"
     },
     "quests/shutdown-start": {
-        "sound-file": "quests/system_shutdown.wav",
+        "sound-file": "quests/system_shutdown.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
     "shell/tracking-button/flip/hover": {
-        "sound-file": "Hover_Flip.wav",
+        "sound-file": "Hover_Flip.webm",
         "loop": true,
         "fade-in": 100,
         "fade-out": 100
     },
     "shell/tracking-button/flip-inverse/hover": {
-        "sound-file": "Hover_InverseFlip.wav",
+        "sound-file": "Hover_InverseFlip.webm",
         "loop": true,
         "fade-in": 100,
         "fade-out": 100
     },
     "shell/tracking-button/flip/click": {
-        "sound-file": "MouseClick_Flip.wav"
+        "sound-file": "MouseClick_Flip.webm"
     },
     "shell/tracking-button/flip-inverse/click": {
-        "sound-file": "MouseClick_Invert.wav"
+        "sound-file": "MouseClick_Invert.webm"
     },
     "shell/tracking-button/flip/enter": {
-        "sound-file": "MouseEnter_Flip.wav"
+        "sound-file": "MouseEnter_Flip.webm"
     },
     "shell/tracking-button/flip-inverse/enter": {
-        "sound-file": "MouseEnter_Inverse.wav"
+        "sound-file": "MouseEnter_Inverse.webm"
     },
     "system/background/front": {
-        "sound-file": "system/Theater_front.wav",
+        "sound-file": "system/Theater_front.webm",
         "loop": true
     },
     "FBE/startup": {
-        "sound-file": "FBE/Theater_backside.wav",
+        "sound-file": "FBE/Theater_backside.webm",
         "loop": true
     },
     "FBE/page-changed": {
-        "sound-file": "common/juicy_button.wav",
+        "sound-file": "common/juicy_button.webm",
         "overlap-behavior": "restart"
     }
 }
