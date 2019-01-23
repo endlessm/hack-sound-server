@@ -1,5 +1,6 @@
 import gi
 import logging
+import numpy as np
 import random
 import uuid
 gi.require_version('GLib', '2.0')  # noqa
@@ -28,11 +29,11 @@ class HackSoundPlayer(GObject.Object):
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
-    def __init__(self, uuid_, metadata, sender, metadata_extras=None):
+    def __init__(self, uuid_, metadata, sender, full_data=None):
         GObject.Object.__init__(self)
         self.uuid = uuid_
         self.metadata = metadata
-        self.metadata_extras = metadata_extras or {}
+        self.full_data = full_data or {}
         self.sender = sender
         self.pipeline = self._build_pipeline()
         self._stop_loop = False
@@ -136,7 +137,7 @@ class HackSoundPlayer(GObject.Object):
 
     @property
     def volume(self):
-        volume = self._get_multipliable_prop("volume")
+        volume = self._recalculate_property("volume")
         if volume is None:
             volume = self._DEFAULT_VOLUME
         return volume
@@ -146,7 +147,7 @@ class HackSoundPlayer(GObject.Object):
         """
         Changes pitch while keeping the tempo.
         """
-        return self._get_multipliable_prop("pitch")
+        return self._recalculate_property("pitch")
 
     @property
     def rate(self):
@@ -210,13 +211,37 @@ class HackSoundPlayer(GObject.Object):
                                 current_time, current_volume,
                                 current_time + time_ms * Gst.MSECOND, 0)
 
-    def _get_multipliable_prop(self, prop_name):
+    def _recalculate_property(self, prop_name):
         value = self.metadata.get(prop_name, None)
-        if prop_name in self.metadata_extras:
-            if value is None:
-                value = self.metadata_extras[prop_name]
+        recalculate = self.metadata.get("recalculate", {}).get(prop_name, {})
+        full_recalculate =\
+            self.full_data.get("recalculate", {}).get(prop_name, {})
+        if recalculate:
+            points = recalculate["points"]
+            degree = recalculate["degree"]
+            if not points or not degree:
+                _logger.warning("Cannot recalculate '%s' because 'points' or "
+                                "'degree' properties are not set." % prop_name)
+
+            min_value = recalculate.get("min", 0)
+            max_value = recalculate.get("max", np.inf)
+
+            points = np.array(recalculate["points"])
+            coefficients = np.polyfit(points[:, 0], points[:, 1], deg=degree)
+
+            x = full_recalculate.get("x") or recalculate.get("x")
+            if x and (isinstance(x, float) or isinstance(int)):
+                value = np.polyval(coefficients, x)
+                return np.minimum(np.maximum(min_value, value), max_value)
             else:
-                value *= self.metadata_extras[prop_name]
+                _logger.warning("Cannot recalculate '%s' because 'x' is not "
+                                "given or this is not a number." % prop_name)
+
+        if prop_name in self.full_data:
+            if value is None:
+                value = self.full_data[prop_name]
+            else:
+                value *= self.full_data[prop_name]
         return value
 
     def _create_control(self, element, prop):
