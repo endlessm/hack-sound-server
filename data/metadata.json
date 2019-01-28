@@ -485,6 +485,12 @@
     "framework/tower/5": {
         "sound-file": "soundpacks/sfxgroup_tower6.webm"
     },
+    "hackdex1/pre-corruption": {
+        "sound-file": "hackdex1/Pre-crash-glitch.webm"
+    },
+    "hackdex1/corrupted": {
+        "sound-file": "hackdex1/roster-crash.webm"
+    },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
