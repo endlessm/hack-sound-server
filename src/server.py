@@ -24,7 +24,7 @@ class HackSoundPlayer(GObject.Object):
     _DEFAULT_FADE_OUT_MS = 1000
 
     __gsignals__ = {
-        'eos': (GObject.SignalFlags.RUN_FIRST, None, ()),
+        'released': (GObject.SignalFlags.RUN_FIRST, None, ()),
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
@@ -43,8 +43,12 @@ class HackSoundPlayer(GObject.Object):
         bus.connect("message", self.__bus_message_cb)
 
     def release(self):
-        self.pipeline.get_bus().remove_signal_watch()
-        self.pipeline = None
+        # Otherwise, GStreamer complains with a WARNING indicating that
+        # g_idle_add should be used.
+        GLib.idle_add(self._release)
+
+    def _release(self):
+        self.pipeline.set_state(Gst.State.NULL)
 
     def get_state(self):
         return self.pipeline.get_state(timeout=0).state
@@ -62,12 +66,12 @@ class HackSoundPlayer(GObject.Object):
     def stop(self):
         if not self.loop:
             # Just stop immediately
-            self.pipeline.send_event(Gst.Event.new_eos())
+            self.release()
             return
 
         if self.fade_out == 0:
             self._stop_loop = True
-            self.pipeline.send_event(Gst.Event.new_eos())
+            self.release()
             return
 
         volume_elem = self.pipeline.get_by_name('volume')
@@ -258,14 +262,14 @@ class HackSoundPlayer(GObject.Object):
         return pipeline
 
     def __volume_cb(self, volume_element, unused_volume):
-        # In case of fade-out effects, send EOS as soon volume reaches 0.
+        # In case of fade-out effects, release the pipeline as soon volume
+        # reaches 0.
         if self._stop_loop and volume_element.props.volume == 0:
-            self.pipeline.send_event(Gst.Event.new_eos())
+            self.release()
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
-            self.pipeline.set_state(Gst.State.NULL)
-            self.emit("eos")
+            self.release()
         elif message.type == Gst.MessageType.SEGMENT_DONE:
             if message.src != self.pipeline:
                 return
@@ -273,9 +277,7 @@ class HackSoundPlayer(GObject.Object):
                 self._n_loop += 1
                 self.seek(0.0, flags=Gst.SeekFlags.SEGMENT)
             else:
-                # Cancel the SEGMENT seek.
-                self.seek()
-                self.pipeline.send_event(Gst.Event.new_eos())
+                self.release()
         elif message.type == Gst.MessageType.ASYNC_DONE:
             if message.src != self.pipeline:
                 return
@@ -298,7 +300,11 @@ class HackSoundPlayer(GObject.Object):
             new_state = st.get_value("new-state")
             if (old_state == Gst.State.READY and new_state == Gst.State.PAUSED
                     and self._stop_loop):
-                self.pipeline.send_event(Gst.Event.new_eos())
+                self.release()
+            elif new_state == Gst.State.NULL:
+                self.pipeline.get_bus().remove_signal_watch()
+                self.pipeline = None
+                self.emit("released")
 
 
 DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
@@ -450,7 +456,7 @@ class HackSoundServer(Gio.Application):
             # Insert the uuid in the dictionary organized by sound event id.
             self._uuid_by_event_id[sound_event_id].add(uuid_)
 
-            self.players[uuid_].connect("eos", self.__player_eos_cb,
+            self.players[uuid_].connect("released", self.__player_released_cb,
                                         sound_event_id, uuid_)
             self.players[uuid_].connect("error", self.__player_error_cb,
                                         sound_event_id, uuid_,
@@ -555,11 +561,10 @@ class HackSoundServer(Gio.Application):
                 Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
                 "Method '%s' not available" % method)
 
-    def __player_eos_cb(self, unused_player, sound_event_id, uuid_):
+    def __player_released_cb(self, unused_player, sound_event_id, uuid_):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
-        self.players[uuid_].release()
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
             self._uuid_by_event_id[sound_event_id].remove(uuid_)
