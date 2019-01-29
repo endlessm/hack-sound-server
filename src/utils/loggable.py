@@ -1,5 +1,8 @@
 import logging
+import os
 
+
+DEFAULT_LOG_LEVEL = logging.WARNING
 
 _COLOR_TMPL = "\033[3{}m"
 (RED,
@@ -17,6 +20,19 @@ def apply_style(text, color=None, bold=False):
     bold = BOLD if bold else ""
     color = color or ""
     return "{}{}{}{}".format(bold, color, text, ESC)
+
+
+def get_log_level():
+    level = os.environ.get('HACK_SOUND_SERVER_LOGLEVEL')
+    if not level:
+        return DEFAULT_LOG_LEVEL
+    try:
+        level = int(level)
+    except ValueError:
+        level = logging.__dict__.get(level)
+    if isinstance(level, int):
+        return level
+    return DEFAULT_LOG_LEVEL
 
 
 class DefaultFormatter(logging.Formatter):
@@ -136,6 +152,7 @@ class Logger(logging.Logger):
             formatter = formatter(obj)
         ch.setFormatter(formatter)
         self.addHandler(ch)
+        self.setLevel(get_log_level())
 
     def _log(self, level, msg, args, exc_info=None, extra=None,
              stack_info=False, **kwargs):
