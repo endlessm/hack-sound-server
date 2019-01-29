@@ -38,6 +38,7 @@ class HackSoundPlayer(GObject.Object):
         self._stop_loop = False
         self._n_loop = 0
         self._is_initial_seek = False
+        self._current_state_change = None
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -57,6 +58,7 @@ class HackSoundPlayer(GObject.Object):
 
     def _play(self):
         self.pipeline.set_state(Gst.State.PLAYING)
+        self._add_fade_in(self.fade_in, self.volume)
         return GLib.SOURCE_REMOVE
 
     def stop(self):
@@ -182,6 +184,27 @@ class HackSoundPlayer(GObject.Object):
     def sound_location(self):
         return random.choice(self.metadata["sound-files"])
 
+    @property
+    def apply_state_on(self):
+        return self.metadata.get("apply-state-on")
+
+    def apply_state(self, state):
+        """
+        Applies the states supported by the 'apply-state-on' metadata property.
+
+        Supported states are 'pause' and 'silence'.
+        """
+        volume_elem = self.pipeline.get_by_name("volume")
+        self._current_state_change = state
+
+        if state == "pause":
+            if volume_elem.props.volume == 0:
+                self.pipeline.set_state(Gst.State.PAUSED)
+            else:
+                self._add_fade_out(volume_elem, self.fade_out)
+        elif state == "silence":
+            self._add_fade_out(volume_elem, self.fade_out)
+
     def _add_keyframe_pair(self, control, time_start_ns, value_start,
                            time_end_ns, value_end, consider_duration=True):
         control.unset_all()
@@ -259,8 +282,12 @@ class HackSoundPlayer(GObject.Object):
 
     def __volume_cb(self, volume_element, unused_volume):
         # In case of fade-out effects, send EOS as soon volume reaches 0.
-        if self._stop_loop and volume_element.props.volume == 0:
-            self.pipeline.send_event(Gst.Event.new_eos())
+        if volume_element.props.volume == 0:
+            if self._current_state_change == "pause":
+                self.pipeline.set_state(Gst.State.PAUSED)
+            self._current_state_change = None
+            if self._stop_loop:
+                self.pipeline.send_event(Gst.Event.new_eos())
 
     def __bus_message_cb(self, unused_bus, message):
         if message.type == Gst.MessageType.EOS:
@@ -456,8 +483,46 @@ class HackSoundServer(Gio.Application):
                                         sound_event_id, uuid_,
                                         connection, path, iface)
             self.players[uuid_].play()
+            self.apply_states(self.players[uuid_])
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+
+    def apply_states(self, player_to_exclude):
+        """
+        Applies the states indicated "apply-state-on" to the stated event ids.
+
+        The metadata for a given sound event may describe something like:
+            ```
+            "sound-a": {
+                "soud-location": "foo.wav",
+                "apply-state-on": [
+                    "pause": ["sound1", "sound2"],
+                    "silence": ["sound3", "sound4"]
+                ]
+            }
+            ```
+        By calling this method, the states "pause" would be applied to "sound1"
+        and "sound2", and the state "silence" to "sound3" and "sound4".
+
+        Args:
+            player_to_exclude (Player): The player which will not be affected
+                                        by the state change.
+        """
+        for player, state in self._players_to_apply_state(player_to_exclude):
+            player.apply_state(state)
+
+    def resume_states(self, player_to_exclude):
+        for player, _ in self._players_to_apply_state(player_to_exclude):
+            player.play()
+
+    def _players_to_apply_state(self, player):
+        if player.apply_state_on is None:
+            return []
+        for state, sound_envent_ids in player.apply_state_on.items():
+            for sound_event_id in sound_envent_ids:
+                uuids = self._uuid_by_event_id[sound_event_id]
+                for uuid in uuids:
+                    yield self.players[uuid], state
 
     def _watch_bus_name(self, bus_name, uuid_):
         # Tracks a player UUID called by its respective DBus names.
@@ -560,6 +625,7 @@ class HackSoundServer(Gio.Application):
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
         self.players[uuid_].release()
+        self.resume_states(self.players[uuid_])
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
             self._uuid_by_event_id[sound_event_id].remove(uuid_)
@@ -582,6 +648,7 @@ class HackSoundServer(Gio.Application):
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
             del self.players[uuid_]
+            self.players[uuid_].release()
             if sound_event_id in self._uuid_by_event_id:
                 self._uuid_by_event_id[sound_event_id].remove(uuid_)
                 if len(self._uuid_by_event_id[sound_event_id]) == 0:
