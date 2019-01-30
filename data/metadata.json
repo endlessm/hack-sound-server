@@ -154,52 +154,62 @@
     "fizzics/level/1/background": {
         "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/2/background": {
         "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/3/background": {
         "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/4/background": {
         "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/5/background": {
         "sound-file": "fizzics/Background_loop.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/6/background": {
         "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/7/background": {
         "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/8/background": {
         "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/9/background": {
         "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/10/background": {
         "sound-file": "fizzics/Background_loop2.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/background1": {
         "sound-file": "fizzics/BG_1.webm",
@@ -547,12 +557,14 @@
     "quests/ada-theme-start": {
         "sound-file": "quests/Ada.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/ada-variant-start": {
         "sound-file": "quests/Ada_piano.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
@@ -560,7 +572,8 @@
     "quests/hi-hat-start": {
         "sound-file": "quests/hihat-sneaker.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/key-given": {
         "sound-file": "quests/key_given.webm"
@@ -568,7 +581,8 @@
     "quests/pink-panther-start": {
         "sound-file": "quests/quest_sneaky.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/quest-unavailable": {
         "sound-file": "common/lockscreenInactive.webm"
@@ -585,7 +599,8 @@
     "quests/quest-march-start": {
         "sound-file": "quests/quest_march.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/quest-proposed": {
         "sound-file": "quests/quest_proposed.webm"
@@ -599,7 +614,8 @@
     "quests/riley-theme": {
         "sound-file": "quests/Rileys_song.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/saniel-intro": {
         "sound-file": "quests/Saniel_intro.webm"
