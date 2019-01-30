@@ -48,7 +48,12 @@ class HackSoundPlayer(GObject.Object):
         GLib.idle_add(self._release)
 
     def _release(self):
+        if self.pipeline is None:
+            return
         self.pipeline.set_state(Gst.State.NULL)
+        self.pipeline.get_bus().remove_signal_watch()
+        self.pipeline = None
+        self.emit("released")
 
     def get_state(self):
         return self.pipeline.get_state(timeout=0).state
@@ -301,10 +306,6 @@ class HackSoundPlayer(GObject.Object):
             if (old_state == Gst.State.READY and new_state == Gst.State.PAUSED
                     and self._stop_loop):
                 self.release()
-            elif new_state == Gst.State.NULL:
-                self.pipeline.get_bus().remove_signal_watch()
-                self.pipeline = None
-                self.emit("released")
 
 
 DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
