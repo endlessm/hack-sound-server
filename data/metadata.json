@@ -499,6 +499,11 @@
         "loop": true,
         "type": "bg"
     },
+    "hack-toolbox/ambient/com.endlessm.OperatingSystemApp": {
+        "sound-file": "toolbox/Theater_backside.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
@@ -551,6 +556,7 @@
     },
     "HackUnlock/ambient/back": {
         "sound-file": "HackUnlock/Ambient_back_noclip.webm",
+        "comment": "This can't be moved to the toolbox, because it doesn't always play continuously while the toolbox is focused",
         "loop": true
     },
     "HackUnlock/landing": {
@@ -687,10 +693,6 @@
     },
     "shell/tracking-button/flip-inverse/enter": {
         "sound-file": "MouseEnter_Inverse.webm"
-    },
-    "system/background/back": {
-        "sound-file": "system/Theater_backside.webm",
-        "loop": true
     },
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
