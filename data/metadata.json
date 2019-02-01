@@ -563,8 +563,8 @@
     "HackUnlock/success": {
         "sound-file": "HackUnlock/Success_Front.webm"
     },
-    "HackUnlock.webme": {
-        "sound-file": "HackUnlock.webme_Back.webm",
+    "HackUnlock/wave": {
+        "sound-file": "HackUnlock/Wave_Back.webm",
         "loop": true
     },
     "quests/ada-intro": {
