@@ -24,7 +24,8 @@
         "sound-file": "clubhouse/clubhouse_ambient.webm",
         "loop": true,
         "fade-in": 0,
-        "fade-out": 0
+        "fade-out": 0,
+        "type": "bg"
     },
     "clubhouse/dialog/open": {
         "sound-file": "clubhouse/dialog_popup.webm"
@@ -61,7 +62,8 @@
     },
     "codeview/ambient/hacking": {
         "sound-file": "codeview/Hacking_music1.webm",
-        "loop": true
+        "loop": true,
+        "type": "bg"
     },
     "codeview/code-error-appearance": {
         "sound-file": "codeview/Code_error.webm"
@@ -174,7 +176,8 @@
     "fizzics/level/4/background": {
         "sound-file": "fizzics/lv4_tripe.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/5/background": {
         "sound-file": "fizzics/lv4_tripe.webm",
