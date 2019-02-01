@@ -499,6 +499,29 @@
     "hack-toolbox/lockscreen/inactive": {
         "sound-file": "common/lockscreenInactive.webm"
     },
+    "hack-toolbox/lockscreen/open/lock.fizzics.1": {
+        "sound-file": "toolbox/Lockscreen_fizzics1_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.fizzics.2a": {
+        "sound-file": "toolbox/Lockscreen_fizzics2A_open.webm",
+        "note": "This lockscreen doesn't exist yet."
+    },
+    "hack-toolbox/lockscreen/open/lock.fizzics.2b": {
+        "sound-file": "toolbox/Lockscreen_fizzics2B_open.webm",
+        "note": "This lockscreen doesn't exist yet."
+    },
+    "hack-toolbox/lockscreen/open/lock.fizzics.2": {
+        "sound-file": "toolbox/Lockscreen_fizzicsL3_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/framework.1": {
+        "sound-file": "toolbox/Lockscreen_framework_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
+        "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.1": {
+        "sound-file": "toolbox/Lockscreen_System_open.webm"
+    },
     "hack-toolbox/minimize": {
         "sound-file": "toolbox/minimizePanel.webm"
     },
