@@ -9,11 +9,13 @@
         "sound-file": "clubhouse/clubhouse_open.webm"
     },
     "clubhouse/entry/pulse": {
-        "sound-file": "clubhouse/clubhouse_attract_event.webm"
+        "sound-file": "clubhouse/clubhouse_attract_jan29.webm"
     },
     "clubhouse/entry/pulse-loop": {
         "sound-file": "clubhouse/clubhouse_attract_loop.webm",
-        "loop": true
+        "loop": true,
+        "volume": 0,
+        "note": "Instead of using the silence.wav sound from David, set volume to 0"
     },
     "clubhouse/entry/close": {
         "sound-file": "clubhouse/clubhouse_close.webm"
@@ -152,66 +154,63 @@
         "sound-file": "fizzics/ButtonClick.webm"
     },
     "fizzics/level/1/background": {
-        "sound-file": "fizzics/Background_loop.webm",
+        "sound-file": "fizzics/lv1_troppy.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/2/background": {
-        "sound-file": "fizzics/Background_loop.webm",
+        "sound-file": "fizzics/lv2_ada_aut.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/3/background": {
-        "sound-file": "fizzics/Background_loop.webm",
+        "sound-file": "fizzics/lv2_ada_aut.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/4/background": {
-        "sound-file": "fizzics/Background_loop.webm",
+        "sound-file": "fizzics/lv4_tripe.webm",
         "loop": true,
         "volume": 0.4
     },
     "fizzics/level/5/background": {
-        "sound-file": "fizzics/Background_loop.webm",
+        "sound-file": "fizzics/lv4_tripe.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/6/background": {
-        "sound-file": "fizzics/Background_loop2.webm",
+        "sound-file": "fizzics/lv6_rock.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/7/background": {
-        "sound-file": "fizzics/Background_loop2.webm",
+        "sound-file": "fizzics/lv6_rock.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/8/background": {
-        "sound-file": "fizzics/Background_loop2.webm",
+        "sound-file": "fizzics/lv8_mystery.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/9/background": {
-        "sound-file": "fizzics/Background_loop2.webm",
+        "sound-file": "fizzics/lv9_hackhouse.webm",
         "loop": true,
-        "volume": 0.4
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/level/10/background": {
-        "sound-file": "fizzics/Background_loop2.webm",
+        "sound-file": "fizzics/lv9_hackhouse.webm",
         "loop": true,
-        "volume": 0.4
-    },
-    "fizzics/background1": {
-        "sound-file": "fizzics/BG_1.webm",
-        "loop": true
-    },
-    "fizzics/background2": {
-        "sound-file": "fizzics/BG_2.webm",
-        "loop": true
-    },
-    "fizzics/background3": {
-        "sound-file": "fizzics/BG_3.webm",
-        "loop": true
+        "volume": 0.4,
+        "type": "bg"
     },
     "fizzics/select1a": {
         "sound-file": "fizzics/Select_Species1_a.webm"
@@ -590,7 +589,7 @@
         "type": "bg"
     },
     "quests/key-given": {
-        "sound-file": "quests/key_given.webm"
+        "sound-file": "quests/key_given_tune.webm"
     },
     "quests/pink-panther-start": {
         "sound-file": "quests/quest_sneaky.webm",
