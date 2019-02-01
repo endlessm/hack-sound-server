@@ -524,6 +524,11 @@
     "framework/tower/5": {
         "sound-file": "soundpacks/sfxgroup_tower6.webm"
     },
+    "hack-toolbox/ambient/com.endlessm.Fizzics": {
+        "sound-file": "toolbox/Fizzics_backside.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
