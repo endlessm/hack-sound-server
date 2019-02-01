@@ -375,7 +375,8 @@
     },
     "fizzics/you_won": {
         "sound-file": "fizzics/you_won_loop.webm",
-        "loop": true
+        "loop": true,
+        "type": "bg"
     },
     "framework/drumkit/0": {
         "sound-file": "soundpacks/sfxgroup_drumkit1.webm"
@@ -570,12 +571,14 @@
     "quests/ada-theme-start": {
         "sound-file": "quests/Ada.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/ada-variant-start": {
         "sound-file": "quests/Ada_piano.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
@@ -583,7 +586,8 @@
     "quests/hi-hat-start": {
         "sound-file": "quests/hihat-sneaker.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/key-given": {
         "sound-file": "quests/key_given.webm"
@@ -591,7 +595,8 @@
     "quests/pink-panther-start": {
         "sound-file": "quests/quest_sneaky.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/quest-unavailable": {
         "sound-file": "common/lockscreenInactive.webm"
@@ -608,7 +613,8 @@
     "quests/quest-march-start": {
         "sound-file": "quests/quest_march.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/quest-proposed": {
         "sound-file": "quests/quest_proposed.webm"
@@ -622,7 +628,8 @@
     "quests/riley-theme": {
         "sound-file": "quests/Rileys_song.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/saniel-intro": {
         "sound-file": "quests/Saniel_intro.webm"
@@ -630,7 +637,8 @@
     "quests/saniel-theme-start": {
         "sound-file": "quests/Saniel2.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/reset-given": {
         "sound-file": "quests/CollectItem_1.webm"
@@ -670,7 +678,8 @@
     },
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
-        "loop": true
+        "loop": true,
+        "type": "bg"
     },
     "FBE/startup": {
         "sound-file": "FBE/Theater_backside.webm",
