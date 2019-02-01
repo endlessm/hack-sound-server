@@ -494,6 +494,11 @@
     "hackdex1/corrupted": {
         "sound-file": "hackdex1/roster-crash.webm"
     },
+    "hack-toolbox/ambient/com.endlessm.Fizzics": {
+        "sound-file": "toolbox/Fizzics_backside.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
