@@ -8,7 +8,8 @@
         "loop": true
     },
     "HackUnlock/ambient/back": {
-        "sound-file": "HackUnlock/Ambient_back_noclip.webm",
+        "comment": "This can't be moved to the toolbox, because it doesn't always play continuously while the toolbox is focused",
+        "sound-file": "HackUnlock/Ambient_Back.webm",
         "loop": true
     },
     "HackUnlock/ambient/front": {
@@ -529,6 +530,11 @@
         "loop": true,
         "type": "bg"
     },
+    "hack-toolbox/ambient/com.endlessm.OperatingSystemApp": {
+        "sound-file": "toolbox/Theater_backside.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
@@ -906,10 +912,6 @@
         "sound-file": "Hover_Flip.webm",
         "fade-in": 100,
         "fade-out": 100,
-        "loop": true
-    },
-    "system/background/back": {
-        "sound-file": "system/Theater_backside.webm",
         "loop": true
     },
     "system/background/front": {
