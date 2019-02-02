@@ -539,7 +539,6 @@ class HackSoundServer(Gio.Application):
             metadata = self.metadata[sound_event_id]
             self.players[uuid_] = HackSoundPlayer(sender, sound_event_id,
                                                   uuid_, metadata, options)
-            self._watch_bus_name(sender, uuid_)
             # Insert the uuid in the dictionary organized by sound event id.
             self._uuid_by_event_id[sound_event_id].add(uuid_)
 
