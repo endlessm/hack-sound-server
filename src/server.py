@@ -1,5 +1,4 @@
 import gi
-import logging
 import random
 import uuid
 gi.require_version('GLib', '2.0')  # noqa
@@ -11,9 +10,9 @@ from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import GstController
 from collections import namedtuple
-
-
-_logger = logging.getLogger(__name__)
+from hack_sound_server.utils.loggable import Logger
+from hack_sound_server.utils.loggable import PlayerFormatter
+from hack_sound_server.utils.loggable import ServerFormatter
 
 
 class HackSoundPlayer(GObject.Object):
@@ -28,14 +27,18 @@ class HackSoundPlayer(GObject.Object):
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
-    def __init__(self, sound_event_id, uuid_, metadata, sender,
+    def __init__(self, bus_name, sound_event_id, uuid_, metadata,
                  metadata_extras=None):
-        GObject.Object.__init__(self)
+        super().__init__()
+        self.logger = Logger(PlayerFormatter, self)
+        # The following attributes (bus_name, sound_event_id and uuid) are used
+        # internally by the logger to format the log messages.
+        self.bus_name = bus_name
         self.sound_event_id = sound_event_id
         self.uuid = uuid_
+
         self.metadata = metadata
         self.metadata_extras = metadata_extras or {}
-        self.sender = sender
         self.pipeline = self._build_pipeline()
         self._stop_loop = False
         self._n_loop = 0
@@ -100,9 +103,8 @@ class HackSoundPlayer(GObject.Object):
         try:
             self._add_fade_out(volume_elem, self.fade_out)
         except ValueError as ex:
-            _logger.error(ex)
-            _logger.warning("{}: Fade out effect could not be applied. "
-                            "Stop.".format(self.uuid))
+            self.logger.error(ex)
+            self.logger.warning("Fade out effect could not be applied. Stop.")
 
     def reset(self):
         self.seek(0.0)
@@ -316,8 +318,8 @@ class HackSoundPlayer(GObject.Object):
                 self._is_initial_seek = True
         elif message.type == Gst.MessageType.ERROR:
             error, debug = message.parse_error()
-            _logger.warning("Error from %s: %s (%s)", message.src, error,
-                            debug)
+            self.logger.warning("Error from %s: %s (%s)", message.src, error,
+                                debug)
             self.pipeline.set_state(Gst.State.NULL)
             self.emit("error", error, debug)
         elif message.type == Gst.MessageType.STATE_CHANGED:
@@ -376,6 +378,7 @@ class HackSoundServer(Gio.Application):
     def __init__(self, metadata):
         super().__init__(application_id=self._DBUS_NAME,
                          flags=Gio.ApplicationFlags.IS_SERVICE)
+        self.logger = Logger(ServerFormatter, self)
         self._dbus_id = None
         self.metadata = metadata
         self._countdown_id = None
@@ -422,6 +425,13 @@ class HackSoundServer(Gio.Application):
                 self._background_players.append(player)
         player.play(fades_in)
 
+    def get_player(self, uuid_):
+        try:
+            return self.players[uuid_]
+        except KeyError:
+            self.logger.critical("This uuid is not assigned to any player.",
+                                 uuid=uuid_)
+
     def refcount(self, uuid_, bus_name=None):
         if bus_name is None:
             refcount = 0
@@ -432,27 +442,38 @@ class HackSoundServer(Gio.Application):
 
     def ref(self, uuid_, bus_name):
         self._refcount[uuid_][bus_name] += 1
-        self.play(uuid_, fades_in=self._refcount[uuid_][bus_name] == 1)
+        refcount = self._refcount[uuid_][bus_name]
+        self.logger.debug("Reference. Refcount: %d", refcount,
+                          bus_name=bus_name,
+                          sound_event_id=self.get_player(uuid_).sound_event_id,
+                          uuid=uuid_)
+        self.play(uuid_, fades_in=refcount == 1)
 
     def unref(self, uuid_, bus_name, count=1):
         if uuid_ not in self._refcount:
-            _logger.warning("{}: This uuid is not registered in the refcount "
-                            "registry.".format(uuid_))
+            self.logger.warning("This uuid is not registered in the refcount "
+                                "registry.", uuid=uuid_)
             return
         if bus_name not in self._refcount[uuid_]:
-            _logger.warning("{}: Bus name '{}' is not registered in the "
-                            "refcount registry.".format(uuid_, bus_name))
+            self.logger.warning("Bus name '{}' is not registered in the "
+                                "refcount registry.".format(bus_name),
+                                bus_name=bus_name)
             return
         if self._refcount[uuid_][bus_name] == 0:
-            _logger.warning("{}: Cannot decrease refcount for bus name '{}'"
-                            "because it's already 0.".format(uuid_, bus_name))
+            self.logger.warning("Cannot decrease refcount for bus name '{}'"
+                                "because it's already 0.".format(bus_name),
+                                uuid=uuid_)
             return
         self._refcount[uuid_][bus_name] -= count
+        self.logger.debug("Unreference. Refcount: %d",
+                          self._refcount[uuid_][bus_name], bus_name=bus_name,
+                          sound_event_id=self.get_player(uuid_).sound_event_id,
+                          uuid=uuid_)
         if self.refcount(uuid_) == 0:
             # Only stop the sound if the last bus name (application) referring
             # to it has been disconnected (closed). The stop method will,
             # indirectly, take care for deleting self._refcount[uuid_].
-            self.players[uuid_].stop()
+            self.get_player(uuid_).stop()
 
     def do_dbus_register(self, connection, path):
         Gio.Application.do_dbus_register(self, connection, path)
@@ -474,19 +495,21 @@ class HackSoundServer(Gio.Application):
             self.release()
             GLib.Source.remove(self._countdown_id)
             self._countdown_id = None
-            _logger.info('Timeout cancelled')
+            self.logger.info('Timeout cancelled')
 
     def _ensure_release_countdown(self):
         self._cancel_countdown()
         self.hold()
-        _logger.info('All sounds done; starting timeout of {} seconds'.format(
-            self._TIMEOUT_S))
+        self.logger.info('All sounds done; starting timeout of {} '
+                         'seconds'.format(self._TIMEOUT_S))
         self._countdown_id = GLib.timeout_add_seconds(
             self._TIMEOUT_S, self.release, priority=GLib.PRIORITY_LOW)
 
     def play_sound(self, sound_event_id, connection, sender, path, iface,
                    invocation, options=None):
         if sound_event_id not in self.metadata:
+            self.logger.info("This sound event id does not exist.",
+                             sound_event_id=sound_event_id)
             invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_SOUND_EVENT_ID,
                 "sound event with id %s does not exist" % sound_event_id)
@@ -495,9 +518,12 @@ class HackSoundServer(Gio.Application):
         overlap_behavior = \
             self.metadata[sound_event_id].get("overlap-behavior", "overlap")
         if overlap_behavior not in self._OVERLAP_BEHAVIOR_CHOICES:
+            msg = "'%s' is not a valid option for 'overlap-behavior'."
+            self.logger.info(msg, overlap_behavior,
+                             sound_event_id=sound_event_id)
             return invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
-                "'%s' is not a valid option." % overlap_behavior)
+                msg % overlap_behavior)
         if not self._uuid_by_event_id.get(sound_event_id):
             self._uuid_by_event_id[sound_event_id] = set()
 
@@ -511,9 +537,9 @@ class HackSoundServer(Gio.Application):
 
             uuid_ = str(uuid.uuid4())
             metadata = self.metadata[sound_event_id]
-            self.players[uuid_] = HackSoundPlayer(sound_event_id, uuid_,
-                                                  metadata, sender, options)
-
+            self.players[uuid_] = HackSoundPlayer(sender, sound_event_id,
+                                                  uuid_, metadata, options)
+            self._watch_bus_name(sender, uuid_)
             # Insert the uuid in the dictionary organized by sound event id.
             self._uuid_by_event_id[sound_event_id].add(uuid_)
 
@@ -567,7 +593,7 @@ class HackSoundServer(Gio.Application):
 
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
-            self.players[uuid_].reset()
+            self.get_player(uuid_).reset()
             return uuid_
         elif overlap_behavior == "ignore":
             # If a sound is already playing, then ignore the new one.
@@ -580,12 +606,13 @@ class HackSoundServer(Gio.Application):
         # never happen because we never define an UUID in the metadata file.
         if not ((uuid_ not in self.players) ^
                 (uuid_ not in self._uuid_by_event_id)):
-            _logger.info('Sound {} was supposed to be stopped, '
-                         'but did not exist'.format(uuid_))
+            self.logger.info("Sound {} was supposed to be stopped, but did "
+                             "not exist".format(uuid_))
         elif (uuid_ in self.players and (uuid_ not in self._refcount or
                                          sender not in self._refcount[uuid_])):
-            _logger.info('Sound {} was supposed to be refcounted by the bus, '
-                         'name \'{}\' but it wasn\'t.'.format(uuid_, sender))
+            self.logger.info("Sound {} was supposed to be "
+                             "refcounted by the bus, name \'{}\' but "
+                             "it wasn\'t.".format(uuid_, sender))
         else:
             if uuid_ in self.players:
                 self.unref(uuid_, sender)
@@ -598,10 +625,11 @@ class HackSoundServer(Gio.Application):
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
         if uuid_ not in self.players:
-            _logger.info('Properties of sound {} was supposed to be updated, '
-                         'but did not exist'.format(uuid_))
+            self.logger.info("Properties of sound {} was supposed to be "
+                             "updated, but did not exist".format(uuid_))
         else:
-            self.players[uuid_].update_properties(transition_time_ms, options)
+            player = self.get_player(uuid_)
+            player.update_properties(transition_time_ms, options)
         invocation.return_value(None)
 
     def __method_called_cb(self, connection, sender, path, iface,
@@ -624,14 +652,16 @@ class HackSoundServer(Gio.Application):
                 "Method '%s' not available" % method)
 
     def _resume_last_bg_player(self, uuid_):
-        if self.players[uuid_] not in self._background_players:
+        player = self.get_player(uuid_)
+        if player not in self._background_players:
             return
-        assert self.players[uuid_].type_ == "bg"
+        assert player.type_ == "bg"
 
         try:
-            self._background_players.remove(self.players[uuid_])
+            self._background_players.remove(player)
+            player.release()
         except ValueError:
-            _logger.warning(
+            self.logger.warning(
                 "Sound %s sound was supposed to be in the list of "
                 "background sounds, but this isn't", uuid)
 
@@ -642,6 +672,12 @@ class HackSoundServer(Gio.Application):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
+        self.logger.debug(
+            "Freeing structures because end-of-stream was reached.",
+            bus_name=self.get_player(uuid_).bus_name,
+            sound_event_id=self.get_player(uuid_).sound_event_id,
+            uuid=uuid_
+        )
         self._resume_last_bg_player(uuid_)
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
@@ -664,6 +700,12 @@ class HackSoundServer(Gio.Application):
         data = (uuid_, error.message, error.domain, error.code, debug)
         vdata = GLib.Variant("(sssis)", data)
         if uuid_ in self.players:
+            self.logger.debug(
+                "Freeing structures because there was an error.",
+                bus_name=self.get_player(uuid_).bus_name,
+                sound_event_id=self.get_player(uuid_).sound_event_id,
+                uuid=uuid_
+            )
             self._resume_last_bg_player(uuid_)
             del self.players[uuid_]
             if sound_event_id in self._uuid_by_event_id:

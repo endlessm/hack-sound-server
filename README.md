@@ -141,3 +141,42 @@ This is the identifier of the sound you have told to play and you can use it to 
 ```
 gdbus call --session --dest com.endlessm.HackSoundServer --object-path /com/endlessm/HackSoundServer --method com.endlessm.HackSoundServer.StopSound a72276d2-a856-4531-aac1-59fe1d331fc1
 ```
+
+# Logging
+
+## Log levels
+The default log level is WARNING, which means that by default only WARNING,
+ERROR and CRITICAL levels will be logged.
+
+The log level can be set using the environment variable `HACK_SOUND_SERVER_LOGLEVEL`.
+
+To log everything:
+```
+HACK_SOUND_SERVER_LOGLEVEL=0 flatpak run com.endlessm.HackSoundServer
+```
+
+Or for example, to log levels from INFO and upper:
+```
+HACK_SOUND_SERVER_LOGLEVEL=INFO flatpak run com.endlessm.HackSoundServer
+```
+
+For more information about levels, check the [Python logging system documentation](https://docs.python.org/3/library/logging.html).
+
+## Format
+For example, the following log output
+
+```
+DEBUG    : 2019-01-29 09:35:52,176 <HackSoundServer at 139708402141224>.ref - :1.19: clubhouse/entry/hover: a1881470-0d54-4e1a-a4bd-3ca76a648ebf: Reference. Refcount: 1 (server.py:382)
+```
+
+should be interpreted as:
+
+- `DEBUG`: The log level
+- `2019-01-29 09:35:52,176`: The current date and time
+- `<HackSoundServer at 139708402141224>`: The class and id of the object from which the log is called.
+- `.ref`: The method that called the log instruction.
+- `:1.19:`: The unique bus name that referenced the sound.
+- `clubhouse/entry/hover`: The sound event id.
+- `a1881470-0d54-4e1a-a4bd-3ca76a648ebf`: The uuid.
+- `Reference. Refcount: 1`: The log message.
+- `(server.py:382)`: The file and line from which the log instruction was called.
