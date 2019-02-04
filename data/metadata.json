@@ -684,8 +684,7 @@
         "type": "bg"
     },
     "FBE/startup": {
-        "sound-file": "FBE/Theater_backside.webm",
-        "loop": true
+        "sound-file": "FBE/OS_startup_jingle.wav"
     },
     "FBE/page-changed": {
         "sound-file": "common/juicy_button.webm",
