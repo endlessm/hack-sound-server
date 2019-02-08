@@ -500,7 +500,7 @@
         "overlap-behavior": "ignore"
     },
     "hack-toolbox/lockscreen/inactive": {
-        "sound-file": "common/lockscreenInactive.webm"
+        "sound-file": "toolbox/lockscreen-nokey-louder.webm"
     },
     "hack-toolbox/lockscreen/open/lock.fizzics.1": {
         "sound-file": "toolbox/Lockscreen_fizzics1_open.webm"
@@ -601,7 +601,7 @@
         "type": "bg"
     },
     "quests/quest-unavailable": {
-        "sound-file": "common/lockscreenInactive.webm"
+        "sound-file": "quests/quest-unavailable.webm"
     },
     "quests/quest-given": {
         "sound-file": "quests/quest_accepted.webm"
