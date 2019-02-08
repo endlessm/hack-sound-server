@@ -625,7 +625,8 @@
         "sound-file": "common/juicy_button.webm"
     },
     "quests/riley-intro": {
-        "sound-file": "quests/Riley_intro.webm"
+        "sound-file": "quests/riley_intro-stinger.webm",
+        "type": "bg"
     },
     "quests/riley-theme": {
         "sound-file": "quests/Rileys_song.webm",
@@ -634,13 +635,17 @@
         "type": "bg"
     },
     "quests/saniel-intro": {
-        "sound-file": "quests/Saniel_intro.webm"
+        "sound-file": "quests/saniel-intro-stinger.webm",
+        "type": "bg"
     },
     "quests/saniel-theme-start": {
         "sound-file": "quests/Saniel2.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
+    },
+    "quests/saniel-angry": {
+        "sound-file": "quests/saniel_angry.webm"
     },
     "quests/reset-given": {
         "sound-file": "quests/CollectItem_1.webm"
