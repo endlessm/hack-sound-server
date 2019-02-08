@@ -601,7 +601,7 @@
         "type": "bg"
     },
     "quests/quest-unavailable": {
-        "sound-file": "common/lockscreenInactive.webm"
+        "sound-file": "quests/quest-unavailable.webm"
     },
     "quests/quest-given": {
         "sound-file": "quests/quest_accepted.webm"
