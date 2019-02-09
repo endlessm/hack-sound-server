@@ -12,7 +12,7 @@
         "sound-file": "clubhouse/clubhouse_attract_jan29.webm"
     },
     "clubhouse/entry/pulse-loop": {
-        "sound-file": "clubhouse/clubhouse_attract_loop.webm",
+        "sound-file": "clubhouse/clubhouse_attract_noclip.webm",
         "loop": true,
         "volume": 0,
         "note": "Instead of using the silence.wav sound from David, set volume to 0"
@@ -541,11 +541,11 @@
         "sound-file": "toolbox/liveTextToGUI.webm"
     },
     "HackUnlock/ambient/front": {
-        "sound-file": "HackUnlock/Ambient_Front.webm",
+        "sound-file": "HackUnlock/Ambient_Front_noclip.webm",
         "loop": true
     },
     "HackUnlock/ambient/back": {
-        "sound-file": "HackUnlock/Ambient_Back.webm",
+        "sound-file": "HackUnlock/Ambient_back_noclip.webm",
         "loop": true
     },
     "HackUnlock/landing": {
@@ -564,8 +564,9 @@
         "sound-file": "HackUnlock/Success_Front.webm"
     },
     "HackUnlock/wave": {
-        "sound-file": "HackUnlock/Wave_Back.webm",
-        "loop": true
+        "sound-file": "HackUnlock/wave_back_noclip.wav",
+        "loop": true,
+        "note": "When compressed to WEBM, this sound clips at the end. Leave as WAV."
     },
     "quests/ada-intro": {
         "sound-file": "quests/Ada_intro.webm"
