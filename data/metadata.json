@@ -591,6 +591,9 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
+    "quests/key-confirm": {
+        "sound-file": "quests/key_confirm.webm"
+    },
     "quests/key-given": {
         "sound-file": "quests/key_given_tune.webm"
     },
