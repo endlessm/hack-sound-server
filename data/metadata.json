@@ -126,259 +126,400 @@
         "sound-file": "codeview/errorPopup - fixitButtonPress.webm"
     },
     "fizzics/moveTool": {
-        "sound-file": "fizzics/Tool_Move.webm"
+        "sound-file": "fizzics/Tool_Move.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/flingTool": {
-        "sound-file": "fizzics/Tool_Fling.webm"
+        "sound-file": "fizzics/Tool_Fling.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/createTool": {
-        "sound-file": "fizzics/Tool_Create.webm"
+        "sound-file": "fizzics/Tool_Create.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/trashTool": {
-        "sound-file": "fizzics/Tool_Trash.webm"
+        "sound-file": "fizzics/Tool_Trash.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/tool0": {
-        "sound-file": "fizzics/Tool_Species1.webm"
+        "sound-file": "fizzics/Tool_Species1.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/tool1": {
-        "sound-file": "fizzics/Tool_Species2.webm"
+        "sound-file": "fizzics/Tool_Species2.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/tool2": {
-        "sound-file": "fizzics/Tool_Species3.webm"
+        "sound-file": "fizzics/Tool_Species3.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/tool3": {
-        "sound-file": "fizzics/Tool_Species4.webm"
+        "sound-file": "fizzics/Tool_Species4.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/tool4": {
-        "sound-file": "fizzics/Tool_Species5.webm"
+        "sound-file": "fizzics/Tool_Species5.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/buttonClick": {
-        "sound-file": "fizzics/ButtonClick.webm"
+        "sound-file": "fizzics/ButtonClick.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/1/background": {
         "sound-file": "fizzics/lv1_troppy.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "type": "bg",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/2/background": {
         "sound-file": "fizzics/lv2_ada_aut.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "type": "bg",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/3/background": {
         "sound-file": "fizzics/lv2_ada_aut.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/4/background": {
         "sound-file": "fizzics/lv4_tripe.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/5/background": {
         "sound-file": "fizzics/lv4_tripe.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/6/background": {
         "sound-file": "fizzics/lv6_rock.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/7/background": {
         "sound-file": "fizzics/lv6_rock.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/8/background": {
         "sound-file": "fizzics/lv8_mystery.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/9/background": {
         "sound-file": "fizzics/lv9_hackhouse.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/level/10/background": {
         "sound-file": "fizzics/lv9_hackhouse.webm",
         "loop": true,
         "volume": 0.4,
-        "type": "bg"
+        "type": "bg",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select1a": {
-        "sound-file": "fizzics/Select_Species1_a.webm"
+        "sound-file": "fizzics/Select_Species1_a.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select1b": {
-        "sound-file": "fizzics/Select_Species1_b.webm"
+        "sound-file": "fizzics/Select_Species1_b.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select1c": {
-        "sound-file": "fizzics/Select_Species1_c.webm"
+        "sound-file": "fizzics/Select_Species1_c.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select2a": {
-        "sound-file": "fizzics/Select_Species2_a.webm"
+        "sound-file": "fizzics/Select_Species2_a.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select2b": {
-        "sound-file": "fizzics/Select_Species2_b.webm"
+        "sound-file": "fizzics/Select_Species2_b.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select2c": {
-        "sound-file": "fizzics/Select_Species2_c.webm"
+        "sound-file": "fizzics/Select_Species2_c.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select3a": {
-        "sound-file": "fizzics/Select_Species3_a.webm"
+        "sound-file": "fizzics/Select_Species3_a.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select3b": {
-        "sound-file": "fizzics/Select_Species3_b.webm"
+        "sound-file": "fizzics/Select_Species3_b.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select3c": {
-        "sound-file": "fizzics/Select_Species3_c.webm"
+        "sound-file": "fizzics/Select_Species3_c.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select4a": {
-        "sound-file": "fizzics/Select_Species4_a.webm"
+        "sound-file": "fizzics/Select_Species4_a.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select4b": {
-        "sound-file": "fizzics/Select_Species4_b.webm"
+        "sound-file": "fizzics/Select_Species4_b.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select4c": {
-        "sound-file": "fizzics/Select_Species4_c.webm"
+        "sound-file": "fizzics/Select_Species4_c.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select5a": {
-        "sound-file": "fizzics/Select_Species5_a.webm"
+        "sound-file": "fizzics/Select_Species5_a.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select5b": {
-        "sound-file": "fizzics/Select_Species5_b.webm"
+        "sound-file": "fizzics/Select_Species5_b.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/select5c": {
-        "sound-file": "fizzics/Select_Species5_c.webm"
+        "sound-file": "fizzics/Select_Species5_c.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/noGrab": {
-        "sound-file": "fizzics/Cannot_Grab.webm"
+        "sound-file": "fizzics/Cannot_Grab.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/success0": {
-        "sound-file": "fizzics/Success_Species1.webm"
+        "sound-file": "fizzics/Success_Species1.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/success1": {
-        "sound-file": "fizzics/Success_Species2.webm"
+        "sound-file": "fizzics/Success_Species2.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/success2": {
-        "sound-file": "fizzics/Success_Species3.webm"
+        "sound-file": "fizzics/Success_Species3.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/success3": {
-        "sound-file": "fizzics/Success_Species4.webm"
+        "sound-file": "fizzics/Success_Species4.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/success4": {
-        "sound-file": "fizzics/Success_Species5.webm"
+        "sound-file": "fizzics/Success_Species5.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/delete0": {
-        "sound-file": "fizzics/Death_Species1.webm"
+        "sound-file": "fizzics/Death_Species1.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/delete1": {
-        "sound-file": "fizzics/Death_Species2.webm"
+        "sound-file": "fizzics/Death_Species2.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/delete2": {
-        "sound-file": "fizzics/Death_Species3.webm"
+        "sound-file": "fizzics/Death_Species3.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/delete3": {
-        "sound-file": "fizzics/Death_Species4.webm"
+        "sound-file": "fizzics/Death_Species4.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/delete4": {
-        "sound-file": "fizzics/Death_Species5.webm"
+        "sound-file": "fizzics/Death_Species5.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death0": {
-        "sound-file": "fizzics/Death_1.webm"
+        "sound-file": "fizzics/Death_1.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death1": {
-        "sound-file": "fizzics/Death_2.webm"
+        "sound-file": "fizzics/Death_2.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death2": {
-        "sound-file": "fizzics/Death_3.webm"
+        "sound-file": "fizzics/Death_3.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death3": {
-        "sound-file": "fizzics/Death_4.webm"
+        "sound-file": "fizzics/Death_4.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death4": {
-        "sound-file": "fizzics/Collision_goal.webm"
+        "sound-file": "fizzics/Collision_goal.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death5": {
-        "sound-file": "fizzics/Collision_gem_get.webm"
+        "sound-file": "fizzics/Collision_gem_get.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/death6": {
-        "sound-file": "fizzics/Collision_bad.webm"
+        "sound-file": "fizzics/Collision_bad.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/moveFling": {
-        "sound-file": "fizzics/Slingshot_Grab.webm"
+        "sound-file": "fizzics/Slingshot_Grab.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/unGrab": {
-        "sound-file": "fizzics/Slingshot_Ungrab.webm"
+        "sound-file": "fizzics/Slingshot_Ungrab.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/pullFling": {
         "sound-file": "fizzics/Slingshot_Pull_Loop.webm",
-        "loop": true
+        "loop": true,
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/fling": {
-        "sound-file": "fizzics/Slingshot_Release.webm"
+        "sound-file": "fizzics/Slingshot_Release.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/fly0": {
-        "sound-file": "fizzics/Fly_Species1.webm"
+        "sound-file": "fizzics/Fly_Species1.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/fly1": {
-        "sound-file": "fizzics/Fly_Species2.webm"
+        "sound-file": "fizzics/Fly_Species2.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/fly2": {
-        "sound-file": "fizzics/Fly_Species3.webm"
+        "sound-file": "fizzics/Fly_Species3.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/fly3": {
-        "sound-file": "fizzics/Fly_Species4.webm"
+        "sound-file": "fizzics/Fly_Species4.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/fly4": {
-        "sound-file": "fizzics/Fly_Species5.webm"
+        "sound-file": "fizzics/Fly_Species5.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/create0": {
-        "sound-file": "fizzics/CreateBall_Species1.webm"
+        "sound-file": "fizzics/CreateBall_Species1.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/create1": {
-        "sound-file": "fizzics/CreateBall_Species2.webm"
+        "sound-file": "fizzics/CreateBall_Species2.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/create2": {
-        "sound-file": "fizzics/CreateBall_Species3.webm"
+        "sound-file": "fizzics/CreateBall_Species3.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/create3": {
-        "sound-file": "fizzics/CreateBall_Species4.webm"
+        "sound-file": "fizzics/CreateBall_Species4.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/create4": {
-        "sound-file": "fizzics/CreateBall_Species5.webm"
+        "sound-file": "fizzics/CreateBall_Species5.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/collision": {
-        "sound-file": "fizzics/Collision.webm"
+        "sound-file": "fizzics/Collision.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/tooManyBalls": {
-        "sound-file": "fizzics/Too_Many_Balls.webm"
+        "sound-file": "fizzics/Too_Many_Balls.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/collision/neutral": {
-        "sound-file": "fizzics/Collision_neutral.webm"
+        "sound-file": "fizzics/Collision_neutral.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/collision/wall": {
-        "sound-file": "fizzics/Collision_neutral.webm"
+        "sound-file": "fizzics/Collision_neutral.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/collision/winning": {
-        "sound-file": "fizzics/Collision_winning.webm"
+        "sound-file": "fizzics/Collision_winning.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/NEXT-LEVEL/clicked": {
-        "sound-file": "fizzics/Next_Level.webm"
+        "sound-file": "fizzics/Next_Level.webm",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "fizzics/you_won": {
         "sound-file": "fizzics/you_won_loop.webm",
         "loop": true,
-        "type": "bg"
+        "type": "bg",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "framework/drumkit/0": {
         "sound-file": "soundpacks/sfxgroup_drumkit1.webm"
@@ -497,7 +638,9 @@
     "hack-toolbox/ambient/com.endlessm.Fizzics": {
         "sound-file": "toolbox/Fizzics_backside.webm",
         "loop": true,
-        "type": "bg"
+        "type": "bg",
+        "side": "backside",
+        "target-app-id": "com.endlessm.Fizzics"
     },
     "hack-toolbox/ambient/com.endlessm.OperatingSystemApp": {
         "sound-file": "toolbox/Theater_backside.webm",
