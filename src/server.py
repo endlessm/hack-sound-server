@@ -13,6 +13,8 @@ from collections import namedtuple
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import PlayerFormatter
 from hack_sound_server.utils.loggable import ServerFormatter
+from hack_sound_server.utils.misc import get_app_id
+from hack_sound_server.dbus.system import Desktop
 
 
 class HackSoundPlayer(GObject.Object):
@@ -64,11 +66,19 @@ class HackSoundPlayer(GObject.Object):
     def get_state(self):
         return self.pipeline.get_state(timeout=0).state
 
-    def play(self, fades_in=True):
+    def play(self, fades_in=True, muted=False):
         if self.delay is None:
-            self._play(fades_in)
+            self._play(fades_in, muted)
         else:
             GLib.timeout_add(self.delay, self._play, fades_in)
+
+    def mute(self, fades=True):
+        self.logger.debug("Muting.")
+        mute_elem = self.pipeline.get_by_name("mute")
+        if fades:
+            self._add_fade_out(mute_elem, 0.0)
+        else:
+            mute_elem.props.volume = 0.0
 
     def pause_with_fade_out(self):
         volume_elem = self.pipeline.get_by_name("volume")
@@ -80,12 +90,15 @@ class HackSoundPlayer(GObject.Object):
             # The element will be set to PAUSED state when volume reaches 0.
             self._add_fade_out(volume_elem, self.fade_out)
 
-    def _play(self, fades_in):
+    def _play(self, fades_in, muted=False):
+        self.logger.info("Playing. Fades: %s. Muted: %s.", fades_in, muted)
         if self._stop_loop:
             return
         self.pipeline.set_state(Gst.State.PLAYING)
         if fades_in:
             self._add_fade_in(self.fade_in, self.volume)
+        if muted:
+            self.mute(fades=False)
         return GLib.SOURCE_REMOVE
 
     def stop(self):
@@ -217,6 +230,14 @@ class HackSoundPlayer(GObject.Object):
             return "sfx"
         return type_
 
+    @property
+    def side(self):
+        return self.metadata.get("side")
+
+    @property
+    def target_app_id(self):
+        return self.metadata.get("target-app-id")
+
     def _add_keyframe_pair(self, control, time_start_ns, value_start,
                            time_end_ns, value_end, consider_duration=True):
         control.unset_all()
@@ -273,6 +294,7 @@ class HackSoundPlayer(GObject.Object):
             "audioconvert",
             "pitch name=pitch pitch={} rate={}".format(*pitch_args),
             "volume name=volume volume={}".format(self.volume),
+            "volume name=mute volume=1",
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
@@ -391,9 +413,26 @@ class HackSoundServer(Gio.Application):
         # Only useful for sounds tagged with "overlap-behavior":
         self._uuid_by_event_id = {}
         self._background_players = []
+        self._uuids_by_target_app_id = {}
+        self._watch_focused_app()
 
-    def play(self, uuid_, fades_in):
+    def _watch_focused_app(self):
+        def _signal_cb(proxy, sender, signal, params):
+            if signal != "FocusedAppFlippedSignal":
+                return
+            app_id, flipped = params.unpack()
+            self._focused_app_changed_cb(get_app_id(app_id), flipped)
+        proxy = Desktop.get_shell_proxy()
+        proxy.connect("g-signal", _signal_cb)
+
+    def _focused_app_changed_cb(self, app_id, flipped):
+        self.logger.debug("Focused app changed. "
+                          "Focused app: '%s'. Flipped: %s.", app_id, flipped)
+        self._mute_unfocused_apps(app_id, flipped, unmute_focused_app=True)
+
+    def play(self, uuid_, refcount):
         player = self.players[uuid_]
+        fades_in = refcount == 1
         if player.type_ == "bg":
             # The following rule applies for 'bg' sounds: whenever a new 'bg'
             # sound starts to play back, if any previous 'bg' sound was already
@@ -425,7 +464,42 @@ class HackSoundServer(Gio.Application):
             elif self._background_players[-1] != player:
                 self._background_players[-1].pause_with_fade_out()
                 self._background_players.append(player)
-        player.play(fades_in)
+
+        target_app_id = self.get_player(uuid_).target_app_id
+        focused_app_id, focused_app_flipped = Desktop.get_focused_app_flipped()
+        focused_app_id = get_app_id(focused_app_id)
+
+        # Only play sounds if its target-app-id is the one to the current
+        # focused application in the right flipped state.
+        if target_app_id:
+            if target_app_id not in self._uuids_by_target_app_id:
+                self._uuids_by_target_app_id[focused_app_id] = set([])
+            self._uuids_by_target_app_id[target_app_id].add(uuid_)
+            self._mute_unfocused_apps(target_app_id, focused_app_flipped)
+
+        # In some cases a sound may be triggered when the application is not
+        # focused. We should play it muted, instead of not playing it, because
+        # that application may be focused again while the sound is supposed to
+        # be playing.
+        unmuted = (self.get_player(uuid_).target_app_id is None or
+                   self.get_player(uuid_).target_app_id == focused_app_id)
+        player.play(fades_in, not unmuted)
+
+    def _mute_unfocused_apps(self, focused_target_app_id, flipped,
+                             unmute_focused_app=False):
+        side = "backside" if flipped else "frontside"
+        for target_app_id in self._uuids_by_target_app_id:
+            for uuid_ in self._uuids_by_target_app_id[target_app_id]:
+                player = self.get_player(uuid_)
+                if (player.target_app_id == focused_target_app_id and
+                        player.side == side):
+                    if unmute_focused_app:
+                        # For a sound in PLAYING state, unmute it.
+                        # For a sound that is in PAUSED state because it was
+                        # a bg sound, resume it.
+                        player.play(fades_in=True)
+                    continue
+                player.mute(fades=True)
 
     def get_player(self, uuid_):
         try:
@@ -449,7 +523,7 @@ class HackSoundServer(Gio.Application):
                           bus_name=bus_name,
                           sound_event_id=self.get_player(uuid_).sound_event_id,
                           uuid=uuid_)
-        self.play(uuid_, fades_in=refcount == 1)
+        self.play(uuid_, refcount)
 
     def unref(self, uuid_, bus_name, count=1):
         if uuid_ not in self._refcount:
@@ -541,13 +615,16 @@ class HackSoundServer(Gio.Application):
             metadata = self.metadata[sound_event_id]
             self.players[uuid_] = HackSoundPlayer(sender, sound_event_id,
                                                   uuid_, metadata, options)
+
             # Insert the uuid in the dictionary organized by sound event id.
             self._uuid_by_event_id[sound_event_id].add(uuid_)
 
             self.players[uuid_].connect("released", self.__player_released_cb,
-                                        sound_event_id, uuid_)
+                                        sound_event_id, uuid_,
+                                        self.players[uuid_].target_app_id)
             self.players[uuid_].connect("error", self.__player_error_cb,
                                         sound_event_id, uuid_,
+                                        self.players[uuid_].target_app_id,
                                         connection, path, iface)
             # Plays the sound.
             self._watch_bus_name(sender, uuid_)
@@ -669,7 +746,8 @@ class HackSoundServer(Gio.Application):
         if len(self._background_players) > 0:
             self._background_players[-1].play()
 
-    def __player_released_cb(self, unused_player, sound_event_id, uuid_):
+    def __player_released_cb(self, unused_player, sound_event_id, uuid_,
+                             target_app_id):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
@@ -685,6 +763,10 @@ class HackSoundServer(Gio.Application):
             self._uuid_by_event_id[sound_event_id].remove(uuid_)
             if len(self._uuid_by_event_id[sound_event_id]) == 0:
                 del self._uuid_by_event_id[sound_event_id]
+        if target_app_id in self._uuids_by_target_app_id:
+            if not self._uuids_by_target_app_id[target_app_id]:
+                del self._uuids_by_target_app_id[target_app_id]
+            self._uuids_by_target_app_id[target_app_id].remove(uuid_)
         for bus_name in self._refcount[uuid_]:
             if bus_name in self._watcher_by_bus_name:
                 self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
@@ -694,7 +776,7 @@ class HackSoundServer(Gio.Application):
         self.release()
 
     def __player_error_cb(self, player, error, debug, sound_event_id,
-                          uuid_, connection, path, iface):
+                          uuid_, target_app_id, connection, path, iface):
         # This method is only called when the player fails or when an
         # application ordered to stop the sound. In both cases this means to
         # delete the references to that sound UUID.
@@ -713,6 +795,10 @@ class HackSoundServer(Gio.Application):
                 self._uuid_by_event_id[sound_event_id].remove(uuid_)
                 if len(self._uuid_by_event_id[sound_event_id]) == 0:
                     del self._uuid_by_event_id[sound_event_id]
+            if target_app_id in self._uuids_by_target_app_id:
+                if not self._uuids_by_target_app_id[target_app_id]:
+                    del self._uuids_by_target_app_id[target_app_id]
+                self._uuids_by_target_app_id[target_app_id].remove(uuid_)
             for bus_name in self._refcount[uuid_]:
                 if bus_name in self._watcher_by_bus_name:
                     self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
