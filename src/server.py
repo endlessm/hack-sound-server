@@ -414,6 +414,7 @@ class HackSoundServer(Gio.Application):
         self._uuid_by_event_id = {}
         self._background_players = []
         self._uuids_by_target_app_id = {}
+        self._uuids_by_side = {}
         self._watch_focused_app()
 
     def _watch_focused_app(self):
@@ -473,9 +474,14 @@ class HackSoundServer(Gio.Application):
         # focused application in the right flipped state.
         if target_app_id:
             if target_app_id not in self._uuids_by_target_app_id:
-                self._uuids_by_target_app_id[focused_app_id] = set([])
+                self._uuids_by_target_app_id[target_app_id] = set([])
             self._uuids_by_target_app_id[target_app_id].add(uuid_)
-            self._mute_unfocused_apps(target_app_id, focused_app_flipped)
+        if player.side:
+            if player.side not in self._uuids_by_side:
+                self._uuids_by_side[player.side] = set([])
+            self._uuids_by_side[player.side].add(uuid_)
+        if target_app_id or player.side:
+            self._mute_unfocused_apps(focused_app_id, focused_app_flipped)
 
         # In some cases a sound may be triggered when the application is not
         # focused. We should play it muted, instead of not playing it, because
@@ -487,19 +493,48 @@ class HackSoundServer(Gio.Application):
 
     def _mute_unfocused_apps(self, focused_target_app_id, flipped,
                              unmute_focused_app=False):
-        side = "backside" if flipped else "frontside"
+        def maybe_unmute(player):
+            if unmute_focused_app:
+                # For a sound in PLAYING state, unmute it.
+                # For a sound that is in PAUSED state because it was
+                # a bg sound, resume it.
+                player.play(fades_in=True)
+
+        current_app_side = "backside" if flipped else "frontside"
+        processed_uuids = set([])
+
+        for uuid_ in self._get_uuids_to_maybe_mute():
+            player = self.get_player(uuid_)
+
+            if (player.target_app_id and player.side and
+                    player.target_app_id == focused_target_app_id and
+                    player.side == current_app_side):
+                maybe_unmute(player)
+                continue
+
+            if (not player.target_app_id and player.side and
+                    player.side == current_app_side):
+                maybe_unmute(player)
+                continue
+
+            if (player.target_app_id and not player.side and
+                    player.target_app_id == focused_target_app_id):
+                maybe_unmute(player)
+                continue
+
+            player.mute(fades=True)
+
+    def _get_uuids_to_maybe_mute(self):
+        processed_uuids = set([])
         for target_app_id in self._uuids_by_target_app_id:
             for uuid_ in self._uuids_by_target_app_id[target_app_id]:
-                player = self.get_player(uuid_)
-                if (player.target_app_id == focused_target_app_id and
-                        player.side == side):
-                    if unmute_focused_app:
-                        # For a sound in PLAYING state, unmute it.
-                        # For a sound that is in PAUSED state because it was
-                        # a bg sound, resume it.
-                        player.play(fades_in=True)
+                processed_uuids.add(uuid_)
+                yield uuid_
+        for side in self._uuids_by_side:
+            for uuid_ in self._uuids_by_side[side]:
+                if uuid_ in processed_uuids:
                     continue
-                player.mute(fades=True)
+                yield uuid_
 
     def get_player(self, uuid_):
         try:
@@ -621,10 +656,12 @@ class HackSoundServer(Gio.Application):
 
             self.players[uuid_].connect("released", self.__player_released_cb,
                                         sound_event_id, uuid_,
-                                        self.players[uuid_].target_app_id)
+                                        self.players[uuid_].target_app_id,
+                                        self.players[uuid_].side)
             self.players[uuid_].connect("error", self.__player_error_cb,
                                         sound_event_id, uuid_,
                                         self.players[uuid_].target_app_id,
+                                        self.players[uuid_].side,
                                         connection, path, iface)
             # Plays the sound.
             self._watch_bus_name(sender, uuid_)
@@ -747,7 +784,7 @@ class HackSoundServer(Gio.Application):
             self._background_players[-1].play()
 
     def __player_released_cb(self, unused_player, sound_event_id, uuid_,
-                             target_app_id):
+                             target_app_id, side):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
@@ -764,9 +801,13 @@ class HackSoundServer(Gio.Application):
             if len(self._uuid_by_event_id[sound_event_id]) == 0:
                 del self._uuid_by_event_id[sound_event_id]
         if target_app_id in self._uuids_by_target_app_id:
-            if not self._uuids_by_target_app_id[target_app_id]:
-                del self._uuids_by_target_app_id[target_app_id]
             self._uuids_by_target_app_id[target_app_id].remove(uuid_)
+            if len(self._uuids_by_target_app_id[target_app_id]) == 0:
+                del self._uuids_by_target_app_id[target_app_id]
+        if side in self._uuids_by_side:
+            self._uuids_by_side[side].remove(uuid_)
+            if len(self._uuids_by_side[side]) == 0:
+                del self._uuids_by_side[side]
         for bus_name in self._refcount[uuid_]:
             if bus_name in self._watcher_by_bus_name:
                 self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
@@ -776,7 +817,7 @@ class HackSoundServer(Gio.Application):
         self.release()
 
     def __player_error_cb(self, player, error, debug, sound_event_id,
-                          uuid_, target_app_id, connection, path, iface):
+                          uuid_, target_app_id, side, connection, path, iface):
         # This method is only called when the player fails or when an
         # application ordered to stop the sound. In both cases this means to
         # delete the references to that sound UUID.
@@ -795,10 +836,14 @@ class HackSoundServer(Gio.Application):
                 self._uuid_by_event_id[sound_event_id].remove(uuid_)
                 if len(self._uuid_by_event_id[sound_event_id]) == 0:
                     del self._uuid_by_event_id[sound_event_id]
-            if target_app_id in self._uuids_by_target_app_id:
-                if not self._uuids_by_target_app_id[target_app_id]:
-                    del self._uuids_by_target_app_id[target_app_id]
-                self._uuids_by_target_app_id[target_app_id].remove(uuid_)
+                if target_app_id in self._uuids_by_target_app_id:
+                    self._uuids_by_target_app_id[target_app_id].remove(uuid_)
+                    if len(self._uuids_by_target_app_id[target_app_id]) == 0:
+                        del self._uuids_by_target_app_id[target_app_id]
+                if side in self._uuids_by_side:
+                    self._uuids_by_side[side].remove(uuid_)
+                    if len(self._uuids_by_side[side]) == 0:
+                        del self._uuids_by_side[side]
             for bus_name in self._refcount[uuid_]:
                 if bus_name in self._watcher_by_bus_name:
                     self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
