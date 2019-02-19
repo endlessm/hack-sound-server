@@ -645,7 +645,9 @@
     "hack-toolbox/ambient/com.endlessm.OperatingSystemApp": {
         "sound-file": "toolbox/Theater_backside.webm",
         "loop": true,
-        "type": "bg"
+        "type": "bg",
+        "side": "backside",
+        "target-app-id": "com.endlessm.OperatingSystemApp"
     },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
@@ -840,7 +842,9 @@
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
         "loop": true,
-        "type": "bg"
+        "type": "bg",
+        "side": "frontside",
+        "target-app-id": "com.endlessm.OperatingSystemApp"
     },
     "FBE/startup": {
         "sound-file": "FBE/Theater_backside.webm",
