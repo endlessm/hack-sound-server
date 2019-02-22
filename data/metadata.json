@@ -714,5 +714,70 @@
         "sound-file": "lightspeed/bg/zarathustra_whale.webm",
         "loop": true,
         "type": "bg"
+    },
+    "operatingSystem/daemons": {
+        "sound-file": "operatingSystem/daemons.webm",
+        "loop": true
+    },
+    "operatingSystem/select": {
+        "sound-file" : "operatingSystem/element-select.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/land": {
+        "sound-file" : "operatingSystem/speech-bubble-land.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/writing": {
+        "sound-file" : "operatingSystem/speech-bubble-writing.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/close": {
+        "sound-file" : "operatingSystem/subsystem-close.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/open": {
+        "sound-file" : "operatingSystem/subsystem-open.webm",
+        "overlap-behavior": "overlap",
+        "delay": 1250
+    },
+    "operatingSystem/kernel": {
+        "sound-file" : "operatingSystem/system-clock.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/clock": {
+        "sound-file" : "operatingSystem/system-clock.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/cursor": {
+        "sound-file" : "operatingSystem/system-cursor.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/file": {
+        "sound-file" : "operatingSystem/system-files.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/memory": {
+        "sound-file" : "operatingSystem/system-memory.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/dev": {
+        "sound-file" : "operatingSystem/system-null.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/system": {
+        "sound-file" : "operatingSystem/system-whole.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/window": {
+        "sound-file" : "operatingSystem/system-window.webm",
+        "loop": true,
+        "type": "bg"
     }
 }
