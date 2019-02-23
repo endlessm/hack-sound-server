@@ -699,5 +699,20 @@
     "FBE/page-changed": {
         "sound-file": "common/juicy_button.webm",
         "overlap-behavior": "restart"
+    },
+    "lightspeed/bg/2001-hardcore": {
+        "sound-file": "lightspeed/bg/2001_hardcore.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "lightspeed/bg/level-loop1": {
+        "sound-file": "lightspeed/bg/level_loop1.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "lightspeed/bg/zarathustra-whale": {
+        "sound-file": "lightspeed/bg/zarathustra_whale.webm",
+        "loop": true,
+        "type": "bg"
     }
 }
