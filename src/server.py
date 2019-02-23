@@ -340,6 +340,7 @@ DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
 
 class HackSoundServer(Gio.Application):
     _TIMEOUT_S = 10
+    _MAX_SIMULTANEOUS_SOUNDS = 5
     _OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
     _DBUS_NAME = "com.endlessm.HackSoundServer"
     _DBUS_UNKNOWN_SOUND_EVENT_ID = \
@@ -537,6 +538,10 @@ class HackSoundServer(Gio.Application):
             self._cancel_countdown()
             self.hold()
 
+            if self._check_too_many_sounds(invocation, sound_event_id,
+                                           overlap_behavior):
+                return
+
             uuid_ = str(uuid.uuid4())
             metadata = self.metadata[sound_event_id]
             self.players[uuid_] = HackSoundPlayer(sender, sound_event_id,
@@ -553,6 +558,17 @@ class HackSoundServer(Gio.Application):
             self._watch_bus_name(sender, uuid_)
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+
+    def _check_too_many_sounds(self, invocation, sound_event_id,
+                               overlap_behavior):
+        n_instances = len(self._uuid_by_event_id[sound_event_id])
+        if n_instances < self._MAX_SIMULTANEOUS_SOUNDS:
+            return False
+        self.logger.info("Sound is already playing %d times, ignoring.",
+                         self._MAX_SIMULTANEOUS_SOUNDS,
+                         sound_event_id=sound_event_id)
+        invocation.return_value(GLib.Variant("(s)", ("", )))
+        return True
 
     def _watch_bus_name(self, bus_name, uuid_):
         # Tracks a player UUID called by its respective DBus names.
