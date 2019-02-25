@@ -625,6 +625,36 @@
     "quests/quest-proposed": {
         "sound-file": "quests/quest_proposed.webm"
     },
+    "quests/quest2-ada-hi": {
+        "sound-file": "quests/guitar-plain.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-ada-hi2": {
+        "sound-file": "quests/guitar-easy2.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-riley-hi": {
+        "sound-file": "quests/guitar-easy1.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-riley-sneak": {
+        "sound-file": "quests/quest_sneaky.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-saniel-chore": {
+        "sound-file": "quests/starlight.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/new-icon": {
         "sound-file": "common/juicy_button.webm"
     },
