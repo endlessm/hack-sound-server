@@ -744,5 +744,70 @@
         "sound-file": "lightspeed/bg/zarathustra_whale.webm",
         "loop": true,
         "type": "bg"
+    },
+    "operatingSystem/daemons": {
+        "sound-file": "system/daemons.webm",
+        "loop": true
+    },
+    "operatingSystem/select": {
+        "sound-file" : "system/element-select.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/land": {
+        "sound-file" : "system/speech-bubble-land.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/writing": {
+        "sound-file" : "system/speech-bubble-writing.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/close": {
+        "sound-file" : "system/subsystem-close.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/open": {
+        "sound-file" : "system/subsystem-open.webm",
+        "overlap-behavior": "overlap",
+        "delay": 1250
+    },
+    "operatingSystem/kernel": {
+        "sound-file" : "system/system-clock.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/clock": {
+        "sound-file" : "system/system-clock.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/cursor": {
+        "sound-file" : "system/system-cursor.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/file": {
+        "sound-file" : "system/system-files.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/memory": {
+        "sound-file" : "system/system-memory.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/dev": {
+        "sound-file" : "system/system-null.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/system": {
+        "sound-file" : "system/system-whole.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/window": {
+        "sound-file" : "system/system-window.webm",
+        "loop": true,
+        "type": "bg"
     }
 }
