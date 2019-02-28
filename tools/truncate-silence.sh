@@ -38,7 +38,7 @@ done;
 shift $((OPTIND-1))
 
 if ${check_ffmpeg}; then
-    $tools_path/check-ffmpeg.sh
+    $tools_path/check-ffmpeg.sh --ffmpeg
 fi
 
 if ${truncate_start}; then

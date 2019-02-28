@@ -1,6 +1,6 @@
 #!/bin/bash -e
 tools_path=$(dirname "$0")
-$tools_path/check-ffmpeg.sh
+$tools_path/check-ffmpeg.sh --ffmpeg
 
 sounds_path=$tools_path/../data/sounds
 
