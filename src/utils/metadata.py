@@ -3,6 +3,7 @@ import os
 from hack_sound_server.utils.misc import get_metadata_path
 from hack_sound_server.utils.misc import get_sounds_dir
 from hack_sound_server.utils.loggable import logger
+from deepmerge import always_merger
 
 
 def _read_in_metadata(metadata, user_type):
@@ -51,6 +52,5 @@ def read_and_parse_metadata():
         return user_metadata
     if user_metadata is None:
         return system_metadata
-    metadata = system_metadata
-    metadata.update(user_metadata)
+    metadata = always_merger.merge(system_metadata, user_metadata)
     return metadata
