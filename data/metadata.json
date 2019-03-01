@@ -745,6 +745,32 @@
         "loop": true,
         "type": "bg"
     },
+    "lightspeed/asteroid-crash": {
+        "sound-file": "lightspeed/asteroid-crash.webm"
+    },
+    "lightspeed/asteroid-passing": {
+        "sound-file": "lightspeed/asteroid-passing.webm"
+    },
+    "lightspeed/astronaut-help": {
+        "sound-file": "lightspeed/astronaut-help.webm"
+    },
+    "lightspeed/astronaut-missed": {
+        "sound-file": "lightspeed/astronaut-missed.webm"
+    },
+    "lightspeed/astronaut-thanks": {
+        "sound-file": "lightspeed/astronaut-thanks.webm"
+    },
+    "lightspeed/thrust-down": {
+        "sound-file": "lightspeed/thrust-down.webm",
+        "loop": true
+    },
+    "lightspeed/thrust-up": {
+        "sound-file": "lightspeed/thrust-up.webm",
+        "loop": true
+    },
+    "lightspeed/timpani-start-win": {
+        "sound-file": "lightspeed/timpani-start-win.webm"
+    },
     "operatingSystem/daemons": {
         "sound-file": "system/daemons.webm",
         "loop": true
