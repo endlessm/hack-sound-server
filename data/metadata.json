@@ -1,44 +1,56 @@
 {
-    "clubhouse/entry/hover": {
-        "sound-file": "clubhouse/clubhouse_button_hover.webm",
+    "FBE/page-changed": {
+        "sound-file": "common/juicy_button.webm",
+        "overlap-behavior": "restart"
+    },
+    "FBE/startup": {
+        "sound-file": "FBE/Theater_backside.webm",
+        "loop": true
+    },
+    "HackUnlock/ambient/back": {
+        "sound-file": "HackUnlock/Ambient_back_noclip.webm",
+        "loop": true
+    },
+    "HackUnlock/ambient/front": {
+        "sound-file": "HackUnlock/Ambient_Front_noclip.webm",
+        "loop": true
+    },
+    "HackUnlock/landing": {
+        "sound-file": "HackUnlock/Landing_front.webm"
+    },
+    "HackUnlock/solution": {
+        "sound-file": "HackUnlock/Success_Back.webm"
+    },
+    "HackUnlock/success": {
+        "sound-file": "HackUnlock/Success_Front.webm"
+    },
+    "HackUnlock/success/back": {
+        "sound-file": "HackUnlock/Success_Back_loop.webm",
         "loop": true,
-        "fade-in": 0,
-        "fade-out": 0
+        "note": "This is a placeholder sound!",
+        "overlap-behavior": "ignore"
     },
-    "clubhouse/entry/open": {
-        "sound-file": "clubhouse/clubhouse_open.webm"
-    },
-    "clubhouse/entry/pulse": {
-        "sound-file": "clubhouse/clubhouse_attract_jan29.webm"
-    },
-    "clubhouse/entry/pulse-loop": {
-        "sound-file": "clubhouse/clubhouse_attract_noclip.webm",
+    "HackUnlock/wave": {
+        "sound-file": "HackUnlock/wave_back_noclip.wav",
         "loop": true,
-        "volume": 0,
-        "note": "Instead of using the silence.wav sound from David, set volume to 0"
-    },
-    "clubhouse/entry/close": {
-        "sound-file": "clubhouse/clubhouse_close.webm"
+        "note": "When compressed to WEBM, this sound clips at the end. Leave as WAV."
     },
     "clubhouse/ambient": {
         "sound-file": "clubhouse/clubhouse_ambient.webm",
-        "loop": true,
         "fade-in": 0,
         "fade-out": 0,
+        "loop": true,
         "type": "bg"
     },
-    "clubhouse/dialog/open": {
-        "sound-file": "clubhouse/dialog_popup.webm"
+    "clubhouse/character/dialog/dismiss": {
+        "sound-file": "clubhouse/character_dismiss.webm",
+        "fade-in": 0,
+        "fade-out": 0
     },
-    "clubhouse/dialog/close": {
-        "sound-file": "common/quest_deny.webm"
-    },
-    "clubhouse/dialog/next": {
-        "sound-files": [
-            "clubhouse/CollectItem_1.webm",
-            "clubhouse/CollectItem_2.webm",
-            "clubhouse/CollectItem_3.webm"
-        ]
+    "clubhouse/character/dialog/invite": {
+        "sound-file": "clubhouse/character_invite.webm",
+        "fade-in": 0,
+        "fade-out": 0
     },
     "clubhouse/character/mood/happy": {
         "sound-file": "clubhouse/Character_happy.webm",
@@ -50,15 +62,57 @@
         "fade-in": 0,
         "fade-out": 0
     },
-    "clubhouse/character/dialog/invite": {
-        "sound-file": "clubhouse/character_invite.webm",
-        "fade-in": 0,
-        "fade-out": 0
+    "clubhouse/dialog/close": {
+        "sound-file": "common/quest_deny.webm"
     },
-    "clubhouse/character/dialog/dismiss": {
-        "sound-file": "clubhouse/character_dismiss.webm",
+    "clubhouse/dialog/next": {
+        "sound-files": [
+            "clubhouse/CollectItem_1.webm",
+            "clubhouse/CollectItem_2.webm",
+            "clubhouse/CollectItem_3.webm"
+        ]
+    },
+    "clubhouse/dialog/open": {
+        "sound-file": "clubhouse/dialog_popup.webm"
+    },
+    "clubhouse/entry/close": {
+        "sound-file": "clubhouse/clubhouse_close.webm"
+    },
+    "clubhouse/entry/hover": {
+        "sound-file": "clubhouse/clubhouse_button_hover.webm",
         "fade-in": 0,
-        "fade-out": 0
+        "fade-out": 0,
+        "loop": true
+    },
+    "clubhouse/entry/open": {
+        "sound-file": "clubhouse/clubhouse_open.webm"
+    },
+    "clubhouse/entry/pulse": {
+        "sound-file": "clubhouse/clubhouse_attract_jan29.webm"
+    },
+    "clubhouse/entry/pulse-loop": {
+        "sound-file": "clubhouse/clubhouse_attract_noclip.webm",
+        "loop": true,
+        "note": "Instead of using the silence.wav sound from David, set volume to 0",
+        "volume": 0
+    },
+    "codeview/action/copy": {
+        "sound-file": "codeview/keyCombo - copy.webm"
+    },
+    "codeview/action/cut": {
+        "sound-file": "codeview/keyCombo - cut.webm"
+    },
+    "codeview/action/paste": {
+        "sound-file": "codeview/keyCombo - paste.webm"
+    },
+    "codeview/action/redo": {
+        "sound-file": "codeview/keyCombo - redo.webm"
+    },
+    "codeview/action/selection-drag": {
+        "sound-file": "codeview/selectionDrag (per character).webm"
+    },
+    "codeview/action/undo": {
+        "sound-file": "codeview/keyCombo - undo.webm"
     },
     "codeview/ambient/hacking": {
         "sound-file": "codeview/Hacking_music1.webm",
@@ -71,8 +125,20 @@
     "codeview/code-error-disappearance": {
         "sound-file": "codeview/Code_solution.webm"
     },
+    "codeview/keypress/delete": {
+        "sound-file": "codeview/key - delete.webm"
+    },
+    "codeview/keypress/delete-selection": {
+        "sound-file": "codeview/key - delete big.webm"
+    },
+    "codeview/keypress/down": {
+        "sound-file": "codeview/cursorDown.webm"
+    },
     "codeview/keypress/equals": {
         "sound-file": "codeview/key - equals.webm"
+    },
+    "codeview/keypress/other": {
+        "sound-file": "codeview/keyGeneric.webm"
     },
     "codeview/keypress/return": {
         "sound-file": "codeview/key - return.webm"
@@ -83,41 +149,8 @@
     "codeview/keypress/space": {
         "sound-file": "codeview/key - space.webm"
     },
-    "codeview/keypress/delete": {
-        "sound-file": "codeview/key - delete.webm"
-    },
-    "codeview/keypress/delete-selection": {
-        "sound-file": "codeview/key - delete big.webm"
-    },
     "codeview/keypress/up": {
         "sound-file": "codeview/cursorUp.webm"
-    },
-    "codeview/keypress/down": {
-        "sound-file": "codeview/cursorDown.webm"
-    },
-    "codeview/keypress/other": {
-        "sound-file": "codeview/keyGeneric.webm"
-    },
-    "codeview/action/cut": {
-        "sound-file": "codeview/keyCombo - cut.webm"
-    },
-    "codeview/action/copy": {
-        "sound-file": "codeview/keyCombo - copy.webm"
-    },
-    "codeview/action/paste": {
-        "sound-file": "codeview/keyCombo - paste.webm"
-    },
-    "codeview/action/undo": {
-        "sound-file": "codeview/keyCombo - undo.webm"
-    },
-    "codeview/action/redo": {
-        "sound-file": "codeview/keyCombo - redo.webm"
-    },
-    "codeview/action/selection-drag": {
-        "sound-file": "codeview/selectionDrag (per character).webm"
-    },
-    "codeview/popup/open": {
-        "sound-file": "codeview/errorPopup - open.webm"
     },
     "codeview/popup/close": {
         "sound-file": "codeview/errorPopup - closed.webm"
@@ -125,95 +158,174 @@
     "codeview/popup/fix": {
         "sound-file": "codeview/errorPopup - fixitButtonPress.webm"
     },
-    "fizzics/moveTool": {
-        "sound-file": "fizzics/Tool_Move.webm"
+    "codeview/popup/open": {
+        "sound-file": "codeview/errorPopup - open.webm"
     },
-    "fizzics/flingTool": {
-        "sound-file": "fizzics/Tool_Fling.webm"
-    },
-    "fizzics/createTool": {
-        "sound-file": "fizzics/Tool_Create.webm"
-    },
-    "fizzics/trashTool": {
-        "sound-file": "fizzics/Tool_Trash.webm"
-    },
-    "fizzics/tool0": {
-        "sound-file": "fizzics/Tool_Species1.webm"
-    },
-    "fizzics/tool1": {
-        "sound-file": "fizzics/Tool_Species2.webm"
-    },
-    "fizzics/tool2": {
-        "sound-file": "fizzics/Tool_Species3.webm"
-    },
-    "fizzics/tool3": {
-        "sound-file": "fizzics/Tool_Species4.webm"
-    },
-    "fizzics/tool4": {
-        "sound-file": "fizzics/Tool_Species5.webm"
+    "fizzics/NEXT-LEVEL/clicked": {
+        "sound-file": "fizzics/Next_Level.webm"
     },
     "fizzics/buttonClick": {
         "sound-file": "fizzics/ButtonClick.webm"
     },
+    "fizzics/collision": {
+        "sound-file": "fizzics/Collision.webm"
+    },
+    "fizzics/collision/neutral": {
+        "sound-file": "fizzics/Collision_neutral.webm"
+    },
+    "fizzics/collision/wall": {
+        "sound-file": "fizzics/Collision_neutral.webm"
+    },
+    "fizzics/collision/winning": {
+        "sound-file": "fizzics/Collision_winning.webm"
+    },
+    "fizzics/create0": {
+        "sound-file": "fizzics/CreateBall_Species1.webm"
+    },
+    "fizzics/create1": {
+        "sound-file": "fizzics/CreateBall_Species2.webm"
+    },
+    "fizzics/create2": {
+        "sound-file": "fizzics/CreateBall_Species3.webm"
+    },
+    "fizzics/create3": {
+        "sound-file": "fizzics/CreateBall_Species4.webm"
+    },
+    "fizzics/create4": {
+        "sound-file": "fizzics/CreateBall_Species5.webm"
+    },
+    "fizzics/createTool": {
+        "sound-file": "fizzics/Tool_Create.webm"
+    },
+    "fizzics/death0": {
+        "sound-file": "fizzics/Death_1.webm"
+    },
+    "fizzics/death1": {
+        "sound-file": "fizzics/Death_2.webm"
+    },
+    "fizzics/death2": {
+        "sound-file": "fizzics/Death_3.webm"
+    },
+    "fizzics/death3": {
+        "sound-file": "fizzics/Death_4.webm"
+    },
+    "fizzics/death4": {
+        "sound-file": "fizzics/Collision_goal.webm"
+    },
+    "fizzics/death5": {
+        "sound-file": "fizzics/Collision_gem_get.webm"
+    },
+    "fizzics/death6": {
+        "sound-file": "fizzics/Collision_bad.webm"
+    },
+    "fizzics/delete0": {
+        "sound-file": "fizzics/Death_Species1.webm"
+    },
+    "fizzics/delete1": {
+        "sound-file": "fizzics/Death_Species2.webm"
+    },
+    "fizzics/delete2": {
+        "sound-file": "fizzics/Death_Species3.webm"
+    },
+    "fizzics/delete3": {
+        "sound-file": "fizzics/Death_Species4.webm"
+    },
+    "fizzics/delete4": {
+        "sound-file": "fizzics/Death_Species5.webm"
+    },
+    "fizzics/fling": {
+        "sound-file": "fizzics/Slingshot_Release.webm"
+    },
+    "fizzics/flingTool": {
+        "sound-file": "fizzics/Tool_Fling.webm"
+    },
+    "fizzics/fly0": {
+        "sound-file": "fizzics/Fly_Species1.webm"
+    },
+    "fizzics/fly1": {
+        "sound-file": "fizzics/Fly_Species2.webm"
+    },
+    "fizzics/fly2": {
+        "sound-file": "fizzics/Fly_Species3.webm"
+    },
+    "fizzics/fly3": {
+        "sound-file": "fizzics/Fly_Species4.webm"
+    },
+    "fizzics/fly4": {
+        "sound-file": "fizzics/Fly_Species5.webm"
+    },
     "fizzics/level/1/background": {
         "sound-file": "fizzics/lv1_troppy.webm",
         "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/2/background": {
-        "sound-file": "fizzics/lv2_ada_aut.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/3/background": {
-        "sound-file": "fizzics/lv2_ada_aut.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/4/background": {
-        "sound-file": "fizzics/lv4_tripe.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/5/background": {
-        "sound-file": "fizzics/lv4_tripe.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/6/background": {
-        "sound-file": "fizzics/lv6_rock.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/7/background": {
-        "sound-file": "fizzics/lv6_rock.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/8/background": {
-        "sound-file": "fizzics/lv8_mystery.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
-    },
-    "fizzics/level/9/background": {
-        "sound-file": "fizzics/lv9_hackhouse.webm",
-        "loop": true,
-        "volume": 0.4,
-        "type": "bg"
+        "type": "bg",
+        "volume": 0.4
     },
     "fizzics/level/10/background": {
         "sound-file": "fizzics/lv9_hackhouse.webm",
         "loop": true,
-        "volume": 0.4,
-        "type": "bg"
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/2/background": {
+        "sound-file": "fizzics/lv2_ada_aut.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/3/background": {
+        "sound-file": "fizzics/lv2_ada_aut.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/4/background": {
+        "sound-file": "fizzics/lv4_tripe.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/5/background": {
+        "sound-file": "fizzics/lv4_tripe.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/6/background": {
+        "sound-file": "fizzics/lv6_rock.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/7/background": {
+        "sound-file": "fizzics/lv6_rock.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/8/background": {
+        "sound-file": "fizzics/lv8_mystery.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/level/9/background": {
+        "sound-file": "fizzics/lv9_hackhouse.webm",
+        "loop": true,
+        "type": "bg",
+        "volume": 0.4
+    },
+    "fizzics/moveFling": {
+        "sound-file": "fizzics/Slingshot_Grab.webm"
+    },
+    "fizzics/moveTool": {
+        "sound-file": "fizzics/Tool_Move.webm"
+    },
+    "fizzics/noGrab": {
+        "sound-file": "fizzics/Cannot_Grab.webm"
+    },
+    "fizzics/pullFling": {
+        "sound-file": "fizzics/Slingshot_Pull_Loop.webm",
+        "loop": true
     },
     "fizzics/select1a": {
         "sound-file": "fizzics/Select_Species1_a.webm"
@@ -260,9 +372,6 @@
     "fizzics/select5c": {
         "sound-file": "fizzics/Select_Species5_c.webm"
     },
-    "fizzics/noGrab": {
-        "sound-file": "fizzics/Cannot_Grab.webm"
-    },
     "fizzics/success0": {
         "sound-file": "fizzics/Success_Species1.webm"
     },
@@ -278,102 +387,29 @@
     "fizzics/success4": {
         "sound-file": "fizzics/Success_Species5.webm"
     },
-    "fizzics/delete0": {
-        "sound-file": "fizzics/Death_Species1.webm"
-    },
-    "fizzics/delete1": {
-        "sound-file": "fizzics/Death_Species2.webm"
-    },
-    "fizzics/delete2": {
-        "sound-file": "fizzics/Death_Species3.webm"
-    },
-    "fizzics/delete3": {
-        "sound-file": "fizzics/Death_Species4.webm"
-    },
-    "fizzics/delete4": {
-        "sound-file": "fizzics/Death_Species5.webm"
-    },
-    "fizzics/death0": {
-        "sound-file": "fizzics/Death_1.webm"
-    },
-    "fizzics/death1": {
-        "sound-file": "fizzics/Death_2.webm"
-    },
-    "fizzics/death2": {
-        "sound-file": "fizzics/Death_3.webm"
-    },
-    "fizzics/death3": {
-        "sound-file": "fizzics/Death_4.webm"
-    },
-    "fizzics/death4": {
-        "sound-file": "fizzics/Collision_goal.webm"
-    },
-    "fizzics/death5": {
-        "sound-file": "fizzics/Collision_gem_get.webm"
-    },
-    "fizzics/death6": {
-        "sound-file": "fizzics/Collision_bad.webm"
-    },
-    "fizzics/moveFling": {
-        "sound-file": "fizzics/Slingshot_Grab.webm"
-    },
-    "fizzics/unGrab": {
-        "sound-file": "fizzics/Slingshot_Ungrab.webm"
-    },
-    "fizzics/pullFling": {
-        "sound-file": "fizzics/Slingshot_Pull_Loop.webm",
-        "loop": true
-    },
-    "fizzics/fling": {
-        "sound-file": "fizzics/Slingshot_Release.webm"
-    },
-    "fizzics/fly0": {
-        "sound-file": "fizzics/Fly_Species1.webm"
-    },
-    "fizzics/fly1": {
-        "sound-file": "fizzics/Fly_Species2.webm"
-    },
-    "fizzics/fly2": {
-        "sound-file": "fizzics/Fly_Species3.webm"
-    },
-    "fizzics/fly3": {
-        "sound-file": "fizzics/Fly_Species4.webm"
-    },
-    "fizzics/fly4": {
-        "sound-file": "fizzics/Fly_Species5.webm"
-    },
-    "fizzics/create0": {
-        "sound-file": "fizzics/CreateBall_Species1.webm"
-    },
-    "fizzics/create1": {
-        "sound-file": "fizzics/CreateBall_Species2.webm"
-    },
-    "fizzics/create2": {
-        "sound-file": "fizzics/CreateBall_Species3.webm"
-    },
-    "fizzics/create3": {
-        "sound-file": "fizzics/CreateBall_Species4.webm"
-    },
-    "fizzics/create4": {
-        "sound-file": "fizzics/CreateBall_Species5.webm"
-    },
-    "fizzics/collision": {
-        "sound-file": "fizzics/Collision.webm"
-    },
     "fizzics/tooManyBalls": {
         "sound-file": "fizzics/Too_Many_Balls.webm"
     },
-    "fizzics/collision/neutral": {
-        "sound-file": "fizzics/Collision_neutral.webm"
+    "fizzics/tool0": {
+        "sound-file": "fizzics/Tool_Species1.webm"
     },
-    "fizzics/collision/wall": {
-        "sound-file": "fizzics/Collision_neutral.webm"
+    "fizzics/tool1": {
+        "sound-file": "fizzics/Tool_Species2.webm"
     },
-    "fizzics/collision/winning": {
-        "sound-file": "fizzics/Collision_winning.webm"
+    "fizzics/tool2": {
+        "sound-file": "fizzics/Tool_Species3.webm"
     },
-    "fizzics/NEXT-LEVEL/clicked": {
-        "sound-file": "fizzics/Next_Level.webm"
+    "fizzics/tool3": {
+        "sound-file": "fizzics/Tool_Species4.webm"
+    },
+    "fizzics/tool4": {
+        "sound-file": "fizzics/Tool_Species5.webm"
+    },
+    "fizzics/trashTool": {
+        "sound-file": "fizzics/Tool_Trash.webm"
+    },
+    "fizzics/unGrab": {
+        "sound-file": "fizzics/Slingshot_Ungrab.webm"
     },
     "fizzics/you_won": {
         "sound-file": "fizzics/you_won_loop.webm",
@@ -488,12 +524,6 @@
     "framework/tower/5": {
         "sound-file": "soundpacks/sfxgroup_tower6.webm"
     },
-    "hackdex1/pre-corruption": {
-        "sound-file": "common/glitch.webm"
-    },
-    "hackdex1/corrupted": {
-        "sound-file": "hackdex1/roster-crash.webm"
-    },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
         "loop": true,
@@ -502,8 +532,20 @@
     "hack-toolbox/lockscreen/inactive": {
         "sound-file": "toolbox/lockscreen-nokey-louder.webm"
     },
+    "hack-toolbox/lockscreen/open/framework.1": {
+        "sound-file": "toolbox/Lockscreen_framework_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.1": {
+        "sound-file": "toolbox/Lockscreen_System_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
+        "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
+    },
     "hack-toolbox/lockscreen/open/lock.fizzics.1": {
         "sound-file": "toolbox/Lockscreen_fizzics1_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.fizzics.2": {
+        "sound-file": "toolbox/Lockscreen_fizzicsL3_open.webm"
     },
     "hack-toolbox/lockscreen/open/lock.fizzics.2a": {
         "sound-file": "toolbox/Lockscreen_fizzics2A_open.webm",
@@ -513,26 +555,14 @@
         "sound-file": "toolbox/Lockscreen_fizzics2B_open.webm",
         "note": "This lockscreen doesn't exist yet."
     },
-    "hack-toolbox/lockscreen/open/lock.fizzics.2": {
-        "sound-file": "toolbox/Lockscreen_fizzicsL3_open.webm"
-    },
-    "hack-toolbox/lockscreen/open/framework.1": {
-        "sound-file": "toolbox/Lockscreen_framework_open.webm"
-    },
-    "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
-        "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
-    },
-    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.1": {
-        "sound-file": "toolbox/Lockscreen_System_open.webm"
-    },
     "hack-toolbox/minimize": {
         "sound-file": "toolbox/minimizePanel.webm"
     },
-    "hack-toolbox/unminimize": {
-        "sound-file": "toolbox/maximizePanel.webm"
-    },
     "hack-toolbox/reset/click": {
         "sound-file": "toolbox/reset - commit.webm"
+    },
+    "hack-toolbox/unminimize": {
+        "sound-file": "toolbox/maximizePanel.webm"
     },
     "hack-toolbox/update-codeview": {
         "sound-file": "toolbox/liveGUItoText.webm"
@@ -540,33 +570,120 @@
     "hack-toolbox/update-gui": {
         "sound-file": "toolbox/liveTextToGUI.webm"
     },
-    "HackUnlock/ambient/front": {
-        "sound-file": "HackUnlock/Ambient_Front_noclip.webm",
+    "hackdex1/corrupted": {
+        "sound-file": "hackdex1/roster-crash.webm"
+    },
+    "hackdex1/pre-corruption": {
+        "sound-file": "common/glitch.webm"
+    },
+    "lightspeed/asteroid-crash": {
+        "sound-file": "lightspeed/asteroid-crash.webm"
+    },
+    "lightspeed/asteroid-passing": {
+        "sound-file": "lightspeed/asteroid-passing.webm"
+    },
+    "lightspeed/astronaut-help": {
+        "sound-file": "lightspeed/astronaut-help.webm"
+    },
+    "lightspeed/astronaut-missed": {
+        "sound-file": "lightspeed/astronaut-missed.webm"
+    },
+    "lightspeed/astronaut-thanks": {
+        "sound-file": "lightspeed/astronaut-thanks.webm"
+    },
+    "lightspeed/bg/2001-hardcore": {
+        "sound-file": "lightspeed/bg/2001_hardcore.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "lightspeed/bg/level-loop1": {
+        "sound-file": "lightspeed/bg/level_loop1.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "lightspeed/bg/zarathustra-whale": {
+        "sound-file": "lightspeed/bg/zarathustra_whale.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "lightspeed/level-complete": {
+        "sound-file": "lightspeed/level-complete.webm"
+    },
+    "lightspeed/thrust-down": {
+        "sound-file": "lightspeed/thrust-down.webm",
         "loop": true
     },
-    "HackUnlock/ambient/back": {
-        "sound-file": "HackUnlock/Ambient_back_noclip.webm",
+    "lightspeed/thrust-up": {
+        "sound-file": "lightspeed/thrust-up.webm",
         "loop": true
     },
-    "HackUnlock/landing": {
-        "sound-file": "HackUnlock/Landing_front.webm"
+    "lightspeed/timpani-start-win": {
+        "sound-file": "lightspeed/timpani-start-win.webm"
     },
-    "HackUnlock/solution": {
-        "sound-file": "HackUnlock/Success_Back.webm"
-    },
-    "HackUnlock/success/back": {
-        "note": "This is a placeholder sound!",
-        "sound-file": "HackUnlock/Success_Back_loop.webm",
+    "operatingSystem/clock": {
+        "sound-file": "system/system-clock.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "type": "bg"
     },
-    "HackUnlock/success": {
-        "sound-file": "HackUnlock/Success_Front.webm"
+    "operatingSystem/close": {
+        "sound-file": "system/subsystem-close.webm",
+        "overlap-behavior": "overlap"
     },
-    "HackUnlock/wave": {
-        "sound-file": "HackUnlock/wave_back_noclip.wav",
+    "operatingSystem/cursor": {
+        "sound-file": "system/system-cursor.webm",
         "loop": true,
-        "note": "When compressed to WEBM, this sound clips at the end. Leave as WAV."
+        "type": "bg"
+    },
+    "operatingSystem/daemons": {
+        "sound-file": "system/daemons.webm",
+        "loop": true
+    },
+    "operatingSystem/dev": {
+        "sound-file": "system/system-null.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/file": {
+        "sound-file": "system/system-files.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/kernel": {
+        "sound-file": "system/system-clock.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/land": {
+        "sound-file": "system/speech-bubble-land.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/memory": {
+        "sound-file": "system/system-memory.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/open": {
+        "sound-file": "system/subsystem-open.webm",
+        "delay": 1250,
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/select": {
+        "sound-file": "system/element-select.webm",
+        "overlap-behavior": "overlap"
+    },
+    "operatingSystem/system": {
+        "sound-file": "system/system-whole.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/window": {
+        "sound-file": "system/system-window.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "operatingSystem/writing": {
+        "sound-file": "system/speech-bubble-writing.webm",
+        "overlap-behavior": "overlap"
     },
     "quests/ada-intro": {
         "sound-file": "quests/Ada_intro.webm"
@@ -604,23 +721,23 @@
     "quests/key-given": {
         "sound-file": "quests/key_given_tune.webm"
     },
+    "quests/new-icon": {
+        "sound-file": "common/juicy_button.webm"
+    },
     "quests/pink-panther-start": {
         "sound-file": "quests/quest_sneaky.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
     },
-    "quests/quest-unavailable": {
-        "sound-file": "quests/quest-unavailable.webm"
-    },
-    "quests/quest-given": {
-        "sound-file": "quests/quest_accepted.webm"
+    "quests/quest-aborted": {
+        "sound-file": "common/quest_deny.webm"
     },
     "quests/quest-complete": {
         "sound-file": "quests/quest_challenge_completed.webm"
     },
-    "quests/quest-aborted": {
-        "sound-file": "common/quest_deny.webm"
+    "quests/quest-given": {
+        "sound-file": "quests/quest_accepted.webm"
     },
     "quests/quest-march-start": {
         "sound-file": "quests/quest_march.webm",
@@ -630,6 +747,9 @@
     },
     "quests/quest-proposed": {
         "sound-file": "quests/quest_proposed.webm"
+    },
+    "quests/quest-unavailable": {
+        "sound-file": "quests/quest-unavailable.webm"
     },
     "quests/quest2-ada-hi": {
         "sound-file": "quests/guitar-plain.webm",
@@ -649,14 +769,14 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
-    "quests/quest2-fabers-fizzics": {
-        "sound-file": "quests/fabers-fizzics.webm",
+    "quests/quest2-faber-werks": {
+        "sound-file": "quests/faber-werks.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
     },
-    "quests/quest2-faber-werks": {
-        "sound-file": "quests/faber-werks.webm",
+    "quests/quest2-fabers-fizzics": {
+        "sound-file": "quests/fabers-fizzics.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
@@ -691,16 +811,16 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
+    "quests/quest2-stealth-piece-get": {
+        "sound-file": "quests/stealth-piece-get.webm",
+        "overlap-behavior": "ignore",
+        "type": "sfx"
+    },
     "quests/quest2-unlock-gush": {
         "sound-file": "quests/unlock gush.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
-    },
-    "quests/quest2-stealth-piece-get": {
-        "sound-file": "quests/stealth-piece-get.webm",
-        "overlap-behavior": "ignore",
-        "type": "sfx"
     },
     "quests/quest2-werk-before-stealth": {
         "sound-file": "quests/werk-before-stealth.webm",
@@ -714,8 +834,8 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
-    "quests/new-icon": {
-        "sound-file": "common/juicy_button.webm"
+    "quests/reset-given": {
+        "sound-file": "quests/CollectItem_1.webm"
     },
     "quests/riley-intro": {
         "sound-file": "quests/riley_intro-stinger.webm",
@@ -727,6 +847,9 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
+    "quests/saniel-angry": {
+        "sound-file": "quests/saniel_angry.webm"
+    },
     "quests/saniel-intro": {
         "sound-file": "quests/saniel-intro-stinger.webm",
         "type": "bg"
@@ -737,40 +860,34 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
-    "quests/saniel-angry": {
-        "sound-file": "quests/saniel_angry.webm"
-    },
-    "quests/reset-given": {
-        "sound-file": "quests/CollectItem_1.webm"
-    },
     "quests/shutdown-start": {
         "sound-file": "quests/system_shutdown.webm",
         "loop": true,
         "overlap-behavior": "ignore"
     },
-    "shell/tracking-button/flip/hover": {
-        "sound-file": "Hover_Flip.webm",
-        "loop": true,
-        "fade-in": 100,
-        "fade-out": 100
+    "shell/tracking-button/flip-inverse/click": {
+        "sound-file": "MouseClick_Invert.webm"
+    },
+    "shell/tracking-button/flip-inverse/enter": {
+        "sound-file": "MouseEnter_Inverse.webm"
     },
     "shell/tracking-button/flip-inverse/hover": {
         "sound-file": "Hover_InverseFlip.webm",
-        "loop": true,
         "fade-in": 100,
-        "fade-out": 100
+        "fade-out": 100,
+        "loop": true
     },
     "shell/tracking-button/flip/click": {
         "sound-file": "MouseClick_Flip.webm"
     },
-    "shell/tracking-button/flip-inverse/click": {
-        "sound-file": "MouseClick_Invert.webm"
-    },
     "shell/tracking-button/flip/enter": {
         "sound-file": "MouseEnter_Flip.webm"
     },
-    "shell/tracking-button/flip-inverse/enter": {
-        "sound-file": "MouseEnter_Inverse.webm"
+    "shell/tracking-button/flip/hover": {
+        "sound-file": "Hover_Flip.webm",
+        "fade-in": 100,
+        "fade-out": 100,
+        "loop": true
     },
     "system/background/back": {
         "sound-file": "system/Theater_backside.webm",
@@ -778,123 +895,6 @@
     },
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "FBE/startup": {
-        "sound-file": "FBE/Theater_backside.webm",
-        "loop": true
-    },
-    "FBE/page-changed": {
-        "sound-file": "common/juicy_button.webm",
-        "overlap-behavior": "restart"
-    },
-    "lightspeed/bg/2001-hardcore": {
-        "sound-file": "lightspeed/bg/2001_hardcore.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "lightspeed/bg/level-loop1": {
-        "sound-file": "lightspeed/bg/level_loop1.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "lightspeed/bg/zarathustra-whale": {
-        "sound-file": "lightspeed/bg/zarathustra_whale.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "lightspeed/asteroid-crash": {
-        "sound-file": "lightspeed/asteroid-crash.webm"
-    },
-    "lightspeed/asteroid-passing": {
-        "sound-file": "lightspeed/asteroid-passing.webm"
-    },
-    "lightspeed/astronaut-help": {
-        "sound-file": "lightspeed/astronaut-help.webm"
-    },
-    "lightspeed/astronaut-missed": {
-        "sound-file": "lightspeed/astronaut-missed.webm"
-    },
-    "lightspeed/astronaut-thanks": {
-        "sound-file": "lightspeed/astronaut-thanks.webm"
-    },
-    "lightspeed/thrust-down": {
-        "sound-file": "lightspeed/thrust-down.webm",
-        "loop": true
-    },
-    "lightspeed/thrust-up": {
-        "sound-file": "lightspeed/thrust-up.webm",
-        "loop": true
-    },
-    "lightspeed/timpani-start-win": {
-        "sound-file": "lightspeed/timpani-start-win.webm"
-    },
-    "lightspeed/level-complete": {
-        "sound-file": "lightspeed/level-complete.webm"
-    },
-    "operatingSystem/daemons": {
-        "sound-file": "system/daemons.webm",
-        "loop": true
-    },
-    "operatingSystem/select": {
-        "sound-file" : "system/element-select.webm",
-        "overlap-behavior": "overlap"
-    },
-    "operatingSystem/land": {
-        "sound-file" : "system/speech-bubble-land.webm",
-        "overlap-behavior": "overlap"
-    },
-    "operatingSystem/writing": {
-        "sound-file" : "system/speech-bubble-writing.webm",
-        "overlap-behavior": "overlap"
-    },
-    "operatingSystem/close": {
-        "sound-file" : "system/subsystem-close.webm",
-        "overlap-behavior": "overlap"
-    },
-    "operatingSystem/open": {
-        "sound-file" : "system/subsystem-open.webm",
-        "overlap-behavior": "overlap",
-        "delay": 1250
-    },
-    "operatingSystem/kernel": {
-        "sound-file" : "system/system-clock.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/clock": {
-        "sound-file" : "system/system-clock.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/cursor": {
-        "sound-file" : "system/system-cursor.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/file": {
-        "sound-file" : "system/system-files.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/memory": {
-        "sound-file" : "system/system-memory.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/dev": {
-        "sound-file" : "system/system-null.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/system": {
-        "sound-file" : "system/system-whole.webm",
-        "loop": true,
-        "type": "bg"
-    },
-    "operatingSystem/window": {
-        "sound-file" : "system/system-window.webm",
         "loop": true,
         "type": "bg"
     }
