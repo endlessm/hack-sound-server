@@ -771,6 +771,9 @@
     "lightspeed/timpani-start-win": {
         "sound-file": "lightspeed/timpani-start-win.webm"
     },
+    "lightspeed/level-complete": {
+        "sound-file": "lightspeed/level-complete.webm"
+    },
     "operatingSystem/daemons": {
         "sound-file": "system/daemons.webm",
         "loop": true
