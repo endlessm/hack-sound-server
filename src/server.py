@@ -92,7 +92,12 @@ class HackSoundPlayer(GObject.Object):
             self._add_fade_out(volume_elem, self.fade_out)
 
     def _play(self, fades_in):
+        self.logger.info("Playing.")
         if self._stop_loop:
+            self.logger.info("Cannot play because stopping with fade out.")
+            return
+        if self._releasing:
+            self.logger.info("Cannot play because being released.")
             return
         self.pipeline.set_state(Gst.State.PLAYING)
         if fades_in:
