@@ -44,6 +44,7 @@ class HackSoundPlayer(GObject.Object):
         self._n_loop = 0
         self._is_initial_seek = False
         self._pending_state_change = None
+        self._releasing = False
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -51,6 +52,8 @@ class HackSoundPlayer(GObject.Object):
     def release(self):
         # Otherwise, GStreamer complains with a WARNING indicating that
         # g_idle_add should be used.
+        self.logger.debug("Releasing.")
+        self._releasing = True
         GLib.idle_add(self._release)
 
     def _release(self):
@@ -71,6 +74,14 @@ class HackSoundPlayer(GObject.Object):
             GLib.timeout_add(self.delay, self._play, fades_in)
 
     def pause_with_fade_out(self):
+        self.logger.info("Pausing.")
+        if self._releasing:
+            self.logger.info("Cannot pause because being released.")
+            return
+        if self._stop_loop:
+            self.logger.info("Cannot pause because being stopped.")
+            return
+
         volume_elem = self.pipeline.get_by_name("volume")
         if volume_elem.props.volume == 0:
             self.pipeline.set_state(Gst.State.PAUSED)
