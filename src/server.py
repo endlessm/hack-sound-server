@@ -562,7 +562,7 @@ class HackSoundServer(Gio.Application):
     def _check_too_many_sounds(self, invocation, sound_event_id,
                                overlap_behavior):
         n_instances = len(self._uuid_by_event_id[sound_event_id])
-        if n_instances < self._MAX_SIMULTANEOUS_SOUNDS:
+        if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
                          self._MAX_SIMULTANEOUS_SOUNDS,
