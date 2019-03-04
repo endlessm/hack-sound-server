@@ -69,8 +69,8 @@ class HackSoundPlayer(GObject.Object):
     def get_state(self):
         return self.pipeline.get_state(timeout=0).state
 
-    def play(self, fades_in=True):
-        self._play(fades_in)
+    def play(self):
+        self._play()
 
     def pause_with_fade_out(self):
         self.logger.info("Pausing.")
@@ -96,15 +96,14 @@ class HackSoundPlayer(GObject.Object):
                 self.pipeline.set_state(Gst.State.PAUSED)
                 self._pending_state_change = None
 
-    def _play(self, fades_in):
+    def _play(self):
         self.logger.info("Playing.")
         if self._releasing:
             self.logger.info("Cannot play because being released.")
             return
         self._stop_loop = False
         self.pipeline.set_state(Gst.State.PLAYING)
-        if fades_in:
-            self._add_fade_in()
+        self._add_fade_in()
         return GLib.SOURCE_REMOVE
 
     def stop(self):
@@ -470,7 +469,7 @@ class HackSoundServer(Gio.Application):
         self._uuid_by_event_id = {}
         self._background_players = []
 
-    def play(self, uuid_, fades_in):
+    def play(self, uuid_):
         player = self.players[uuid_]
         if player.type_ == "bg":
             # The following rule applies for 'bg' sounds: whenever a new 'bg'
@@ -488,10 +487,6 @@ class HackSoundServer(Gio.Application):
                 # the list/stack.
                 if (overlap_behavior in ("ignore", "restart") and
                         player in self._background_players):
-                    # This does not makes sense to fade in the sound if we are
-                    # just ignoring the request.
-                    fades_in = (overlap_behavior == "ignore" and
-                                self._background_players[-1] != player)
                     if self._background_players[-1] != player:
                         self._background_players[-1].pause_with_fade_out()
                     # Reorder.
@@ -503,7 +498,7 @@ class HackSoundServer(Gio.Application):
             elif self._background_players[-1] != player:
                 self._background_players[-1].pause_with_fade_out()
                 self._background_players.append(player)
-        player.play(fades_in)
+        player.play()
 
     def get_player(self, uuid_):
         try:
@@ -527,7 +522,7 @@ class HackSoundServer(Gio.Application):
                           bus_name=bus_name,
                           sound_event_id=self.get_player(uuid_).sound_event_id,
                           uuid=uuid_)
-        self.play(uuid_, fades_in=refcount == 1)
+        self.play(uuid_)
 
     def unref(self, uuid_, bus_name, count=1):
         if uuid_ not in self._refcount:
