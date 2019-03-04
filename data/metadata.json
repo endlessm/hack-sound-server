@@ -637,6 +637,7 @@
     "operatingSystem/clock": {
         "sound-file": "system/system-clock.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/close": {
@@ -646,25 +647,30 @@
     "operatingSystem/cursor": {
         "sound-file": "system/system-cursor.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/daemons": {
         "sound-file": "system/daemons.webm",
-        "loop": true
+        "loop": true,
+        "overlap-behavior": "ignore"
     },
     "operatingSystem/dev": {
         "sound-file": "system/system-null.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/file": {
         "sound-file": "system/system-files.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/kernel": {
         "sound-file": "system/system-clock.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/land": {
@@ -674,6 +680,7 @@
     "operatingSystem/memory": {
         "sound-file": "system/system-memory.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/open": {
@@ -688,11 +695,13 @@
     "operatingSystem/system": {
         "sound-file": "system/system-whole.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/window": {
         "sound-file": "system/system-window.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/writing": {
@@ -910,6 +919,7 @@
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     }
 }
