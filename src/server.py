@@ -39,13 +39,14 @@ class HackSoundPlayer(GObject.Object):
 
         self.metadata = metadata
         self.metadata_extras = metadata_extras or {}
-        self.pipeline = self._build_pipeline()
 
         self._stop_loop = False
         self._n_loop = 0
         self._is_initial_seek = False
         self._pending_state_change = None
         self._releasing = False
+
+        self.pipeline = self._build_pipeline()
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -88,7 +89,7 @@ class HackSoundPlayer(GObject.Object):
             self._pending_state_change = Gst.State.PAUSED
             # The element will be set to PAUSED state when volume reaches 0.
             try:
-                self._add_fade_out(volume_elem, self.fade_out)
+                self._add_fade_out()
             except (ValueError, AssertionError):
                 self.logger.warning("Fade out effect could not be applied. "
                                     "Pausing.")
@@ -103,7 +104,7 @@ class HackSoundPlayer(GObject.Object):
         self._stop_loop = False
         self.pipeline.set_state(Gst.State.PLAYING)
         if fades_in:
-            self._add_fade_in(self.fade_in, self.volume)
+            self._add_fade_in()
         return GLib.SOURCE_REMOVE
 
     def stop(self):
@@ -117,11 +118,10 @@ class HackSoundPlayer(GObject.Object):
             self.release()
             return
 
-        volume_elem = self.pipeline.get_by_name('volume')
         # Stop at the end of the current loop
         self._stop_loop = True
         try:
-            self._add_fade_out(volume_elem, self.fade_out)
+            self._add_fade_out()
         except (ValueError, AssertionError) as ex:
             self.logger.error(ex)
             self.logger.warning("Fade out effect could not be applied. Stop.")
@@ -132,7 +132,7 @@ class HackSoundPlayer(GObject.Object):
         # Reset keyframes.
         self._fade_control.unset_all()
         self._rate_control.unset_all()
-        self._add_fade_in(self.fade_in, self.volume)
+        self._add_fade_in()
 
     def update_properties(self, transition_time_ms, options):
         if "volume" in options:
@@ -260,21 +260,49 @@ class HackSoundPlayer(GObject.Object):
             time_ns += delay
         return control.set(time_ns, value)
 
-    def _add_fade_in(self, time_ms_end, volume_end):
-        self._add_keyframe_pair(self._fade_control, 0, 0,
-                                time_ms_end * Gst.MSECOND, volume_end, False,
-                                consider_delay=True)
+    def _add_fade_in(self):
+        if not self.loop or self.loop and self.fade_in == 0:
+            return
+        self.logger.debug("Fading in.")
+        try:
+            current_time = self.get_current_position()
+        except ValueError:
+            # This is the first call to play the sound and it should fade in
+            # from the time 0.
+            self.logger.info("Cannot get the current position. "
+                             "Current state is '%s'. "
+                             "Assume first PlaySound call. Current time=0.",
+                             Gst.Element.state_get_name(self.get_state()))
+            current_time = 0
+        current_volume = self.pipeline.get_by_name("volume").props.volume
+        end_time = current_time + self.fade_in * Gst.MSECOND
+        consider_delay = current_time == 0
+        self._add_keyframe_pair(self._fade_control,
+                                current_time, current_volume,
+                                end_time, self.volume, False, consider_delay)
 
-    def _add_fade_out(self, element, time_ms):
-        current_volume = element.props.volume
+    def _add_fade_out(self):
+        # This method may raise a ValueError usually if the pipeline is in
+        # NULL or READY state which is likely to happen when a StopSound call
+        # arrives very quick "just after" a PlaySound call has arrived, because
+        # the pipeline may have not reached the PAUSED state yet.
+        # Remember that there may be intermediate states:
+        # https://gstreamer.freedesktop.org/documentation/design/states.html
+        # and that the position query will usually fail if the pipeline is not
+        # PAUSED or PLAYING.
+        if not self.loop or self.loop and self.fade_out == 0:
+            return
+        self.logger.debug("Fading out.")
         current_time = self.get_current_position()
         if self.delay and current_time < self.delay * Gst.MSECOND:
             self.logger.warning("Cannot fade out while in an in-progress "
                                 "delay.")
             raise AssertionError
+        current_volume = self.pipeline.get_by_name("volume").props.volume
+        end_time = current_time + self.fade_out * Gst.MSECOND
         self._add_keyframe_pair(self._fade_control,
                                 current_time, current_volume,
-                                current_time + time_ms * Gst.MSECOND, 0,
+                                end_time, 0,
                                 consider_delay=False)
 
     def _get_multipliable_prop(self, prop_name):
@@ -311,8 +339,11 @@ class HackSoundPlayer(GObject.Object):
         pipeline = Gst.parse_launch(spipeline)
 
         volume_elem = pipeline.get_by_name("volume")
-        volume_elem.connect("notify::volume", self.__volume_cb)
         assert volume_elem is not None
+        # Set the initial volume to 0 for looping sounds that fade in.
+        if self.loop and self.fade_in > 0:
+            volume_elem.props.volume = 0
+        volume_elem.connect("notify::volume", self.__volume_cb)
         self._fade_control = self._create_control(volume_elem, "volume")
 
         pitch_elem = pipeline.get_by_name("pitch")
