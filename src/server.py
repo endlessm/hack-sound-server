@@ -89,7 +89,13 @@ class HackSoundPlayer(GObject.Object):
         else:
             self._pending_state_change = Gst.State.PAUSED
             # The element will be set to PAUSED state when volume reaches 0.
-            self._add_fade_out(volume_elem, self.fade_out)
+            try:
+                self._add_fade_out(volume_elem, self.fade_out)
+            except ValueError:
+                self.logger.warning("Fade out effect could not be applied. "
+                                    "Pausing.")
+                self.pipeline.set_state(Gst.State.PAUSED)
+                self._pending_state_change = None
 
     def _play(self, fades_in):
         self.logger.info("Playing.")
