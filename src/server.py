@@ -367,6 +367,9 @@ class HackSoundServer(Gio.Application):
         <method name='StopSound'>
           <arg type='s' name='uuid' direction='in'/>
         </method>
+        <method name='TerminateSound'>
+          <arg type='s' name='uuid' direction='in'/>
+        </method>
         <signal name='Error'>
           <arg type='s' name='uuid'/>
           <arg type='s' name='error_message'/>
@@ -617,7 +620,22 @@ class HackSoundServer(Gio.Application):
             return uuid_
         return None
 
-    def stop_sound(self, uuid_, connection, sender, path, iface, invocation):
+    def terminate_sound_for_sender(self, uuid_, connection, sender, invocation,
+                                   term_sound=False):
+        """
+        Decreases the reference count of a sound for the given `sender`.
+
+        Args:
+            uuid (str): The sound uuid or the sound event id to stop playing.
+            connection (Gio.DBusConnection): The current connection.
+            sender (str): The unique bus name of the sender (starts with ':').
+            invocation (Gio.DBusMethodInvocation): Used to handle
+                                                   error or results.
+        Optional keyword arguments:
+            term_sound (bool): Defaults to False, which means to decrease the
+                               refcount by 1. If set to True, then the refcount
+                               is set to 0.
+        """
         assert not (uuid_ in self.players and uuid_ in self._uuid_by_event_id)
         # xor: With the exception that the case of both cases being True will
         # never happen because we never define an UUID in the metadata file.
@@ -632,12 +650,16 @@ class HackSoundServer(Gio.Application):
                              "it wasn\'t.".format(uuid_, sender))
         else:
             if uuid_ in self.players:
-                self.unref(uuid_, sender)
+                self._unref_on_stop(uuid_, sender, term_sound)
             elif uuid_ in self._uuid_by_event_id:
                 sound_event_id = uuid_
                 for uuid_ in self._uuid_by_event_id[sound_event_id]:
-                    self.unref(uuid_, sender)
+                    self._unref_on_stop(uuid_, sender, term_sound)
             invocation.return_value(None)
+
+    def _unref_on_stop(self, uuid_, bus_name, term_sound=False):
+        n_unref = 1 if not term_sound else self.refcount(uuid_, bus_name)
+        self.unref(uuid_, bus_name, n_unref)
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
@@ -658,8 +680,11 @@ class HackSoundServer(Gio.Application):
             self.play_sound(params[0], connection, sender, path,
                             iface, invocation, params[1])
         elif method == 'StopSound':
-            self.stop_sound(params[0], connection, sender, path, iface,
-                            invocation)
+            self.terminate_sound_for_sender(params[0], connection, sender,
+                                            invocation)
+        elif method == 'TerminateSound':
+            self.terminate_sound_for_sender(params[0], connection, sender,
+                                            invocation, term_sound=True)
         elif method == "UpdateProperties":
             self.update_properties(params[0], params[1], params[2], connection,
                                    sender, path, iface, invocation)
