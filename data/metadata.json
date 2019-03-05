@@ -489,7 +489,7 @@
         "sound-file": "soundpacks/sfxgroup_tower6.webm"
     },
     "hackdex1/pre-corruption": {
-        "sound-file": "hackdex1/Pre-crash-glitch.webm"
+        "sound-file": "common/glitch.webm"
     },
     "hackdex1/corrupted": {
         "sound-file": "hackdex1/roster-crash.webm"
@@ -586,6 +586,12 @@
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
     },
+    "quests/faber-theme": {
+        "sound-file": "quests/Faber-theme.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/hi-hat-start": {
         "sound-file": "quests/hihat-sneaker.webm",
         "loop": true,
@@ -637,6 +643,30 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
+    "quests/quest2-faber-conga-build": {
+        "sound-file": "quests/faber-conga-build.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-fabers-fizzics": {
+        "sound-file": "quests/fabers-fizzics.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-faber-werks": {
+        "sound-file": "quests/faber-werks.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-glitch": {
+        "sound-file": "common/glitch.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/quest2-riley-hi": {
         "sound-file": "quests/guitar-easy1.webm",
         "loop": true,
@@ -651,6 +681,35 @@
     },
     "quests/quest2-saniel-chore": {
         "sound-file": "quests/starlight.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-sneaky-hihat": {
+        "sound-file": "quests/sneaky-hihat.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-unlock-gush": {
+        "sound-file": "quests/unlock gush.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-stealth-piece-get": {
+        "sound-file": "quests/stealth-piece-get.webm",
+        "overlap-behavior": "ignore",
+        "type": "sfx"
+    },
+    "quests/quest2-werk-before-stealth": {
+        "sound-file": "quests/werk-before-stealth.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/quest2-zarathustra-whale": {
+        "sound-file": "quests/zarathustra whale.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
