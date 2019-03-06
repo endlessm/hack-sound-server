@@ -614,6 +614,19 @@
         "sound-file": "lightspeed/thrust-down.webm",
         "loop": true
     },
+    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.2": {
+        "sound-file": "toolbox/trap_unlock.webm"
+    },
+    "hack-toolbox/lockscreen/trap/glitch": {
+        "sound-file": "toolbox/trap_glitch.webm"
+    },
+    "hack-toolbox/lockscreen/trap/alarm": {
+        "sound-file": "toolbox/trap_alarm_loop.webm",
+        "loop": true
+    },
+    "hack-toolbox/minimize": {
+        "sound-file": "toolbox/minimizePanel.webm"
+    },
     "lightspeed/thrust-up": {
         "sound-file": "lightspeed/thrust-up.webm",
         "loop": true
