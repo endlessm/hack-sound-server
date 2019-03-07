@@ -44,6 +44,7 @@ class HackSoundPlayer(GObject.Object):
         self._n_loop = 0
         self._is_initial_seek = False
         self._pending_state_change = None
+        self._releasing = False
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
@@ -51,6 +52,8 @@ class HackSoundPlayer(GObject.Object):
     def release(self):
         # Otherwise, GStreamer complains with a WARNING indicating that
         # g_idle_add should be used.
+        self.logger.debug("Releasing.")
+        self._releasing = True
         GLib.idle_add(self._release)
 
     def _release(self):
@@ -71,6 +74,14 @@ class HackSoundPlayer(GObject.Object):
             GLib.timeout_add(self.delay, self._play, fades_in)
 
     def pause_with_fade_out(self):
+        self.logger.info("Pausing.")
+        if self._releasing:
+            self.logger.info("Cannot pause because being released.")
+            return
+        if self._stop_loop:
+            self.logger.info("Cannot pause because being stopped.")
+            return
+
         volume_elem = self.pipeline.get_by_name("volume")
         if volume_elem.props.volume == 0:
             self.pipeline.set_state(Gst.State.PAUSED)
@@ -565,7 +576,7 @@ class HackSoundServer(Gio.Application):
     def _check_too_many_sounds(self, invocation, sound_event_id,
                                overlap_behavior):
         n_instances = len(self._uuid_by_event_id[sound_event_id])
-        if n_instances < self._MAX_SIMULTANEOUS_SOUNDS:
+        if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
                          self._MAX_SIMULTANEOUS_SOUNDS,
