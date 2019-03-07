@@ -530,6 +530,11 @@
         "loop": true,
         "type": "bg"
     },
+    "hack-toolbox/ambient/com.endlessm.LightSpeed": {
+        "sound-file": "toolbox/lightspeed-toolbox.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "hack-toolbox/ambient/com.endlessm.OperatingSystemApp": {
         "sound-file": "toolbox/Theater_backside.webm",
         "loop": true,
