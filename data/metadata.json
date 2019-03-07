@@ -808,7 +808,7 @@
         "type": "bg"
     },
     "quests/quest2-riley-sneak": {
-        "sound-file": "quests/quest_sneaky.webm",
+        "sound-file": "quests/pink panther edit.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
