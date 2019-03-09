@@ -526,8 +526,8 @@
     },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
-        "loop": true,
         "bg": true,
+        "loop": true,
         "overlap-behavior": "ignore"
     },
     "hack-toolbox/lockscreen/inactive": {
@@ -538,6 +538,9 @@
     },
     "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.1": {
         "sound-file": "toolbox/Lockscreen_System_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.2": {
+        "sound-file": "toolbox/trap_unlock.webm"
     },
     "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
         "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
@@ -555,6 +558,13 @@
     "hack-toolbox/lockscreen/open/lock.fizzics.2b": {
         "sound-file": "toolbox/Lockscreen_fizzics2B_open.webm",
         "note": "This lockscreen doesn't exist yet."
+    },
+    "hack-toolbox/lockscreen/trap/alarm": {
+        "sound-file": "toolbox/trap_alarm_loop.webm",
+        "loop": true
+    },
+    "hack-toolbox/lockscreen/trap/glitch": {
+        "sound-file": "toolbox/trap_glitch.webm"
     },
     "hack-toolbox/minimize": {
         "sound-file": "toolbox/minimizePanel.webm"
@@ -614,19 +624,6 @@
         "sound-file": "lightspeed/thrust-down.webm",
         "loop": true
     },
-    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.2": {
-        "sound-file": "toolbox/trap_unlock.webm"
-    },
-    "hack-toolbox/lockscreen/trap/glitch": {
-        "sound-file": "toolbox/trap_glitch.webm"
-    },
-    "hack-toolbox/lockscreen/trap/alarm": {
-        "sound-file": "toolbox/trap_alarm_loop.webm",
-        "loop": true
-    },
-    "hack-toolbox/minimize": {
-        "sound-file": "toolbox/minimizePanel.webm"
-    },
     "lightspeed/thrust-up": {
         "sound-file": "lightspeed/thrust-up.webm",
         "loop": true
@@ -637,6 +634,7 @@
     "operatingSystem/clock": {
         "sound-file": "system/system-clock.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/close": {
@@ -646,25 +644,30 @@
     "operatingSystem/cursor": {
         "sound-file": "system/system-cursor.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/daemons": {
         "sound-file": "system/daemons.webm",
-        "loop": true
+        "loop": true,
+        "overlap-behavior": "ignore"
     },
     "operatingSystem/dev": {
         "sound-file": "system/system-null.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/file": {
         "sound-file": "system/system-files.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/kernel": {
         "sound-file": "system/system-clock.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/land": {
@@ -674,6 +677,7 @@
     "operatingSystem/memory": {
         "sound-file": "system/system-memory.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/open": {
@@ -688,11 +692,13 @@
     "operatingSystem/system": {
         "sound-file": "system/system-whole.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/window": {
         "sound-file": "system/system-window.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     },
     "operatingSystem/writing": {
@@ -910,6 +916,7 @@
     "system/background/front": {
         "sound-file": "system/Theater_front.webm",
         "loop": true,
+        "overlap-behavior": "ignore",
         "type": "bg"
     }
 }
