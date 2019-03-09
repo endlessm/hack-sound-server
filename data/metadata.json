@@ -526,8 +526,8 @@
     },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
-        "loop": true,
         "bg": true,
+        "loop": true,
         "overlap-behavior": "ignore"
     },
     "hack-toolbox/lockscreen/inactive": {
@@ -538,6 +538,9 @@
     },
     "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.1": {
         "sound-file": "toolbox/Lockscreen_System_open.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.2": {
+        "sound-file": "toolbox/trap_unlock.webm"
     },
     "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
         "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
@@ -555,6 +558,13 @@
     "hack-toolbox/lockscreen/open/lock.fizzics.2b": {
         "sound-file": "toolbox/Lockscreen_fizzics2B_open.webm",
         "note": "This lockscreen doesn't exist yet."
+    },
+    "hack-toolbox/lockscreen/trap/alarm": {
+        "sound-file": "toolbox/trap_alarm_loop.webm",
+        "loop": true
+    },
+    "hack-toolbox/lockscreen/trap/glitch": {
+        "sound-file": "toolbox/trap_glitch.webm"
     },
     "hack-toolbox/minimize": {
         "sound-file": "toolbox/minimizePanel.webm"
@@ -613,19 +623,6 @@
     "lightspeed/thrust-down": {
         "sound-file": "lightspeed/thrust-down.webm",
         "loop": true
-    },
-    "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.2": {
-        "sound-file": "toolbox/trap_unlock.webm"
-    },
-    "hack-toolbox/lockscreen/trap/glitch": {
-        "sound-file": "toolbox/trap_glitch.webm"
-    },
-    "hack-toolbox/lockscreen/trap/alarm": {
-        "sound-file": "toolbox/trap_alarm_loop.webm",
-        "loop": true
-    },
-    "hack-toolbox/minimize": {
-        "sound-file": "toolbox/minimizePanel.webm"
     },
     "lightspeed/thrust-up": {
         "sound-file": "lightspeed/thrust-up.webm",
