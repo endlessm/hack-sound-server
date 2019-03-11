@@ -29,6 +29,7 @@
         {
             "name": "gstreamer-plugin-soundtouch",
             "config-opts": [
+                "--disable-aom",
                 "--disable-nls",
                 "--disable-introspection",
                 "--disable-gtk-doc",
