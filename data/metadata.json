@@ -526,9 +526,9 @@
     },
     "hack-toolbox/lockscreen/active": {
         "sound-file": "toolbox/lockscreenActive.webm",
-        "bg": true,
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "hack-toolbox/lockscreen/inactive": {
         "sound-file": "toolbox/lockscreen-nokey-louder.webm"
