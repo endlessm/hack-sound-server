@@ -40,6 +40,7 @@ class HackSoundPlayer(GObject.Object):
         self.metadata = metadata
         self.metadata_extras = metadata_extras or {}
         self.pipeline = self._build_pipeline()
+
         self._stop_loop = False
         self._n_loop = 0
         self._is_initial_seek = False
@@ -96,12 +97,10 @@ class HackSoundPlayer(GObject.Object):
 
     def _play(self, fades_in):
         self.logger.info("Playing.")
-        if self._stop_loop:
-            self.logger.info("Cannot play because stopping with fade out.")
-            return
         if self._releasing:
             self.logger.info("Cannot play because being released.")
             return
+        self._stop_loop = False
         self.pipeline.set_state(Gst.State.PLAYING)
         if fades_in:
             self._add_fade_in(self.fade_in, self.volume)
@@ -751,7 +750,17 @@ class HackSoundServer(Gio.Application):
                 "background sounds, but this isn't", uuid)
 
         if len(self._background_players) > 0:
-            self._background_players[-1].play()
+            last_player = self._background_players[-1]
+            self.logger.info("Resuming player.",
+                             sound_event_id=last_player.sound_event_id,
+                             uuid=last_player.uuid)
+            if self.refcount(last_player.uuid) == 0:
+                self.logger.info("Cannot resume this player because its "
+                                 "owning apps have dissapeared from the bus.",
+                                 sound_event_id=last_player.sound_event_id,
+                                 uuid=last_player.uuid)
+                return
+            last_player.play()
 
     def __player_released_cb(self, unused_player, sound_event_id, uuid_):
         # This method is only called when a sound naturally reaches
