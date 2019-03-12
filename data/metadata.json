@@ -591,7 +591,7 @@
         "sound-file": "lightspeed/asteroid-crash.webm"
     },
     "lightspeed/asteroid-passing": {
-        "sound-file": "lightspeed/asteroid-passing.webm"
+        "sound-file": "lightspeed/astroid-pass-faster.webm"
     },
     "lightspeed/astronaut-help": {
         "sound-file": "lightspeed/astronaut-help.webm"
