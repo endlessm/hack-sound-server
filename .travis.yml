@@ -4,7 +4,8 @@ python:
   - '3.5'
 sudo: required
 install:
-  - pip install flake8
+  - pip install flake8 jsonschema
 
 script:
   - flake8 bin/hack-sound-server.in .
+  - jsonschema -i data/metadata.json ci/metadata.schema.json

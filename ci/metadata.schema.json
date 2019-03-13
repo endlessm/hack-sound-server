@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": {
+        "type": "object",
+        "properties": {
+            "delay": {
+                "description": "Delay starting the sound, in milliseconds",
+                "type": "integer",
+                "minimum": 0
+            },
+            "fade-in": {
+                "description": "Fade-in time from 0 volume, in milliseconds",
+                "type": "integer",
+                "minimum": 0
+            },
+            "fade-out": {
+                "description": "Fade-out time to 0 volume, in milliseconds",
+                "type": "integer",
+                "minimum": 0
+            },
+            "loop": {
+                "description": "Whether to loop the sound until it is stopped",
+                "type": "boolean"
+            },
+            "note": {
+                "description": "Use this for any kind of comment",
+                "type": "string"
+            },
+            "overlap-behavior": {
+                "description": "What to do if the sound is played more than once at the same time",
+                "type": "string",
+                "enum": ["overlap", "restart", "ignore"]
+            },
+            "sound-file": {
+                "description": "Relative path to the sound file to be played",
+                "type": "string"
+            },
+            "sound-files": {
+                "description": "Array of relative paths to sound files, one will be selected at random",
+                "type": "array",
+                "items": {"type": "string"},
+                "minItems": 2,
+                "uniqueItems": true
+            },
+            "type": {
+                "description": "Whether the sound is a sound effect or background music",
+                "type": "string",
+                "enum": ["bg", "sfx"]
+            },
+            "volume": {
+                "description": "Volume to play the sound at, from 0 to 1 (or overdriven up to 10)",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+            }
+        },
+        "additionalProperties": false,
+
+        "$comment": "This means one or the other are required, but both together are forbidden",
+        "not": {
+            "required": ["sound-file", "sound-files"]
+        },
+        "anyOf": [
+            {"required": ["sound-file"]},
+            {"required": ["sound-files"]}
+        ]
+    }
+}
