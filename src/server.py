@@ -677,7 +677,7 @@ class HackSoundServer(Gio.Application):
                 sound_event_id = uuid_
                 for uuid_ in self._uuid_by_event_id[sound_event_id]:
                     self._unref_on_stop(uuid_, sender, term_sound)
-            invocation.return_value(None)
+        invocation.return_value(None)
 
     def _unref_on_stop(self, uuid_, bus_name, term_sound=False):
         n_unref = 1 if not term_sound else self.refcount(uuid_, bus_name)
