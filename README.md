@@ -167,7 +167,7 @@ For more information about levels, check the [Python logging system documentatio
 For example, the following log output
 
 ```
-DEBUG    : 2019-01-29 09:35:52,176 <HackSoundServer at 139708402141224>.ref - :1.19: clubhouse/entry/hover: a1881470-0d54-4e1a-a4bd-3ca76a648ebf: Reference. Refcount: 1 (server.py:382)
+DEBUG    : 2019-01-29 09:35:52,176 <HackSoundServer at 139708402141224>.ref - :1.19, :1.20: clubhouse/entry/hover: a1881470-0d54-4e1a-a4bd-3ca76a648ebf: Reference. Refcount: 1 (server.py:382)
 ```
 
 should be interpreted as:
@@ -176,7 +176,7 @@ should be interpreted as:
 - `2019-01-29 09:35:52,176`: The current date and time
 - `<HackSoundServer at 139708402141224>`: The class and id of the object from which the log is called.
 - `.ref`: The method that called the log instruction.
-- `:1.19:`: The unique bus name that referenced the sound.
+- `:1.19, :1.20:`: The unique bus names that referenced the sound.
 - `clubhouse/entry/hover`: The sound event id.
 - `a1881470-0d54-4e1a-a4bd-3ca76a648ebf`: The uuid.
 - `Reference. Refcount: 1`: The log message.
