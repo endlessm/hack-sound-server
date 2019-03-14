@@ -68,10 +68,7 @@ class HackSoundPlayer(GObject.Object):
         return self.pipeline.get_state(timeout=0).state
 
     def play(self, fades_in=True):
-        if self.delay is None:
-            self._play(fades_in)
-        else:
-            GLib.timeout_add(self.delay, self._play, fades_in)
+        self._play(fades_in)
 
     def pause_with_fade_out(self):
         self.logger.info("Pausing.")
@@ -91,7 +88,7 @@ class HackSoundPlayer(GObject.Object):
             # The element will be set to PAUSED state when volume reaches 0.
             try:
                 self._add_fade_out(volume_elem, self.fade_out)
-            except ValueError:
+            except (ValueError, AssertionError):
                 self.logger.warning("Fade out effect could not be applied. "
                                     "Pausing.")
                 self.pipeline.set_state(Gst.State.PAUSED)
@@ -126,7 +123,7 @@ class HackSoundPlayer(GObject.Object):
         self._stop_loop = True
         try:
             self._add_fade_out(volume_elem, self.fade_out)
-        except ValueError as ex:
+        except (ValueError, AssertionError) as ex:
             self.logger.error(ex)
             self.logger.warning("Fade out effect could not be applied. Stop.")
 
@@ -157,7 +154,8 @@ class HackSoundPlayer(GObject.Object):
         current_time = self.get_current_position()
         time_end = current_time + transition_time_ms * Gst.MSECOND
         self._add_keyframe_pair(control, current_time, current_value,
-                                time_end, prop_value, consider_duration=False)
+                                time_end, prop_value, consider_duration=False,
+                                consider_delay=False)
 
     def seek(self, position=None, flags=None):
         if flags is None:
@@ -240,9 +238,11 @@ class HackSoundPlayer(GObject.Object):
         return type_
 
     def _add_keyframe_pair(self, control, time_start_ns, value_start,
-                           time_end_ns, value_end, consider_duration=True):
+                           time_end_ns, value_end, consider_duration=True,
+                           consider_delay=False):
         control.unset_all()
-        if not self._add_keyframe(control, time_start_ns, value_start):
+        if not self._add_keyframe(control, time_start_ns, value_start,
+                                  consider_delay):
             raise ValueError('bad start time')
         # Rather than deal with the case where we have to split the keyframes
         # over the sound's loop; if the end keyframe is greater than the sound
@@ -250,22 +250,32 @@ class HackSoundPlayer(GObject.Object):
         if consider_duration:
             duration = self.get_duration()
             time_end_ns = min(time_end_ns, duration * (self._n_loop + 1))
-        if not self._add_keyframe(control, time_end_ns, value_end):
+        if not self._add_keyframe(control, time_end_ns, value_end,
+                                  consider_delay):
             raise ValueError('bad end time')
 
-    def _add_keyframe(self, control, time_ns, value):
+    def _add_keyframe(self, control, time_ns, value, consider_delay=False):
+        if consider_delay:
+            delay = 0 if not self.delay else self.delay * Gst.MSECOND
+            time_ns += delay
         return control.set(time_ns, value)
 
     def _add_fade_in(self, time_ms_end, volume_end):
         self._add_keyframe_pair(self._fade_control, 0, 0,
-                                time_ms_end * Gst.MSECOND, volume_end, False)
+                                time_ms_end * Gst.MSECOND, volume_end, False,
+                                consider_delay=True)
 
     def _add_fade_out(self, element, time_ms):
         current_volume = element.props.volume
         current_time = self.get_current_position()
+        if self.delay and current_time < self.delay * Gst.MSECOND:
+            self.logger.warning("Cannot fade out while in an in-progress "
+                                "delay.")
+            raise AssertionError
         self._add_keyframe_pair(self._fade_control,
                                 current_time, current_volume,
-                                current_time + time_ms * Gst.MSECOND, 0)
+                                current_time + time_ms * Gst.MSECOND, 0,
+                                consider_delay=False)
 
     def _get_multipliable_prop(self, prop_name):
         value = self.metadata.get(prop_name, None)
@@ -290,7 +300,7 @@ class HackSoundPlayer(GObject.Object):
                       self.rate or self._DEFAULT_RATE)
         elements = [
             "filesrc name=src location=\"{}\"".format(self.sound_location),
-            "decodebin",
+            "decodebin name=decoder",
             "identity single-segment=true",
             "audioconvert",
             "pitch name=pitch pitch={} rate={}".format(*pitch_args),
@@ -309,7 +319,18 @@ class HackSoundPlayer(GObject.Object):
         assert pitch_elem is not None
         self._rate_control = self._create_control(pitch_elem, "rate")
 
+        decoder_elem = pipeline.get_by_name("decoder")
+        assert decoder_elem is not None
+        decoder_elem.connect("pad-added", self.__pad_added_cb)
+
         return pipeline
+
+    def __pad_added_cb(self, unused_decoder, pad):
+        if self.pipeline is None:
+            return
+        if not self.delay:
+            return
+        pad.set_offset(self.delay * Gst.MSECOND)
 
     def __volume_cb(self, volume_element, unused_volume):
         # In case of fade-out effects, release the pipeline as soon volume
