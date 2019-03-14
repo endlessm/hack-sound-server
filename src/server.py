@@ -560,12 +560,11 @@ class HackSoundServer(Gio.Application):
             self._watch_bus_name(sender, uuid_)
 
         if uuid_ is None:
-            self._cancel_countdown()
-            self.hold()
-
             if self._check_too_many_sounds(invocation, sound_event_id,
                                            overlap_behavior):
                 return
+            self._cancel_countdown()
+            self.hold()
 
             uuid_ = str(uuid.uuid4())
             metadata = self.metadata[sound_event_id]
