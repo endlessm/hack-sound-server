@@ -27,13 +27,13 @@ class HackSoundPlayer(GObject.Object):
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
-    def __init__(self, bus_name, sound_event_id, uuid_, metadata,
+    def __init__(self, sound_event_id, uuid_, metadata,
                  metadata_extras=None):
         super().__init__()
         self.logger = Logger(PlayerFormatter, self)
-        # The following attributes (bus_name, sound_event_id and uuid) are used
-        # internally by the logger to format the log messages.
-        self.bus_name = bus_name
+        # The following attributes (bus_names, sound_event_id and uuid) are
+        # used internally by the logger to format the log messages.
+        self.bus_names = set([])
         self.sound_event_id = sound_event_id
         self.uuid = uuid_
 
@@ -522,6 +522,7 @@ class HackSoundServer(Gio.Application):
                           bus_name=bus_name,
                           sound_event_id=self.get_player(uuid_).sound_event_id,
                           uuid=uuid_)
+        self.get_player(uuid_).bus_names.add(bus_name)
         self.play(uuid_)
 
     def unref(self, uuid_, bus_name, count=1):
@@ -540,6 +541,8 @@ class HackSoundServer(Gio.Application):
                                 uuid=uuid_)
             return
         self._refcount[uuid_][bus_name] -= count
+        if self._refcount[uuid_][bus_name] == 0:
+            self.get_player(uuid_).bus_names.remove(bus_name)
         self.logger.debug("Unreference. Refcount: %d",
                           self._refcount[uuid_][bus_name], bus_name=bus_name,
                           sound_event_id=self.get_player(uuid_).sound_event_id,
@@ -615,7 +618,7 @@ class HackSoundServer(Gio.Application):
 
             uuid_ = str(uuid.uuid4())
             metadata = self.metadata[sound_event_id]
-            self.players[uuid_] = HackSoundPlayer(sender, sound_event_id,
+            self.players[uuid_] = HackSoundPlayer(sound_event_id,
                                                   uuid_, metadata, options)
             # Insert the uuid in the dictionary organized by sound event id.
             self._uuid_by_event_id[sound_event_id].add(uuid_)
@@ -794,7 +797,6 @@ class HackSoundServer(Gio.Application):
         # both cases this means to delete the references to that sound UUID.
         self.logger.debug(
             "Freeing structures because end-of-stream was reached.",
-            bus_name=self.get_player(uuid_).bus_name,
             sound_event_id=self.get_player(uuid_).sound_event_id,
             uuid=uuid_
         )
