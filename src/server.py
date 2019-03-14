@@ -129,6 +129,7 @@ class HackSoundPlayer(GObject.Object):
         except ValueError as ex:
             self.logger.error(ex)
             self.logger.warning("Fade out effect could not be applied. Stop.")
+            self.release()
 
     def reset(self):
         self.seek(0.0)
