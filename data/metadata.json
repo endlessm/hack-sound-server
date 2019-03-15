@@ -559,6 +559,9 @@
         "sound-file": "toolbox/Lockscreen_fizzics2B_open.webm",
         "note": "This lockscreen doesn't exist yet."
     },
+    "hack-toolbox/lockscreen/open/lock.lightspeed.1": {
+        "sound-file": "toolbox/lightspeed_unlock.webm"
+    },
     "hack-toolbox/lockscreen/trap/alarm": {
         "sound-file": "toolbox/trap_alarm_loop.webm",
         "loop": true
