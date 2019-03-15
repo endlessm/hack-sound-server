@@ -575,6 +575,9 @@
     "hack-toolbox/reset/click": {
         "sound-file": "toolbox/reset - commit.webm"
     },
+    "hack-toolbox/topic/show": {
+        "sound-file": "toolbox/spawn appear.webm"
+    },
     "hack-toolbox/unminimize": {
         "sound-file": "toolbox/maximizePanel.webm"
     },
