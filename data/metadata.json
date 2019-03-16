@@ -540,7 +540,7 @@
         "sound-file": "toolbox/Lockscreen_System_open.webm"
     },
     "hack-toolbox/lockscreen/open/lock.OperatingSystemApp.2": {
-        "sound-file": "toolbox/trap_unlock.webm"
+        "sound-file": "toolbox/trap_unlock_box.webm"
     },
     "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
         "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
