@@ -656,7 +656,8 @@
     "operatingSystem/daemons": {
         "sound-file": "system/daemons.webm",
         "loop": true,
-        "overlap-behavior": "ignore"
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "operatingSystem/dev": {
         "sound-file": "system/system-null.webm",
