@@ -726,6 +726,18 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
+    "quests/clarifying": {
+        "sound-file": "quests/clarifying.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/device-hope": {
+        "sound-file": "quests/device-hope.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
     },
