@@ -60,12 +60,20 @@ install_subdir(
     strip_directory: true
 )
 
+data_dir = join_paths(get_option('prefix'), get_option('datadir'))
+
+install_data(
+    'com.endlessm.HackSoundServer.appdata.xml',
+    install_dir: join_paths(data_dir, 'appdata')
+)
+
 message('\n'.join([
     '@0@ @1@'.format(meson.project_name(), meson.project_version()),
     '--------------------------------------',
     'Directories:',
     '    prefix: @0@'.format(get_option('prefix')),
     '    bindir: @0@'.format(get_option('bindir')),
+    '    datadir: @0@'.format(data_dir),
     '    session_bus_services_dir: @0@'.format(session_bus_services_dir),
     ''
 ]))
