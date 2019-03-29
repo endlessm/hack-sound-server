@@ -87,16 +87,28 @@ class SoundFormatter(ObjectFormatter):
 
     def format(self, record):
         tmpl = "{}: {}: {}: {}"
-        bus_name = apply_style(self.obj.bus_name,
+        bus_name = apply_style(self.bus_name,
                                self.beautify and self._DEFAULT_BUS_NAME)
-        event_id = apply_style(self.obj.sound_event_id,
+        event_id = apply_style(self.sound_event_id,
                                self.beautify and self._DEFAULT_EVENT_ID_COLOR)
-        uuid = apply_style(self.obj.uuid,
+        uuid = apply_style(self.uuid,
                            self.beautify and self._DEFAULT_UUID_COLOR)
 
         record.msg = tmpl.format(bus_name, event_id, uuid, record.msg)
         msg = super().format(record)
         return msg
+
+    @property
+    def bus_name(self):
+        return self.obj.bus_name
+
+    @property
+    def sound_event_id(self):
+        return self.obj.sound_event_id
+
+    @property
+    def uuid(self):
+        return self.obj.uuid
 
 
 class ServerFormatter(ObjectFormatter):

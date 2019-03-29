@@ -21,7 +21,17 @@ class ServerSoundFactory(Factory):
         return Sound(self.server, *args, **kwargs)
 
 
-class Sound(GObject.Object):
+class SoundBase(GObject.Object):
+    # API V2 compatibility.
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.id = None
+        self.player = None
+        self.manager = None
+        self._object_path = None
+
+
+class Sound(SoundBase):
     _DEFAULT_VOLUME = 1.0
     _DEFAULT_PITCH = 1.0
     _DEFAULT_RATE = 1.0
@@ -41,7 +51,7 @@ class Sound(GObject.Object):
         # used internally by the logger to format the log messages.
         self.bus_name = bus_name
         self.sound_event_id = sound_event_id
-        self.uuid = str(uuid.uuid4())
+        self._uuid = None
 
         assert sound_event_id in server.metadata
         self.metadata = server.metadata[sound_event_id]
@@ -186,6 +196,12 @@ class Sound(GObject.Object):
         if not ok:
             raise ValueError('error querying duration')
         return duration
+
+    @property
+    def uuid(self):
+        if self._uuid is None:
+            self._uuid = str(uuid.uuid4())
+        return self._uuid
 
     @property
     def loop(self):

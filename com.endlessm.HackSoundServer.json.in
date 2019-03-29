@@ -104,6 +104,17 @@
             ]
         },
         {
+            "name": "hack-services",
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/endlessm/hack-services.git",
+                    "branch": "@GIT_CLONE_BRANCH@"
+                }
+            ]
+        },
+        {
             "name": "hack-sound-server",
             "buildsystem": "meson",
             "config-opts" : [
