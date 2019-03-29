@@ -618,6 +618,18 @@
         "loop": true,
         "type": "bg"
     },
+    "lightspeed/bg/powerup/invincibility": {
+        "sound-file": "lightspeed/bg/powerup/powerup_invincible.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "lightspeed/bg/powerup/upgrade": {
+        "sound-file": "lightspeed/bg/powerup/powerup_random.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "lightspeed/bg/zarathustra-whale": {
         "sound-file": "lightspeed/bg/zarathustra_whale.webm",
         "loop": true,
@@ -625,6 +637,15 @@
     },
     "lightspeed/level-complete": {
         "sound-file": "lightspeed/level-complete.webm"
+    },
+    "lightspeed/powerup/blowup": {
+        "sound-file": "lightspeed/powerup/enemy_blowup.webm"
+    },
+    "lightspeed/powerup/invincibility": {
+        "sound-file": "lightspeed/powerup/power_invincible_sfx.webm"
+    },
+    "lightspeed/powerup/upgrade": {
+        "sound-file": "lightspeed/powerup/power_upgrade_sfx.webm"
     },
     "lightspeed/thrust-down": {
         "sound-file": "lightspeed/thrust-down.webm",
