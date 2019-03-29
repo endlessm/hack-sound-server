@@ -2,11 +2,14 @@ import gi
 gi.require_version('GLib', '2.0')  # noqa
 from gi.repository import Gio
 from gi.repository import GLib
-
+from collections import namedtuple
 from hack_sound_server.registry import Registry
 from hack_sound_server.sound import Sound
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import ServerFormatter
+
+
+DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
 
 
 class UnregisteredUUID(Exception):
@@ -19,15 +22,6 @@ class TooManySoundsException(Exception):
 
 class UnknownSoundEventIDException(Exception):
     INTERFACE = "com.endlessm.HackSoundServer.UnknownSoundEventID"
-
-
-class DBusWatcher:
-    def __init__(self, watcher_id):
-        self.watcher_id = watcher_id
-        self.uuids = set()
-
-    def track_sound(self, sound):
-        self.uuids.add(sound.uuid)
 
 
 class Server(Gio.Application):
@@ -231,8 +225,7 @@ class Server(Gio.Application):
 
     def _play_sound(self, sound):
         sound_to_pause = self.registry.add_sound(sound)
-        bus_name_watcher = self.watch_bus_name(sound.bus_name)
-        bus_name_watcher.track_sound(sound)
+        self.watch_sound_bus_name(sound)
         self.ref(sound)
         if sound_to_pause is not None:
             sound_to_pause.pause_with_fade_out()
@@ -270,24 +263,27 @@ class Server(Gio.Application):
                              sound_event_id=sound_event_id)
             raise TooManySoundsException
 
-    def watch_bus_name(self, bus_name):
+    def watch_sound_bus_name(self, sound):
         """
         Watches a sound bus name for the given sound..
 
         If a watcher already exists no bus name watcher will be created.
 
         Args:
-            bus_name (str): A bus name.
+            sound (Sound): A sound object
         """
-        if bus_name not in self.registry.watcher_by_bus_name:
+        if sound.bus_name not in self.registry.watcher_by_bus_name:
             watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
-                                            bus_name,
+                                            sound.bus_name,
                                             Gio.DBusProxyFlags.NONE,
                                             None,
                                             self._bus_name_disconnect_cb)
-            watcher = DBusWatcher(watcher_id)
-            self.registry.watcher_by_bus_name[bus_name] = watcher
-        return self.registry.watcher_by_bus_name[bus_name]
+
+            # Tracks a sound UUID called by its respective DBus names.
+            uuids = set()
+            self.registry.watcher_by_bus_name[sound.bus_name] = \
+                DBusWatcher(watcher_id, uuids)
+        self.registry.watcher_by_bus_name[sound.bus_name].uuids.add(sound.uuid)
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
         # When a dbus name dissappears (for example, when an application that

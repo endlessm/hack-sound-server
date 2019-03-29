@@ -8,11 +8,12 @@ from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import GstController
+from hack_sound_server.future.sound import SoundBase
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import SoundFormatter
 
 
-class Sound(GObject.Object):
+class Sound(SoundBase):
     _DEFAULT_VOLUME = 1.0
     _DEFAULT_PITCH = 1.0
     _DEFAULT_RATE = 1.0
@@ -32,7 +33,7 @@ class Sound(GObject.Object):
         # used internally by the logger to format the log messages.
         self.bus_name = bus_name
         self.sound_event_id = sound_event_id
-        self.uuid = str(uuid.uuid4())
+        self._uuid = None
 
         assert sound_event_id in server.metadata
         self.metadata = server.metadata[sound_event_id]
@@ -201,6 +202,12 @@ class Sound(GObject.Object):
                              Gst.Element.state_get_name(self.get_state()))
             raise ValueError('error querying duration')
         return duration
+
+    @property
+    def uuid(self):
+        if self._uuid is None:
+            self._uuid = str(uuid.uuid4())
+        return self._uuid
 
     @property
     def loop(self):
