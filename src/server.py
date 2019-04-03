@@ -798,6 +798,27 @@ class HackSoundServer(Gio.Application):
             sound_event_id=self.get_player(uuid_).sound_event_id,
             uuid=uuid_
         )
+        self.__free_registry(sound_event_id, uuid_)
+        if not self.players:
+            self._ensure_release_countdown()
+        self.release()
+
+    def __player_error_cb(self, unused_player, error, debug, sound_event_id,
+                          uuid_, connection, path, iface):
+        # This method is only called when the player fails or when an
+        # application ordered to stop the sound. In both cases this means to
+        # delete the references to that sound UUID.
+        if uuid_ not in self.players:
+            return
+        self.__free_registry(sound_event_id, uuid_)
+        if not self.players:
+            self._ensure_release_countdown()
+        self.release()
+        data = (uuid_, error.message, error.domain, error.code, debug)
+        vdata = GLib.Variant("(sssis)", data)
+        connection.emit_signal(None, path, iface, 'Error', vdata)
+
+    def __free_registry(self, sound_event_id, uuid_):
         self._resume_last_bg_player(uuid_)
         del self.players[uuid_]
         if sound_event_id in self._uuid_by_event_id:
@@ -808,35 +829,3 @@ class HackSoundServer(Gio.Application):
             if bus_name in self._watcher_by_bus_name:
                 self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
         del self._refcount[uuid_]
-        if not self.players:
-            self._ensure_release_countdown()
-        self.release()
-
-    def __player_error_cb(self, player, error, debug, sound_event_id,
-                          uuid_, connection, path, iface):
-        # This method is only called when the player fails or when an
-        # application ordered to stop the sound. In both cases this means to
-        # delete the references to that sound UUID.
-        data = (uuid_, error.message, error.domain, error.code, debug)
-        vdata = GLib.Variant("(sssis)", data)
-        if uuid_ in self.players:
-            self.logger.debug(
-                "Freeing structures because there was an error.",
-                bus_name=self.get_player(uuid_).bus_name,
-                sound_event_id=self.get_player(uuid_).sound_event_id,
-                uuid=uuid_
-            )
-            self._resume_last_bg_player(uuid_)
-            del self.players[uuid_]
-            if sound_event_id in self._uuid_by_event_id:
-                self._uuid_by_event_id[sound_event_id].remove(uuid_)
-                if len(self._uuid_by_event_id[sound_event_id]) == 0:
-                    del self._uuid_by_event_id[sound_event_id]
-            for bus_name in self._refcount[uuid_]:
-                if bus_name in self._watcher_by_bus_name:
-                    self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
-            del self._refcount[uuid_]
-            if not self.players:
-                self._ensure_release_countdown()
-            self.release()
-            connection.emit_signal(None, path, iface, 'Error', vdata)
