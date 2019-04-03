@@ -658,54 +658,55 @@
     "lightspeed/timpani-start-win": {
         "sound-file": "lightspeed/timpani-start-win.webm"
     },
-    "operatingSystem/clock": {
-        "sound-file": "system/system-clock.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
-    },
-    "operatingSystem/close": {
-        "sound-file": "system/subsystem-close.webm",
-        "overlap-behavior": "overlap"
-    },
-    "operatingSystem/cursor": {
-        "sound-file": "system/system-cursor.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
-    },
-    "operatingSystem/daemons": {
-        "sound-file": "system/daemons.webm",
-        "loop": true,
-        "overlap-behavior": "ignore"
-    },
-    "operatingSystem/dev": {
-        "sound-file": "system/system-null.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
-    },
-    "operatingSystem/file": {
-        "sound-file": "system/system-files.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
-    },
-    "operatingSystem/kernel": {
-        "sound-file": "system/system-clock.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
+    "operatingSystem/background-music": {
+      "tracks": {
+        "background": {
+          "sound-file": "system/system-whole.webm",
+          "volume": 1,
+        },
+        "clock": {
+          "sound-file": "system/system-clock.webm",
+          "volume": 0
+        },
+        "daemons": {
+          "sound-file": "system/daemons.webm",
+          "volume": 0
+        },
+        "cursor": {
+          "sound-file": "system/system-cursor.webm",
+          "volume": 0
+        },
+        "kernel": {
+          "sound-file": "system/system-clock.webm",
+          "volume": 0
+        },
+        "dev": {
+          "sound-file": "system/system-null.webm",
+          "volume": 0
+        },
+        "file": {
+          "sound-file": "system/system-files.webm",
+          "volume": 0
+        },
+        "memory": {
+          "sound-file": "system/system-memory.webm",
+          "volume": 0
+        },
+        "window": {
+          "sound-file": "system/system-window.webm",
+          "volume": 0
+        },
+        "system": {
+          "sound-file": "system/system-whole.webm",
+          "volume": 0
+        }
+      },
+      "loop": true,
+      "type": "bg"
     },
     "operatingSystem/land": {
         "sound-file": "system/speech-bubble-land.webm",
         "overlap-behavior": "overlap"
-    },
-    "operatingSystem/memory": {
-        "sound-file": "system/system-memory.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
     },
     "operatingSystem/open": {
         "sound-file": "system/subsystem-open.webm",
@@ -716,17 +717,9 @@
         "sound-file": "system/element-select.webm",
         "overlap-behavior": "overlap"
     },
-    "operatingSystem/system": {
-        "sound-file": "system/system-whole.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
-    },
-    "operatingSystem/window": {
-        "sound-file": "system/system-window.webm",
-        "loop": true,
-        "overlap-behavior": "ignore",
-        "type": "bg"
+    "operatingSystem/close": {
+        "sound-file": "system/subsystem-close.webm",
+        "overlap-behavior": "overlap"
     },
     "operatingSystem/writing": {
         "sound-file": "system/speech-bubble-writing.webm",
