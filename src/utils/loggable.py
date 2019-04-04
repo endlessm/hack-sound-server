@@ -77,7 +77,7 @@ class ObjectFormatter(DefaultFormatter):
         return super().format(record)
 
 
-class PlayerFormatter(ObjectFormatter):
+class SoundFormatter(ObjectFormatter):
     _DEFAULT_BUS_NAME = YELLOW
     _DEFAULT_EVENT_ID_COLOR = VIOLET
     _DEFAULT_UUID_COLOR = CYAN
