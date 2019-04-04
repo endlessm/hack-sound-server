@@ -19,7 +19,7 @@ def _add_hack_sound_server_path():
 
 
 def _run_server():
-    from hack_sound_server.server import HackSoundServer
+    from hack_sound_server.server import Server
     from hack_sound_server.utils.loggable import logger
     from hack_sound_server.utils.metadata import read_and_parse_metadata
 
@@ -29,7 +29,7 @@ def _run_server():
         logger.critical("Cannot load metadata.")
         sys.exit(1)
 
-    server = HackSoundServer(metadata)
+    server = Server(metadata)
     GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, server.quit)
     GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGTERM, server.release)
     server.run(None)

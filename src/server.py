@@ -1,439 +1,17 @@
 import gi
-import random
-import uuid
 gi.require_version('GLib', '2.0')  # noqa
-gi.require_version('Gst', '1.0')   # noqa
-gi.require_version('GstController', '1.0')  # noqa
 from gi.repository import Gio
 from gi.repository import GLib
-from gi.repository import GObject
-from gi.repository import Gst
-from gi.repository import GstController
 from collections import namedtuple
+from hack_sound_server.sound import Sound
 from hack_sound_server.utils.loggable import Logger
-from hack_sound_server.utils.loggable import PlayerFormatter
 from hack_sound_server.utils.loggable import ServerFormatter
-
-
-class HackSoundPlayer(GObject.Object):
-    _DEFAULT_VOLUME = 1.0
-    _DEFAULT_PITCH = 1.0
-    _DEFAULT_RATE = 1.0
-    _DEFAULT_FADE_IN_MS = 1000
-    _DEFAULT_FADE_OUT_MS = 1000
-
-    __gsignals__ = {
-        'released': (GObject.SignalFlags.RUN_FIRST, None, ()),
-        'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
-    }
-
-    def __init__(self, sound_event_id, uuid_, metadata,
-                 metadata_extras=None):
-        super().__init__()
-        self.logger = Logger(PlayerFormatter, self)
-        # The following attributes (bus_names, sound_event_id and uuid) are
-        # used internally by the logger to format the log messages.
-        self.bus_names = set([])
-        self.sound_event_id = sound_event_id
-        self.uuid = uuid_
-
-        self.metadata = metadata
-        self.metadata_extras = metadata_extras or {}
-
-        self._stop_loop = False
-        self._n_loop = 0
-        self._is_initial_seek = False
-        self._pending_state_change = None
-        self._releasing = False
-        self._error = False
-
-        self.pipeline = self._build_pipeline()
-        bus = self.pipeline.get_bus()
-        bus.add_signal_watch()
-        bus.connect("message", self.__bus_message_cb)
-
-    def release(self):
-        if self._error:
-            return
-        # Otherwise, GStreamer complains with a WARNING indicating that
-        # g_idle_add should be used.
-        self.logger.debug("Releasing.")
-        self._releasing = True
-        GLib.idle_add(self._release)
-
-    def _release(self):
-        if self.pipeline is None:
-            return
-        self.pipeline.set_state(Gst.State.NULL)
-        self.pipeline.get_bus().remove_signal_watch()
-        self.pipeline = None
-        self.emit("released")
-
-    def get_state(self):
-        return self.pipeline.get_state(timeout=0).state
-
-    def play(self):
-        self._play()
-
-    def pause_with_fade_out(self):
-        self.logger.info("Pausing.")
-        if self._releasing:
-            self.logger.info("Cannot pause because being released.")
-            return
-        if self._stop_loop:
-            self.logger.info("Cannot pause because being stopped.")
-            return
-
-        volume_elem = self.pipeline.get_by_name("volume")
-        if volume_elem.props.volume == 0:
-            self.pipeline.set_state(Gst.State.PAUSED)
-            self._pending_state_change = None
-        else:
-            self._pending_state_change = Gst.State.PAUSED
-            # The element will be set to PAUSED state when volume reaches 0.
-            try:
-                self._add_fade_out()
-            except (ValueError, AssertionError):
-                self.logger.warning("Fade out effect could not be applied. "
-                                    "Pausing.")
-                self.pipeline.set_state(Gst.State.PAUSED)
-                self._pending_state_change = None
-
-    def _play(self):
-        self.logger.info("Playing.")
-        if self._releasing:
-            self.logger.info("Cannot play because being released.")
-            return
-        self._stop_loop = False
-        self.pipeline.set_state(Gst.State.PLAYING)
-        try:
-            self._add_fade_in()
-        except ValueError:
-            self.logger.warning("Fade in effect could not be applied.")
-        return GLib.SOURCE_REMOVE
-
-    def stop(self):
-        if not self.loop:
-            # Just stop immediately
-            self.release()
-            return
-
-        if self.fade_out == 0 or self.get_state() == Gst.State.PAUSED:
-            self._stop_loop = True
-            self.release()
-            return
-
-        # Stop at the end of the current loop
-        self._stop_loop = True
-        try:
-            self._add_fade_out()
-        except (ValueError, AssertionError) as ex:
-            self.logger.error(ex)
-            self.logger.warning("Fade out effect could not be applied. Stop.")
-            self.release()
-
-    def reset(self):
-        self.seek(0.0)
-        # Reset keyframes.
-        self._fade_control.unset_all()
-        self._rate_control.unset_all()
-        try:
-            self._add_fade_in()
-        except ValueError:
-            self.logger.warning("Fade in effect could not be applied.")
-
-    def update_properties(self, transition_time_ms, options):
-        if "volume" in options:
-            self._update_property_with_keyframes("volume", self._fade_control,
-                                                 transition_time_ms, "volume",
-                                                 options["volume"])
-        if "rate" in options:
-            self._update_property_with_keyframes("pitch", self._rate_control,
-                                                 transition_time_ms, "rate",
-                                                 options["rate"])
-
-    def _update_property_with_keyframes(self, element_name, control,
-                                        transition_time_ms, prop_name,
-                                        prop_value):
-        element = self.pipeline.get_by_name(element_name)
-        if element is None:
-            return
-        current_value = element.get_property(prop_name)
-        try:
-            current_time = self.get_current_position()
-        except ValueError:
-            self.logger.warning("Cannot update the property '%s'.", prop_name)
-            return
-        time_end = current_time + transition_time_ms * Gst.MSECOND
-        try:
-            self._add_keyframe_pair(control, current_time, current_value,
-                                    time_end, prop_value,
-                                    consider_duration=False,
-                                    consider_delay=False)
-        except ValueError:
-            self.logger.warning("Cannot update the property '%s'.", prop_name)
-            return
-
-    def seek(self, position=None, flags=None):
-        if flags is None:
-            flags = Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT
-        if position is None:
-            self.pipeline.seek(self._DEFAULT_RATE, Gst.Format.TIME, flags,
-                               Gst.SeekType.NONE, -1, Gst.SeekType.NONE, -1)
-        else:
-            self.pipeline.seek_simple(Gst.Format.TIME, flags, position)
-
-    def get_current_position(self):
-        ok, current_time = self.pipeline.query_position(Gst.Format.TIME)
-        if not ok:
-            self.logger.info("Cannot get the current position. "
-                             "Current state is '%s'. ",
-                             Gst.Element.state_get_name(self.get_state()))
-            raise ValueError('error querying position')
-        return current_time
-
-    def get_duration(self):
-        ok, duration = self.pipeline.query_duration(Gst.Format.TIME)
-        if not ok:
-            self.logger.info("Cannot get the current position. "
-                             "Current state is '%s'. ",
-                             Gst.Element.state_get_name(self.get_state()))
-            raise ValueError('error querying duration')
-        return duration
-
-    @property
-    def loop(self):
-        return "loop" in self.metadata and self.metadata["loop"]
-
-    @property
-    def volume(self):
-        volume = self._get_multipliable_prop("volume")
-        if volume is None:
-            volume = self._DEFAULT_VOLUME
-        return volume
-
-    @property
-    def pitch(self):
-        """
-        Changes pitch while keeping the tempo.
-        """
-        return self._get_multipliable_prop("pitch")
-
-    @property
-    def rate(self):
-        """
-        Changes tempo and pitch.
-        """
-        if "rate" in self.metadata:
-            return self.metadata["rate"]
-        return None
-
-    @property
-    def fade_in(self):
-        return self.metadata.get("fade-in",
-                                 self._DEFAULT_FADE_IN_MS if self.loop else 0)
-
-    @property
-    def fade_out(self):
-        pipeline_fade_out = 0
-        if self.loop:
-            pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
-        metadata_fade_out = self.metadata.get("fade-out")
-        if metadata_fade_out is not None:
-            pipeline_fade_out = metadata_fade_out
-        return pipeline_fade_out
-
-    @property
-    def delay(self):
-        if "delay" in self.metadata:
-            return self.metadata["delay"]
-        return None
-
-    @property
-    def sound_location(self):
-        return random.choice(self.metadata["sound-files"])
-
-    @property
-    def type_(self):
-        type_ = self.metadata.get("type", "sfx")
-        if type_ not in ("sfx", "bg"):
-            return "sfx"
-        return type_
-
-    def _add_keyframe_pair(self, control, time_start_ns, value_start,
-                           time_end_ns, value_end, consider_duration=True,
-                           consider_delay=False):
-        control.unset_all()
-        if not self._add_keyframe(control, time_start_ns, value_start,
-                                  consider_delay):
-            raise ValueError('bad start time')
-        # Rather than deal with the case where we have to split the keyframes
-        # over the sound's loop; if the end keyframe is greater than the sound
-        # file duration, we just apply the end keyframe to the end.
-        if consider_duration:
-            duration = self.get_duration()
-            time_end_ns = min(time_end_ns, duration * (self._n_loop + 1))
-        if not self._add_keyframe(control, time_end_ns, value_end,
-                                  consider_delay):
-            raise ValueError('bad end time')
-
-    def _add_keyframe(self, control, time_ns, value, consider_delay=False):
-        if consider_delay:
-            delay = 0 if not self.delay else self.delay * Gst.MSECOND
-            time_ns += delay
-        return control.set(time_ns, value)
-
-    def _add_fade_in(self):
-        if not self.loop or self.loop and self.fade_in == 0:
-            return
-        self.logger.debug("Fading in.")
-        try:
-            current_time = self.get_current_position()
-        except ValueError:
-            # This is the first call to play the sound and it should fade in
-            # from the time 0.
-            self.logger.info("Assume first PlaySound call. Current time=0.")
-            current_time = 0
-        current_volume = self.pipeline.get_by_name("volume").props.volume
-        end_time = current_time + self.fade_in * Gst.MSECOND
-        consider_delay = current_time == 0
-        self._add_keyframe_pair(self._fade_control,
-                                current_time, current_volume,
-                                end_time, self.volume, False, consider_delay)
-
-    def _add_fade_out(self):
-        # This method may raise a ValueError usually if the pipeline is in
-        # NULL or READY state which is likely to happen when a StopSound call
-        # arrives very quick "just after" a PlaySound call has arrived, because
-        # the pipeline may have not reached the PAUSED state yet.
-        # Remember that there may be intermediate states:
-        # https://gstreamer.freedesktop.org/documentation/design/states.html
-        # and that the position query will usually fail if the pipeline is not
-        # PAUSED or PLAYING.
-        if not self.loop or self.loop and self.fade_out == 0:
-            return
-        self.logger.debug("Fading out.")
-        current_time = self.get_current_position()
-        if self.delay and current_time < self.delay * Gst.MSECOND:
-            self.logger.warning("Cannot fade out while in an in-progress "
-                                "delay.")
-            raise AssertionError
-        current_volume = self.pipeline.get_by_name("volume").props.volume
-        end_time = current_time + self.fade_out * Gst.MSECOND
-        self._add_keyframe_pair(self._fade_control,
-                                current_time, current_volume,
-                                end_time, 0,
-                                consider_delay=False)
-
-    def _get_multipliable_prop(self, prop_name):
-        value = self.metadata.get(prop_name, None)
-        if prop_name in self.metadata_extras:
-            if value is None:
-                value = self.metadata_extras[prop_name]
-            else:
-                value *= self.metadata_extras[prop_name]
-        return value
-
-    def _create_control(self, element, prop):
-        fade_control = GstController.InterpolationControlSource(
-            mode=GstController.InterpolationMode.LINEAR)
-        binding = GstController.DirectControlBinding.new_absolute(
-            element, prop, fade_control)
-        if not element.add_control_binding(binding):
-            raise ValueError('bad control binding')
-        return fade_control
-
-    def _build_pipeline(self):
-        pitch_args = (self.pitch or self._DEFAULT_PITCH,
-                      self.rate or self._DEFAULT_RATE)
-        elements = [
-            "filesrc name=src location=\"{}\"".format(self.sound_location),
-            "decodebin name=decoder",
-            "identity single-segment=true",
-            "audioconvert",
-            "pitch name=pitch pitch={} rate={}".format(*pitch_args),
-            "volume name=volume volume={}".format(self.volume),
-            "autoaudiosink"
-        ]
-        spipeline = " ! ".join(elements)
-        pipeline = Gst.parse_launch(spipeline)
-
-        volume_elem = pipeline.get_by_name("volume")
-        assert volume_elem is not None
-        # Set the initial volume to 0 for looping sounds that fade in.
-        if self.loop and self.fade_in > 0:
-            volume_elem.props.volume = 0
-        volume_elem.connect("notify::volume", self.__volume_cb)
-        self._fade_control = self._create_control(volume_elem, "volume")
-
-        pitch_elem = pipeline.get_by_name("pitch")
-        assert pitch_elem is not None
-        self._rate_control = self._create_control(pitch_elem, "rate")
-
-        decoder_elem = pipeline.get_by_name("decoder")
-        assert decoder_elem is not None
-        decoder_elem.connect("pad-added", self.__pad_added_cb)
-
-        return pipeline
-
-    def __pad_added_cb(self, unused_decoder, pad):
-        if self.pipeline is None:
-            return
-        if not self.delay:
-            return
-        pad.set_offset(self.delay * Gst.MSECOND)
-
-    def __volume_cb(self, volume_element, unused_volume):
-        # In case of fade-out effects, release the pipeline as soon volume
-        # reaches 0.
-        if volume_element.props.volume == 0:
-            if self._pending_state_change is not None:
-                self.pipeline.set_state(self._pending_state_change)
-                self._pending_state_change = None
-            if self._stop_loop:
-                self.release()
-
-    def __bus_message_cb(self, unused_bus, message):
-        if message.type == Gst.MessageType.EOS:
-            self.release()
-        elif message.type == Gst.MessageType.SEGMENT_DONE:
-            if message.src != self.pipeline:
-                return
-            if self.loop and not self._stop_loop:
-                self._n_loop += 1
-                self.seek(0.0, flags=Gst.SeekFlags.SEGMENT)
-            else:
-                self.release()
-        elif message.type == Gst.MessageType.ASYNC_DONE:
-            if message.src != self.pipeline:
-                return
-            if self.loop and not self._is_initial_seek:
-                flags = Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT |\
-                        Gst.SeekFlags.SEGMENT
-                self.seek(0.0, flags=flags)
-                self._is_initial_seek = True
-        elif message.type == Gst.MessageType.ERROR:
-            error, debug = message.parse_error()
-            self.logger.warning("Error from %s: %s (%s)", message.src, error,
-                                debug)
-            self.pipeline.set_state(Gst.State.NULL)
-            self._error = True
-            self.emit("error", error, debug)
-        elif message.type == Gst.MessageType.STATE_CHANGED:
-            if message.src != self.pipeline:
-                return
-            st = message.get_structure()
-            old_state = st.get_value("old-state")
-            new_state = st.get_value("new-state")
-            if (old_state == Gst.State.READY and new_state == Gst.State.PAUSED
-                    and self._stop_loop):
-                self.release()
 
 
 DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
 
 
-class HackSoundServer(Gio.Application):
+class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
     _OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
@@ -476,7 +54,7 @@ class HackSoundServer(Gio.Application):
         self._dbus_id = None
         self.metadata = metadata
         self._countdown_id = None
-        self.players = {}
+        self.sounds = {}
         # COunts the references of a sound by UUID and by bus name.
         self._refcount = {}
         self._watcher_by_bus_name = {}
@@ -485,41 +63,41 @@ class HackSoundServer(Gio.Application):
         self._background_players = []
 
     def play(self, uuid_):
-        player = self.players[uuid_]
-        if player.type_ == "bg":
+        sound = self.sounds[uuid_]
+        if sound.type_ == "bg":
             # The following rule applies for 'bg' sounds: whenever a new 'bg'
             # sound starts to play back, if any previous 'bg' sound was already
             # playing, then pause that previous sound and play the new one. If
             # this last sound finishes, then the last sound is resumed.
             overlap_behavior =\
-                self.metadata[player.sound_event_id].get("overlap-behavior",
-                                                         "overlap")
+                self.metadata[sound.sound_event_id].get("overlap-behavior",
+                                                        "overlap")
 
-            # Reorder the list of background players if necessary.
-            if len(self._background_players) > 0:
+            # Reorder the list of background sounds if necessary.
+            if len(self._background_sounds) > 0:
                 # Sounds with overlap behavior 'ignore' or 'restart' are unique
-                # so just need to move the incoming player to the head/top of
+                # so just need to move the incoming sound to the head/top of
                 # the list/stack.
                 if (overlap_behavior in ("ignore", "restart") and
-                        player in self._background_players):
-                    if self._background_players[-1] != player:
-                        self._background_players[-1].pause_with_fade_out()
+                        sound in self._background_sounds):
+                    if self._background_sounds[-1] != sound:
+                        self._background_sounds[-1].pause_with_fade_out()
                     # Reorder.
-                    self._background_players.remove(player)
-                    self._background_players.append(player)
+                    self._background_sounds.remove(sound)
+                    self._background_sounds.append(sound)
 
-            if len(self._background_players) == 0:
-                self._background_players.append(player)
-            elif self._background_players[-1] != player:
-                self._background_players[-1].pause_with_fade_out()
-                self._background_players.append(player)
-        player.play()
+            if len(self._background_sounds) == 0:
+                self._background_sounds.append(sound)
+            elif self._background_sounds[-1] != sound:
+                self._background_sounds[-1].pause_with_fade_out()
+                self._background_sounds.append(sound)
+        sound.play()
 
-    def get_player(self, uuid_):
+    def get_sound(self, uuid_):
         try:
-            return self.players[uuid_]
+            return self.sounds[uuid_]
         except KeyError:
-            self.logger.critical("This uuid is not assigned to any player.",
+            self.logger.critical("This uuid is not assigned to any sound.",
                                  uuid=uuid_)
 
     def refcount(self, uuid_, bus_name=None):
@@ -535,9 +113,9 @@ class HackSoundServer(Gio.Application):
         refcount = self._refcount[uuid_][bus_name]
         self.logger.debug("Reference. Refcount: %d", refcount,
                           bus_name=bus_name,
-                          sound_event_id=self.get_player(uuid_).sound_event_id,
+                          sound_event_id=self.get_sound(uuid_).sound_event_id,
                           uuid=uuid_)
-        self.get_player(uuid_).bus_names.add(bus_name)
+        self.get_sound(uuid_).bus_names.add(bus_name)
         self.play(uuid_)
 
     def unref(self, uuid_, bus_name, count=1):
@@ -557,16 +135,16 @@ class HackSoundServer(Gio.Application):
             return
         self._refcount[uuid_][bus_name] -= count
         if self._refcount[uuid_][bus_name] == 0:
-            self.get_player(uuid_).bus_names.remove(bus_name)
+            self.get_sound(uuid_).bus_names.remove(bus_name)
         self.logger.debug("Unreference. Refcount: %d",
                           self._refcount[uuid_][bus_name], bus_name=bus_name,
-                          sound_event_id=self.get_player(uuid_).sound_event_id,
+                          sound_event_id=self.get_sound(uuid_).sound_event_id,
                           uuid=uuid_)
         if self.refcount(uuid_) == 0:
             # Only stop the sound if the last bus name (application) referring
             # to it has been disconnected (closed). The stop method will,
             # indirectly, take care for deleting self._refcount[uuid_].
-            self.get_player(uuid_).stop()
+            self.get_sound(uuid_).stop()
 
     def do_dbus_register(self, connection, path):
         Gio.Application.do_dbus_register(self, connection, path)
@@ -631,18 +209,18 @@ class HackSoundServer(Gio.Application):
             self._cancel_countdown()
             self.hold()
 
-            uuid_ = str(uuid.uuid4())
-            metadata = self.metadata[sound_event_id]
-            self.players[uuid_] = HackSoundPlayer(sound_event_id,
-                                                  uuid_, metadata, options)
+            sound = Sound(self, sound_event_id, options)
+            uuid_ = sound.uuid
+            self.sounds[uuid_] = sound
+
             # Insert the uuid in the dictionary organized by sound event id.
             self._uuids_by_event_id[sound_event_id].add(uuid_)
 
-            self.players[uuid_].connect("released", self.__player_released_cb,
-                                        sound_event_id, uuid_)
-            self.players[uuid_].connect("error", self.__player_error_cb,
-                                        sound_event_id, uuid_,
-                                        connection, path, iface)
+            self.sounds[uuid_].connect("released", self.__sound_released_cb,
+                                       sound_event_id, uuid_)
+            self.sounds[uuid_].connect("error", self.__sound_error_cb,
+                                       sound_event_id, uuid_,
+                                       connection, path, iface)
             # Plays the sound.
             self._watch_bus_name(sender, uuid_)
 
@@ -660,7 +238,7 @@ class HackSoundServer(Gio.Application):
         return True
 
     def _watch_bus_name(self, bus_name, uuid_):
-        # Tracks a player UUID called by its respective DBus names.
+        # Tracks a sound UUID called by its respective DBus names.
         if bus_name not in self._watcher_by_bus_name:
             watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
                                             bus_name,
@@ -678,7 +256,7 @@ class HackSoundServer(Gio.Application):
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
         # When a dbus name dissappears (for example, when an application that
-        # requested to play a sound is killed/colsed), all the players created
+        # requested to play a sound is killed/colsed), all the sounds created
         # due to this application will be stopped.
         if bus_name not in self._watcher_by_bus_name:
             return
@@ -699,7 +277,7 @@ class HackSoundServer(Gio.Application):
 
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
-            self.get_player(uuid_).reset()
+            self.get_sound(uuid_).reset()
             return uuid_
         elif overlap_behavior == "ignore":
             # If a sound is already playing, then ignore the new one.
@@ -722,20 +300,20 @@ class HackSoundServer(Gio.Application):
                                refcount by 1. If set to True, then the refcount
                                is set to 0.
         """
-        assert not (uuid_ in self.players and uuid_ in self._uuids_by_event_id)
+        assert not (uuid_ in self.sounds and uuid_ in self._uuids_by_event_id)
         # xor: With the exception that the case of both cases being True will
         # never happen because we never define an UUID in the metadata file.
-        if not ((uuid_ not in self.players) ^
+        if not ((uuid_ not in self.sounds) ^
                 (uuid_ not in self._uuids_by_event_id)):
             self.logger.info("Sound {} was supposed to be stopped, but did "
                              "not exist".format(uuid_))
-        elif (uuid_ in self.players and (uuid_ not in self._refcount or
-                                         sender not in self._refcount[uuid_])):
+        elif (uuid_ in self.sounds and (uuid_ not in self._refcount or
+                                        sender not in self._refcount[uuid_])):
             self.logger.info("Sound {} was supposed to be "
                              "refcounted by the bus, name \'{}\' but "
                              "it wasn\'t.".format(uuid_, sender))
         else:
-            if uuid_ in self.players:
+            if uuid_ in self.sounds:
                 self._unref_on_stop(uuid_, sender, term_sound)
             elif uuid_ in self._uuids_by_event_id:
                 sound_event_id = uuid_
@@ -749,12 +327,12 @@ class HackSoundServer(Gio.Application):
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
-        if uuid_ not in self.players:
+        if uuid_ not in self.sounds:
             self.logger.info("Properties of sound {} was supposed to be "
                              "updated, but did not exist".format(uuid_))
         else:
-            player = self.get_player(uuid_)
-            player.update_properties(transition_time_ms, options)
+            sound = self.get_sound(uuid_)
+            sound.update_properties(transition_time_ms, options)
         invocation.return_value(None)
 
     def __method_called_cb(self, connection, sender, path, iface,
@@ -779,49 +357,49 @@ class HackSoundServer(Gio.Application):
                 Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
                 "Method '%s' not available" % method)
 
-    def _resume_last_bg_player(self, uuid_):
-        player = self.get_player(uuid_)
-        if player not in self._background_players:
+    def _resume_last_bg_sound(self, uuid_):
+        sound = self.get_sound(uuid_)
+        if sound not in self._background_sounds:
             return
-        assert player.type_ == "bg"
+        assert sound.type_ == "bg"
 
         try:
-            self._background_players.remove(player)
+            self._background_sounds.remove(sound)
         except ValueError:
             self.logger.warning(
                 "Sound %s sound was supposed to be in the list of "
                 "background sounds, but this isn't", uuid_)
 
-        if len(self._background_players) > 0:
-            last_player = self._background_players[-1]
-            self.logger.info("Resuming player.",
-                             sound_event_id=last_player.sound_event_id,
-                             uuid=last_player.uuid)
-            if self.refcount(last_player.uuid) == 0:
-                self.logger.info("Cannot resume this player because its "
+        if len(self._background_sounds) > 0:
+            last_sound = self._background_sounds[-1]
+            self.logger.info("Resuming sound.",
+                             sound_event_id=last_sound.sound_event_id,
+                             uuid=last_sound.uuid)
+            if self.refcount(last_sound.uuid) == 0:
+                self.logger.info("Cannot resume this sound because its "
                                  "owning apps have dissapeared from the bus.",
-                                 sound_event_id=last_player.sound_event_id,
-                                 uuid=last_player.uuid)
+                                 sound_event_id=last_sound.sound_event_id,
+                                 uuid=last_sound.uuid)
                 return
-            last_player.play()
+            last_sound.play()
 
-    def __player_released_cb(self, unused_player, sound_event_id, uuid_):
+    def __sound_released_cb(self, unused_sound, sound_event_id, uuid_):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
         self.logger.debug(
             "Freeing structures because end-of-stream was reached.",
-            sound_event_id=self.get_player(uuid_).sound_event_id,
+            sound_event_id=self.get_sound(uuid_).sound_event_id,
             uuid=uuid_
         )
         self.__free_registry(sound_event_id, uuid_)
-        if not self.players:
+        if not self.sounds:
             self._ensure_release_countdown()
         self.release()
 
-    def __player_error_cb(self, unused_player, error, debug, sound_event_id,
-                          uuid_, connection, path, iface):
-        # This method is only called when the player fails or when an
+    def __sound_error_cb(self, unused_sound, error, debug, sound_event_id,
+                         uuid_, connection, path, iface):
+        # This method is only called when the sound fails or when an
         # application ordered to stop the sound. In both cases this means to
         # delete the references to that sound UUID.
         self.logger.error("Freeing structures because of a GStreamer error. "
@@ -829,16 +407,16 @@ class HackSoundServer(Gio.Application):
                           sound_event_id=sound_event_id,
                           uuid=uuid_)
 
-        if uuid_ not in self.players:
+        if uuid_ not in self.sounds:
             return
         self.__free_registry(sound_event_id, uuid_)
-        if not self.players:
+        if not self.sounds:
             self._ensure_release_countdown()
         self.release()
 
     def __free_registry(self, sound_event_id, uuid_):
-        self._resume_last_bg_player(uuid_)
-        del self.players[uuid_]
+        self._resume_last_bg_sound(uuid_)
+        del self.sounds[uuid_]
         if sound_event_id in self._uuids_by_event_id:
             self._uuids_by_event_id[sound_event_id].remove(uuid_)
             if len(self._uuids_by_event_id[sound_event_id]) == 0:
