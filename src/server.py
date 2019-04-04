@@ -769,7 +769,7 @@ class HackSoundServer(Gio.Application):
         except ValueError:
             self.logger.warning(
                 "Sound %s sound was supposed to be in the list of "
-                "background sounds, but this isn't", uuid)
+                "background sounds, but this isn't", uuid_)
 
         if len(self._background_players) > 0:
             last_player = self._background_players[-1]
