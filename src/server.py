@@ -3,6 +3,7 @@ gi.require_version('GLib', '2.0')  # noqa
 from gi.repository import Gio
 from gi.repository import GLib
 from collections import namedtuple
+from hack_sound_server.registry import Registry
 from hack_sound_server.sound import Sound
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import ServerFormatter
@@ -54,16 +55,10 @@ class Server(Gio.Application):
         self._dbus_id = None
         self.metadata = metadata
         self._countdown_id = None
-        self.sounds = {}
-        # COunts the references of a sound by UUID and by bus name.
-        self._refcount = {}
-        self._watcher_by_bus_name = {}
-        # Only useful for sounds tagged with "overlap-behavior":
-        self._uuids_by_event_id = {}
-        self._background_players = []
+        self.registry = Registry()
 
     def play(self, uuid_):
-        sound = self.sounds[uuid_]
+        sound = self.registry.sounds[uuid_]
         if sound.type_ == "bg":
             # The following rule applies for 'bg' sounds: whenever a new 'bg'
             # sound starts to play back, if any previous 'bg' sound was already
@@ -74,28 +69,29 @@ class Server(Gio.Application):
                                                         "overlap")
 
             # Reorder the list of background sounds if necessary.
-            if len(self._background_sounds) > 0:
+            if len(self.registry.background_sounds) > 0:
                 # Sounds with overlap behavior 'ignore' or 'restart' are unique
                 # so just need to move the incoming sound to the head/top of
                 # the list/stack.
                 if (overlap_behavior in ("ignore", "restart") and
-                        sound in self._background_sounds):
-                    if self._background_sounds[-1] != sound:
-                        self._background_sounds[-1].pause_with_fade_out()
+                        sound in self.registry.background_sounds):
+                    last_sound = self.registry.background_sounds[-1]
+                    if last_sound != sound:
+                        last_sound.pause_with_fade_out()
                     # Reorder.
-                    self._background_sounds.remove(sound)
-                    self._background_sounds.append(sound)
+                    self.registry.background_sounds.remove(sound)
+                    self.registry.background_sounds.append(sound)
 
-            if len(self._background_sounds) == 0:
-                self._background_sounds.append(sound)
-            elif self._background_sounds[-1] != sound:
-                self._background_sounds[-1].pause_with_fade_out()
-                self._background_sounds.append(sound)
+            if len(self.registry.background_sounds) == 0:
+                self.registry.background_sounds.append(sound)
+            elif self.registry.background_sounds[-1] != sound:
+                self.registry.background_sounds[-1].pause_with_fade_out()
+                self.registry.background_sounds.append(sound)
         sound.play()
 
     def get_sound(self, uuid_):
         try:
-            return self.sounds[uuid_]
+            return self.registry.sounds[uuid_]
         except KeyError:
             self.logger.critical("This uuid is not assigned to any sound.",
                                  uuid=uuid_)
@@ -103,14 +99,14 @@ class Server(Gio.Application):
     def refcount(self, uuid_, bus_name=None):
         if bus_name is None:
             refcount = 0
-            for bus_name in self._refcount[uuid_]:
-                refcount += self._refcount[uuid_][bus_name]
+            for bus_name in self.registry.refcount[uuid_]:
+                refcount += self.registry.refcount[uuid_][bus_name]
             return refcount
-        return self._refcount[uuid_][bus_name]
+        return self.registry.refcount[uuid_][bus_name]
 
     def ref(self, uuid_, bus_name):
-        self._refcount[uuid_][bus_name] += 1
-        refcount = self._refcount[uuid_][bus_name]
+        self.registry.refcount[uuid_][bus_name] += 1
+        refcount = self.registry.refcount[uuid_][bus_name]
         self.logger.debug("Reference. Refcount: %d", refcount,
                           bus_name=bus_name,
                           sound_event_id=self.get_sound(uuid_).sound_event_id,
@@ -119,31 +115,32 @@ class Server(Gio.Application):
         self.play(uuid_)
 
     def unref(self, uuid_, bus_name, count=1):
-        if uuid_ not in self._refcount:
+        if uuid_ not in self.registry.refcount:
             self.logger.warning("This uuid is not registered in the refcount "
                                 "registry.", uuid=uuid_)
             return
-        if bus_name not in self._refcount[uuid_]:
+        if bus_name not in self.registry.refcount[uuid_]:
             self.logger.warning("Bus name '{}' is not registered in the "
                                 "refcount registry.".format(bus_name),
                                 bus_name=bus_name)
             return
-        if self._refcount[uuid_][bus_name] == 0:
+        if self.registry.refcount[uuid_][bus_name] == 0:
             self.logger.warning("Cannot decrease refcount for bus name '{}'"
                                 "because it's already 0.".format(bus_name),
                                 uuid=uuid_)
             return
-        self._refcount[uuid_][bus_name] -= count
-        if self._refcount[uuid_][bus_name] == 0:
+        self.registry.refcount[uuid_][bus_name] -= count
+        if self.registry.refcount[uuid_][bus_name] == 0:
             self.get_sound(uuid_).bus_names.remove(bus_name)
         self.logger.debug("Unreference. Refcount: %d",
-                          self._refcount[uuid_][bus_name], bus_name=bus_name,
+                          self.registry.refcount[uuid_][bus_name],
+                          bus_name=bus_name,
                           sound_event_id=self.get_sound(uuid_).sound_event_id,
                           uuid=uuid_)
         if self.refcount(uuid_) == 0:
             # Only stop the sound if the last bus name (application) referring
             # to it has been disconnected (closed). The stop method will,
-            # indirectly, take care for deleting self._refcount[uuid_].
+            # indirectly, take care for deleting self.registry.refcount[uuid_].
             self.get_sound(uuid_).stop()
 
     def do_dbus_register(self, connection, path):
@@ -195,8 +192,8 @@ class Server(Gio.Application):
             return invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
                 msg % overlap_behavior)
-        if not self._uuids_by_event_id.get(sound_event_id):
-            self._uuids_by_event_id[sound_event_id] = set()
+        if not self.registry.uuids_by_event_id.get(sound_event_id):
+            self.registry.uuids_by_event_id[sound_event_id] = set()
 
         uuid_ = self._do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
@@ -211,16 +208,18 @@ class Server(Gio.Application):
 
             sound = Sound(self, sound_event_id, options)
             uuid_ = sound.uuid
-            self.sounds[uuid_] = sound
+            self.registry.sounds[uuid_] = sound
 
             # Insert the uuid in the dictionary organized by sound event id.
-            self._uuids_by_event_id[sound_event_id].add(uuid_)
+            self.registry.uuids_by_event_id[sound_event_id].add(uuid_)
 
-            self.sounds[uuid_].connect("released", self.__sound_released_cb,
-                                       sound_event_id, uuid_)
-            self.sounds[uuid_].connect("error", self.__sound_error_cb,
-                                       sound_event_id, uuid_,
-                                       connection, path, iface)
+            self.registry.sounds[uuid_].connect("released",
+                                                self.__sound_released_cb,
+                                                sound_event_id, uuid_)
+            self.registry.sounds[uuid_].connect("error",
+                                                self.__sound_error_cb,
+                                                sound_event_id, uuid_,
+                                                connection, path, iface)
             # Plays the sound.
             self._watch_bus_name(sender, uuid_)
 
@@ -228,7 +227,7 @@ class Server(Gio.Application):
 
     def _check_too_many_sounds(self, invocation, sound_event_id,
                                overlap_behavior):
-        n_instances = len(self._uuids_by_event_id[sound_event_id])
+        n_instances = len(self.registry.uuids_by_event_id[sound_event_id])
         if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
@@ -239,37 +238,39 @@ class Server(Gio.Application):
 
     def _watch_bus_name(self, bus_name, uuid_):
         # Tracks a sound UUID called by its respective DBus names.
-        if bus_name not in self._watcher_by_bus_name:
+        if bus_name not in self.registry.watcher_by_bus_name:
             watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
                                             bus_name,
                                             Gio.DBusProxyFlags.NONE,
                                             None,
                                             self._bus_name_disconnect_cb)
-            self._watcher_by_bus_name[bus_name] = DBusWatcher(watcher_id,
-                                                              set())
-        if uuid_ not in self._refcount:
-            self._refcount[uuid_] = {}
-        if bus_name not in self._refcount[uuid_]:
-            self._refcount[uuid_][bus_name] = 0
+            self.registry.watcher_by_bus_name[bus_name] = \
+                DBusWatcher(watcher_id, set())
+        if uuid_ not in self.registry.refcount:
+            self.registry.refcount[uuid_] = {}
+        if bus_name not in self.registry.refcount[uuid_]:
+            self.registry.refcount[uuid_][bus_name] = 0
         self.ref(uuid_, bus_name)
-        self._watcher_by_bus_name[bus_name].uuids.add(uuid_)
+        self.registry.watcher_by_bus_name[bus_name].uuids.add(uuid_)
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
         # When a dbus name dissappears (for example, when an application that
         # requested to play a sound is killed/colsed), all the sounds created
         # due to this application will be stopped.
-        if bus_name not in self._watcher_by_bus_name:
+        if bus_name not in self.registry.watcher_by_bus_name:
             return
-        for uuid_ in self._watcher_by_bus_name[bus_name].uuids:
-            self.unref(uuid_, bus_name, count=self._refcount[uuid_][bus_name])
+        for uuid_ in self.registry.watcher_by_bus_name[bus_name].uuids:
+            self.unref(uuid_, bus_name,
+                       count=self.registry.refcount[uuid_][bus_name])
         # Remove the watcher.
-        Gio.bus_unwatch_name(self._watcher_by_bus_name[bus_name].watcher_id)
-        del self._watcher_by_bus_name[bus_name]
+        watcher_id = self.registry.watcher_by_bus_name[bus_name].watcher_id
+        Gio.bus_unwatch_name(watcher_id)
+        del self.registry.watcher_by_bus_name[bus_name]
 
     def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
         if overlap_behavior == "overlap":
             return None
-        uuids = self._uuids_by_event_id.get(sound_event_id)
+        uuids = self.registry.uuids_by_event_id.get(sound_event_id)
         assert len(uuids) <= 1
         if len(uuids) == 0:
             return None
@@ -300,24 +301,26 @@ class Server(Gio.Application):
                                refcount by 1. If set to True, then the refcount
                                is set to 0.
         """
-        assert not (uuid_ in self.sounds and uuid_ in self._uuids_by_event_id)
+        assert not (uuid_ in self.registry.sounds and
+                    uuid_ in self.registry.uuids_by_event_id)
         # xor: With the exception that the case of both cases being True will
         # never happen because we never define an UUID in the metadata file.
-        if not ((uuid_ not in self.sounds) ^
-                (uuid_ not in self._uuids_by_event_id)):
+        if not ((uuid_ not in self.registry.sounds) ^
+                (uuid_ not in self.registry.uuids_by_event_id)):
             self.logger.info("Sound {} was supposed to be stopped, but did "
                              "not exist".format(uuid_))
-        elif (uuid_ in self.sounds and (uuid_ not in self._refcount or
-                                        sender not in self._refcount[uuid_])):
+        elif (uuid_ in self.registry.sounds and
+              (uuid_ not in self.registry.refcount or
+               sender not in self.registry.refcount[uuid_])):
             self.logger.info("Sound {} was supposed to be "
                              "refcounted by the bus, name \'{}\' but "
                              "it wasn\'t.".format(uuid_, sender))
         else:
-            if uuid_ in self.sounds:
+            if uuid_ in self.registry.sounds:
                 self._unref_on_stop(uuid_, sender, term_sound)
-            elif uuid_ in self._uuids_by_event_id:
+            elif uuid_ in self.registry.uuids_by_event_id:
                 sound_event_id = uuid_
-                for uuid_ in self._uuids_by_event_id[sound_event_id]:
+                for uuid_ in self.registry.uuids_by_event_id[sound_event_id]:
                     self._unref_on_stop(uuid_, sender, term_sound)
         invocation.return_value(None)
 
@@ -327,7 +330,7 @@ class Server(Gio.Application):
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
-        if uuid_ not in self.sounds:
+        if uuid_ not in self.registry.sounds:
             self.logger.info("Properties of sound {} was supposed to be "
                              "updated, but did not exist".format(uuid_))
         else:
@@ -359,20 +362,20 @@ class Server(Gio.Application):
 
     def _resume_last_bg_sound(self, uuid_):
         sound = self.get_sound(uuid_)
-        if sound not in self._background_sounds:
+        if sound not in self.registry.background_sounds:
             return
         assert sound.type_ == "bg"
 
         try:
-            self._background_sounds.remove(sound)
+            self.registry.background_sounds.remove(sound)
             sound.release()
         except ValueError:
             self.logger.warning(
                 "Sound %s sound was supposed to be in the list of "
                 "background sounds, but this isn't", uuid_)
 
-        if len(self._background_sounds) > 0:
-            last_sound = self._background_sounds[-1]
+        if len(self.registry.background_sounds) > 0:
+            last_sound = self.registry.background_sounds[-1]
             self.logger.info("Resuming sound.",
                              sound_event_id=last_sound.sound_event_id,
                              uuid=last_sound.uuid)
@@ -394,7 +397,7 @@ class Server(Gio.Application):
             uuid=uuid_
         )
         self.__free_registry(sound_event_id, uuid_)
-        if not self.sounds:
+        if not self.registry.sounds:
             self._ensure_release_countdown()
         self.release()
 
@@ -408,21 +411,21 @@ class Server(Gio.Application):
                           sound_event_id=sound_event_id,
                           uuid=uuid_)
 
-        if uuid_ not in self.sounds:
+        if uuid_ not in self.registry.sounds:
             return
         self.__free_registry(sound_event_id, uuid_)
-        if not self.sounds:
+        if not self.registry.sounds:
             self._ensure_release_countdown()
         self.release()
 
     def __free_registry(self, sound_event_id, uuid_):
         self._resume_last_bg_sound(uuid_)
-        del self.sounds[uuid_]
-        if sound_event_id in self._uuids_by_event_id:
-            self._uuids_by_event_id[sound_event_id].remove(uuid_)
-            if len(self._uuids_by_event_id[sound_event_id]) == 0:
-                del self._uuids_by_event_id[sound_event_id]
-        for bus_name in self._refcount[uuid_]:
-            if bus_name in self._watcher_by_bus_name:
-                self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
-        del self._refcount[uuid_]
+        del self.registry.sounds[uuid_]
+        if sound_event_id in self.registry.uuids_by_event_id:
+            self.registry.uuids_by_event_id[sound_event_id].remove(uuid_)
+            if len(self.registry.uuids_by_event_id[sound_event_id]) == 0:
+                del self.registry.uuids_by_event_id[sound_event_id]
+        for bus_name in self.registry.refcount[uuid_]:
+            if bus_name in self.registry.watcher_by_bus_name:
+                self.registry.watcher_by_bus_name[bus_name].uuids.remove(uuid_)
+        del self.registry.refcount[uuid_]
