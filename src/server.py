@@ -212,14 +212,6 @@ class Server(Gio.Application):
 
             # Insert the uuid in the dictionary organized by sound event id.
             self.registry.uuids_by_event_id[sound_event_id].add(uuid_)
-
-            self.registry.sounds[uuid_].connect("released",
-                                                self.__sound_released_cb,
-                                                sound_event_id, uuid_)
-            self.registry.sounds[uuid_].connect("error",
-                                                self.__sound_error_cb,
-                                                sound_event_id, uuid_,
-                                                connection, path, iface)
             # Plays the sound.
             self._watch_bus_name(sender, uuid_)
 
@@ -386,45 +378,46 @@ class Server(Gio.Application):
                 return
             last_sound.play()
 
-    def __sound_released_cb(self, unused_sound, sound_event_id, uuid_):
+    def sound_released_cb(self, sound):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
         # both cases this means to delete the references to that sound UUID.
         self.logger.debug(
             "Freeing structures because end-of-stream was reached.",
-            sound_event_id=self.get_sound(uuid_).sound_event_id,
-            uuid=uuid_
+            sound_event_id=sound.sound_event_id,
+            uuid=sound.uuid
         )
-        self.__free_registry(sound_event_id, uuid_)
-        if not self.registry.sounds:
-            self._ensure_release_countdown()
-        self.release()
+        self.__free_registry_with_countdown(sound)
 
-    def __sound_error_cb(self, unused_sound, error, debug, sound_event_id,
-                         uuid_, connection, path, iface):
+    def sound_error_cb(self, sound, error, debug):
         # This method is only called when the sound fails or when an
         # application ordered to stop the sound. In both cases this means to
         # delete the references to that sound UUID.
         self.logger.error("Freeing structures because of a GStreamer error. "
                           "%s: %s", error.message, debug,
-                          sound_event_id=sound_event_id,
-                          uuid=uuid_)
+                          sound_event_id=sound.sound_event_id,
+                          uuid=sound.uuid)
 
-        if uuid_ not in self.registry.sounds:
+        if sound.uuid not in self.registry.sounds:
             return
-        self.__free_registry(sound_event_id, uuid_)
+        self.__free_registry_with_countdown(sound)
+
+    def __free_registry(self, sound):
+        self._resume_last_bg_sound(sound.uuid)
+        del self.registry.sounds[sound.uuid]
+        if sound.sound_event_id in self.registry.uuids_by_event_id:
+            self.registry.uuids_by_event_id[sound.sound_event_id].remove(
+                sound.uuid)
+            if len(self.registry.uuids_by_event_id[sound.sound_event_id]) == 0:
+                del self.registry.uuids_by_event_id[sound.sound_event_id]
+        for bus_name in self.registry.refcount[sound.uuid]:
+            if bus_name in self.registry.watcher_by_bus_name:
+                self.registry.watcher_by_bus_name[bus_name].uuids.remove(
+                    sound.uuid)
+        del self.registry.refcount[sound.uuid]
+
+    def __free_registry_with_countdown(self, sound):
+        self.__free_registry(sound)
         if not self.registry.sounds:
             self._ensure_release_countdown()
         self.release()
-
-    def __free_registry(self, sound_event_id, uuid_):
-        self._resume_last_bg_sound(uuid_)
-        del self.registry.sounds[uuid_]
-        if sound_event_id in self.registry.uuids_by_event_id:
-            self.registry.uuids_by_event_id[sound_event_id].remove(uuid_)
-            if len(self.registry.uuids_by_event_id[sound_event_id]) == 0:
-                del self.registry.uuids_by_event_id[sound_event_id]
-        for bus_name in self.registry.refcount[uuid_]:
-            if bus_name in self.registry.watcher_by_bus_name:
-                self.registry.watcher_by_bus_name[bus_name].uuids.remove(uuid_)
-        del self.registry.refcount[uuid_]

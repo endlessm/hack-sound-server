@@ -50,6 +50,9 @@ class Sound(GObject.Object):
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
 
+        self.connect("released", self.server.sound_released_cb)
+        self.connect("error", self.server.sound_error_cb)
+
     def release(self):
         if self._error:
             return
