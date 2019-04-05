@@ -35,6 +35,14 @@
         "loop": true,
         "note": "When compressed to WEBM, this sound clips at the end. Leave as WAV."
     },
+    "clubhouse/ada/mood/talk": {
+        "sound-files": [
+            "clubhouse/characters/ada/moods/talk/Ada_bobble1.webm",
+            "clubhouse/characters/ada/moods/talk/Ada_bobble2.webm",
+            "clubhouse/characters/ada/moods/talk/Ada_bobble3.webm"
+        ],
+        "delay": 250
+    },
     "clubhouse/ambient": {
         "sound-file": "clubhouse/clubhouse_ambient.webm",
         "fade-in": 0,
@@ -95,6 +103,30 @@
         "loop": true,
         "note": "Instead of using the silence.wav sound from David, set volume to 0",
         "volume": 0
+    },
+    "clubhouse/faber/mood/talk": {
+        "sound-files": [
+            "clubhouse/characters/faber/moods/talk/Faber_bobble1.webm",
+            "clubhouse/characters/faber/moods/talk/Faber_bobble2.webm",
+            "clubhouse/characters/faber/moods/talk/Faber_bobble3.webm"
+        ],
+        "delay": 250
+    },
+    "clubhouse/riley/mood/talk": {
+        "sound-files": [
+            "clubhouse/characters/riley/moods/talk/Riley_bobble1.webm",
+            "clubhouse/characters/riley/moods/talk/Riley_bobble2.webm",
+            "clubhouse/characters/riley/moods/talk/Riley_bobble3.webm"
+        ],
+        "delay": 250
+    },
+    "clubhouse/saniel/mood/talk": {
+        "sound-files": [
+            "clubhouse/characters/saniel/moods/talk/Saniel_bobble1.webm",
+            "clubhouse/characters/saniel/moods/talk/Saniel_bobble2.webm",
+            "clubhouse/characters/saniel/moods/talk/Saniel_bobble3.webm"
+        ],
+        "delay": 250
     },
     "codeview/action/copy": {
         "sound-file": "codeview/keyCombo - copy.webm"
