@@ -443,13 +443,6 @@ class HackSoundServer(Gio.Application):
         <method name='TerminateSound'>
           <arg type='s' name='uuid' direction='in'/>
         </method>
-        <signal name='Error'>
-          <arg type='s' name='uuid'/>
-          <arg type='s' name='error_message'/>
-          <arg type='s' name='error_domain'/>
-          <arg type='i' name='error_code'/>
-          <arg type='s' name='debug'/>
-        </signal>
       </interface>
     </node>
     """
@@ -808,15 +801,17 @@ class HackSoundServer(Gio.Application):
         # This method is only called when the player fails or when an
         # application ordered to stop the sound. In both cases this means to
         # delete the references to that sound UUID.
+        self.logger.error("Freeing structures because of a GStreamer error. "
+                          "%s: %s", error.message, debug,
+                          sound_event_id=sound_event_id,
+                          uuid=uuid_)
+
         if uuid_ not in self.players:
             return
         self.__free_registry(sound_event_id, uuid_)
         if not self.players:
             self._ensure_release_countdown()
         self.release()
-        data = (uuid_, error.message, error.domain, error.code, debug)
-        vdata = GLib.Variant("(sssis)", data)
-        connection.emit_signal(None, path, iface, 'Error', vdata)
 
     def __free_registry(self, sound_event_id, uuid_):
         self._resume_last_bg_player(uuid_)
