@@ -769,7 +769,6 @@ class HackSoundServer(Gio.Application):
 
         try:
             self._background_players.remove(player)
-            player.release()
         except ValueError:
             self.logger.warning(
                 "Sound %s sound was supposed to be in the list of "
