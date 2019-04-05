@@ -49,6 +49,9 @@ class Sound(GObject.Object):
         bus.add_signal_watch()
         bus.connect("message", self.__bus_message_cb)
 
+        self.connect("released", self.server.sound_released_cb)
+        self.connect("error", self.server.sound_error_cb)
+
     def release(self):
         # Otherwise, GStreamer complains with a WARNING indicating that
         # g_idle_add should be used.
