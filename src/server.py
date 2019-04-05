@@ -97,7 +97,6 @@ class Server(Gio.Application):
                           bus_name=sound.bus_name,
                           sound_event_id=sound.sound_event_id,
                           uuid=sound.uuid)
-        self.play(sound.uuid)
 
     def unref(self, sound, count=1):
         if sound.uuid not in self.registry.refcount:
@@ -179,7 +178,9 @@ class Server(Gio.Application):
         uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
             sound = self.get_sound(uuid_)
-            self.watch_bus_name(sound)
+            self.watch_sound_bus_name(sound)
+            self.ref(sound)
+            self.play(uuid_)
 
         if uuid_ is None:
             if self.check_too_many_sounds(sound_event_id, overlap_behavior):
@@ -193,10 +194,11 @@ class Server(Gio.Application):
             self.registry.sounds[uuid_] = sound
 
             # Insert the uuid in the dictionary organized by sound event id.
-
             self.registry.sound_events.add_sound(sound)
-            # Plays the sound.
-            self.watch_bus_name(sound)
+
+            self.watch_sound_bus_name(sound)
+            self.ref(sound)
+            self.play(uuid_)
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
@@ -213,17 +215,27 @@ class Server(Gio.Application):
                          sound_event_id=sound_event_id)
         return True
 
-    def watch_bus_name(self, sound):
+    def watch_sound_bus_name(self, sound):
+        """
+        Watches a sound bus name for the given sound..
+
+        If a watcher already exists no bus name watcher will be created.
+
+        Args:
+            sound (Sound): A sound object
+        """
+        if sound.bus_name in self.registry.watcher_by_bus_name:
+            return
+        watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
+                                        sound.bus_name,
+                                        Gio.DBusProxyFlags.NONE,
+                                        None,
+                                        self._bus_name_disconnect_cb)
+
         # Tracks a sound UUID called by its respective DBus names.
-        if sound.bus_name not in self.registry.watcher_by_bus_name:
-            watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
-                                            sound.bus_name,
-                                            Gio.DBusProxyFlags.NONE,
-                                            None,
-                                            self._bus_name_disconnect_cb)
-            self.registry.watcher_by_bus_name[sound.bus_name] = \
-                DBusWatcher(watcher_id, set())
-        self.ref(sound)
+        uuids = set()
+        self.registry.watcher_by_bus_name[sound.bus_name] = \
+            DBusWatcher(watcher_id, uuids)
         self.registry.watcher_by_bus_name[sound.bus_name].uuids.add(sound.uuid)
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
