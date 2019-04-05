@@ -90,13 +90,16 @@ class Server(Gio.Application):
         return self.registry.refcount[sound.uuid]
 
     def ref(self, sound):
+        if sound.uuid not in self.registry.refcount:
+            self.registry.refcount[sound.uuid] = 0
+        self.registry.watcher_by_bus_name[sound.bus_name].uuids.add(sound.uuid)
+
         self.registry.refcount[sound.uuid] += 1
         refcount = self.registry.refcount[sound.uuid]
         self.logger.debug("Reference. Refcount: %d", refcount,
                           bus_name=sound.uuid,
                           sound_event_id=sound.sound_event_id,
                           uuid=sound.uuid)
-        self.play(sound.uuid)
 
     def unref(self, sound, count=1):
         if sound.uuid not in self.registry.refcount:
@@ -176,7 +179,9 @@ class Server(Gio.Application):
         uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
             sound = self.get_sound(uuid_)
-            self.watch_bus_name(sound)
+            self.watch_bus_name(sound.bus_name)
+            self.ref(sound)
+            self.play(uuid_)
 
         if uuid_ is None:
             if self.check_too_many_sounds(sound_event_id, overlap_behavior):
@@ -190,11 +195,12 @@ class Server(Gio.Application):
             self.registry.sounds[uuid_] = sound
 
             # Insert the uuid in the dictionary organized by sound event id.
-
             self.registry.sound_events.add_uuid(sound.sound_event_id,
                                                 sound.uuid, sound.bus_name)
-            # Plays the sound.
-            self.watch_bus_name(sound)
+
+            self.watch_bus_name(sound.bus_name)
+            self.ref(sound)
+            self.play(uuid_)
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
@@ -211,20 +217,27 @@ class Server(Gio.Application):
                          sound_event_id=sound_event_id)
         return True
 
-    def watch_bus_name(self, sound):
+    def watch_bus_name(self, bus_name):
+        """
+        Watches a name on the given bus name.
+
+        If a watcher already exists no bus name watcher will be created.
+
+        Args:
+            bus_name (str): A well-known or unique name
+        """
+        if bus_name in self.registry.watcher_by_bus_name:
+            return
+        watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
+                                        bus_name,
+                                        Gio.DBusProxyFlags.NONE,
+                                        None,
+                                        self._bus_name_disconnect_cb)
+
         # Tracks a sound UUID called by its respective DBus names.
-        if sound.bus_name not in self.registry.watcher_by_bus_name:
-            watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
-                                            sound.bus_name,
-                                            Gio.DBusProxyFlags.NONE,
-                                            None,
-                                            self._bus_name_disconnect_cb)
-            self.registry.watcher_by_bus_name[sound.bus_name] = \
-                DBusWatcher(watcher_id, set())
-        if sound.uuid not in self.registry.refcount:
-            self.registry.refcount[sound.uuid] = 0
-        self.ref(sound)
-        self.registry.watcher_by_bus_name[sound.bus_name].uuids.add(sound.uuid)
+        uuids = set()
+        self.registry.watcher_by_bus_name[bus_name] = \
+            DBusWatcher(watcher_id, uuids)
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
         # When a dbus name dissappears (for example, when an application that
