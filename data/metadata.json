@@ -593,6 +593,26 @@
     "hackdex1/pre-corruption": {
         "sound-file": "common/glitch.webm"
     },
+    "hackdex2/board": {
+        "sound-file": "hackdex2/leviathan_board.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "hackdex2/articles": {
+        "sound-file": "hackdex2/leviathan_articles.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "hackdex2/hover": {
+        "sound-file": "hackdex2/leviathan_hover.webm",
+        "loop": true
+    },
+    "hackdex2/click": {
+        "sound-file": "hackdex2/timpani-start-win.webm"
+    },
+    "hackdex2/close-article": {
+        "sound-file": "hackdex2/collision_gem_get.webm"
+    },
     "lightspeed/asteroid-crash": {
         "sound-file": "lightspeed/asteroid-crash.webm"
     },
