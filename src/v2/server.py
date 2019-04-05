@@ -27,7 +27,7 @@ class ServerManager(DBusManager):
         player = self.target_object.registry.players_by_bus_name.get(app_id)
         if not player:
             player = Player(self.target_object, app_id)
-            self.target_object.registry.players_by_bus_name[app_id] = player
+            self.target_object.registry.add_player(player)
         invocation.return_value(GLib.Variant("(o)", (player.object_path, )))
 
     def register_object(self, unused_connection=None, path=None):
@@ -65,7 +65,7 @@ class Server(_Server):
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
         super()._bus_name_disconnect_cb(unused_connection, bus_name)
-        player = self.registry.players_by_bus_name.get(bus_name)
+        player = self.registry.get_player(bus_name)
         if player is None:
             return
-        del self.registry.players_by_bus_name[bus_name]
+        self.registry.remove_player(bus_name)

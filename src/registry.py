@@ -1,3 +1,6 @@
+from gi.repository import GObject
+
+
 class SoundEventRegistry:
     def __init__(self, registry):
         self.registry = registry
@@ -55,8 +58,14 @@ class SoundEventsRegistry:
         return iter(self._sound_events)
 
 
-class Registry:
+class Registry(GObject.Object):
+    __gsignals__ = {
+        "player-added": (GObject.SignalFlags.RUN_FIRST, None, (object, )),
+        "player-removed": (GObject.SignalFlags.RUN_FIRST, None, ())
+    }
+
     def __init__(self):
+        super().__init__()
         self.sounds = {}
         # COunts the references of a sound by UUID and by bus name.
         self.refcount = {}
@@ -176,3 +185,27 @@ class Registry:
                 uuids.remove(sound.uuid)
         del self.refcount[sound.uuid]
         return sound_to_resume
+
+    def get_player(self, app_id):
+        """
+        Obtains a player given its app id (a well-known name).
+
+        Arguments:
+            app_id (str): A well known name, ie: "com.endlessm.Fizzics".
+
+        Returns:
+            A `Player` object if exists in the registry. Otherwise, `None`.
+        """
+        return self.players_by_bus_name.get(app_id)
+
+    def add_player(self, player):
+        self.players_by_bus_name[player.bus_name] = player
+        self.emit("player-added", player)
+
+    def remove_player(self, app_id):
+        del self.players_by_bus_name[app_id]
+        self.emit("player-removed")
+
+    @property
+    def players(self):
+        return self.players_by_bus_name.items()
