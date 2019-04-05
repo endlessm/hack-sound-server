@@ -15,6 +15,9 @@ class ServerManager(DBusManager):
         super().__init__(server, server)
         self._owner_id = None
 
+        self.server.registry.connect("player-added", self._player_added_cb)
+        self.server.registry.connect("player-removed", self._player_removed_cb)
+
     @property
     def interface_name(self):
         return "com.endlessm.HackSoundServer2"
@@ -29,6 +32,16 @@ class ServerManager(DBusManager):
             player = Player(self.target_object, app_id)
             self.target_object.registry.add_player(player)
         invocation.return_value(GLib.Variant("(o)", (player.object_path, )))
+
+    def _player_added_cb(self, unused_registry, player):
+        self.server.watch_bus_name(player.bus_name)
+        self.server.cancel_countdown()
+        self.server.hold()
+
+    def _player_removed_cb(self, unused_registry):
+        if not self.server.registry.players:
+            self.server.ensure_release_countdown()
+        self.server.release()
 
     def register_object(self, unused_connection=None, path=None):
         self._owner_id = Gio.bus_own_name(
