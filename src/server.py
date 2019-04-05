@@ -15,7 +15,7 @@ DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
 class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
-    _OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
+    OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
     _DBUS_NAME = "com.endlessm.HackSoundServer"
     _DBUS_UNKNOWN_SOUND_EVENT_ID = \
         "com.endlessm.HackSoundServer.UnknownSoundEventID"
@@ -158,15 +158,15 @@ class Server(Gio.Application):
         connection.unregister_object(self._dbus_id)
         self._dbus_id = None
 
-    def _cancel_countdown(self):
+    def cancel_countdown(self):
         if self._countdown_id:
             self.release()
             GLib.Source.remove(self._countdown_id)
             self._countdown_id = None
             self.logger.info('Timeout cancelled')
 
-    def _ensure_release_countdown(self):
-        self._cancel_countdown()
+    def ensure_release_countdown(self):
+        self.cancel_countdown()
         self.hold()
         self.logger.info('All sounds done; starting timeout of {} '
                          'seconds'.format(self._TIMEOUT_S))
@@ -185,7 +185,7 @@ class Server(Gio.Application):
 
         overlap_behavior = \
             self.metadata[sound_event_id].get("overlap-behavior", "overlap")
-        if overlap_behavior not in self._OVERLAP_BEHAVIOR_CHOICES:
+        if overlap_behavior not in self.OVERLAP_BEHAVIOR_CHOICES:
             msg = "'%s' is not a valid option for 'overlap-behavior'."
             self.logger.info(msg, overlap_behavior,
                              sound_event_id=sound_event_id)
@@ -195,15 +195,15 @@ class Server(Gio.Application):
         if not self.registry.uuids_by_event_id.get(sound_event_id):
             self.registry.uuids_by_event_id[sound_event_id] = set()
 
-        uuid_ = self._do_overlap_behaviour(sound_event_id, overlap_behavior)
+        uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
-            self._watch_bus_name(sender, uuid_)
+            self.watch_bus_name(sender, uuid_)
 
         if uuid_ is None:
-            if self._check_too_many_sounds(invocation, sound_event_id,
-                                           overlap_behavior):
+            if self.check_too_many_sounds(sound_event_id, overlap_behavior):
+                invocation.return_value(GLib.Variant("(s)", ("", )))
                 return
-            self._cancel_countdown()
+            self.cancel_countdown()
             self.hold()
 
             sound = Sound(self, sound_event_id, options)
@@ -213,22 +213,20 @@ class Server(Gio.Application):
             # Insert the uuid in the dictionary organized by sound event id.
             self.registry.uuids_by_event_id[sound_event_id].add(uuid_)
             # Plays the sound.
-            self._watch_bus_name(sender, uuid_)
+            self.watch_bus_name(sender, uuid_)
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
-    def _check_too_many_sounds(self, invocation, sound_event_id,
-                               overlap_behavior):
+    def check_too_many_sounds(self, sound_event_id, overlap_behavior):
         n_instances = len(self.registry.uuids_by_event_id[sound_event_id])
         if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
                          self._MAX_SIMULTANEOUS_SOUNDS,
                          sound_event_id=sound_event_id)
-        invocation.return_value(GLib.Variant("(s)", ("", )))
         return True
 
-    def _watch_bus_name(self, bus_name, uuid_):
+    def watch_bus_name(self, bus_name, uuid_):
         # Tracks a sound UUID called by its respective DBus names.
         if bus_name not in self.registry.watcher_by_bus_name:
             watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
@@ -259,7 +257,7 @@ class Server(Gio.Application):
         Gio.bus_unwatch_name(watcher_id)
         del self.registry.watcher_by_bus_name[bus_name]
 
-    def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
+    def do_overlap_behaviour(self, sound_event_id, overlap_behavior):
         if overlap_behavior == "overlap":
             return None
         uuids = self.registry.uuids_by_event_id.get(sound_event_id)
@@ -309,14 +307,14 @@ class Server(Gio.Application):
                              "it wasn\'t.".format(uuid_, sender))
         else:
             if uuid_ in self.registry.sounds:
-                self._unref_on_stop(uuid_, sender, term_sound)
+                self.unref_on_stop(uuid_, sender, term_sound)
             elif uuid_ in self.registry.uuids_by_event_id:
                 sound_event_id = uuid_
                 for uuid_ in self.registry.uuids_by_event_id[sound_event_id]:
-                    self._unref_on_stop(uuid_, sender, term_sound)
+                    self.unref_on_stop(uuid_, sender, term_sound)
         invocation.return_value(None)
 
-    def _unref_on_stop(self, uuid_, bus_name, term_sound=False):
+    def unref_on_stop(self, uuid_, bus_name, term_sound=False):
         n_unref = 1 if not term_sound else self.refcount(uuid_, bus_name)
         self.unref(uuid_, bus_name, n_unref)
 
@@ -419,5 +417,5 @@ class Server(Gio.Application):
     def __free_registry_with_countdown(self, sound):
         self.__free_registry(sound)
         if not self.registry.sounds:
-            self._ensure_release_countdown()
+            self.ensure_release_countdown()
         self.release()
