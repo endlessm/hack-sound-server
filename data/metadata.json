@@ -83,6 +83,21 @@
     "clubhouse/dialog/open": {
         "sound-file": "clubhouse/dialog_popup.webm"
     },
+    "clubhouse/ending/episode1": {
+        "sound-file": "clubhouse/ending/episode1.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "clubhouse/ending/episode2": {
+        "sound-file": "clubhouse/ending/episode2.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "clubhouse/ending/episode3": {
+        "sound-file": "clubhouse/ending/episode3.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "clubhouse/entry/close": {
         "sound-file": "clubhouse/clubhouse_close.webm"
     },
