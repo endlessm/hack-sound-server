@@ -670,8 +670,8 @@
         "loop": true,
         "type": "bg"
     },
-    "lightspeed/bg/powerup/invincibility": {
-        "sound-file": "lightspeed/bg/powerup/powerup_invincible.webm",
+    "lightspeed/bg/powerup/invulnerable": {
+        "sound-file": "lightspeed/bg/powerup/powerup_invulnerable.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
@@ -693,8 +693,8 @@
     "lightspeed/powerup/blowup": {
         "sound-file": "lightspeed/powerup/enemy_blowup.webm"
     },
-    "lightspeed/powerup/invincibility": {
-        "sound-file": "lightspeed/powerup/power_invincible_sfx.webm"
+    "lightspeed/powerup/invulnerable": {
+        "sound-file": "lightspeed/powerup/power_invulnerable_sfx.webm"
     },
     "lightspeed/powerup/upgrade": {
         "sound-file": "lightspeed/powerup/power_upgrade_sfx.webm"
