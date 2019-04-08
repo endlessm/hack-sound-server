@@ -148,12 +148,17 @@ class Server(Gio.Application):
             self.logger.info('Timeout cancelled')
 
     def ensure_release_countdown(self):
+        def release():
+            self._countdown_id = None
+            self.release()
+            return GLib.SOURCE_REMOVE
+
         self.cancel_countdown()
         self.hold()
         self.logger.info('All sounds done; starting timeout of {} '
                          'seconds'.format(self._TIMEOUT_S))
         self._countdown_id = GLib.timeout_add_seconds(
-            self._TIMEOUT_S, self.release, priority=GLib.PRIORITY_LOW)
+            self._TIMEOUT_S, release, priority=GLib.PRIORITY_LOW)
 
     def play_sound_with_factory(self, bus_name, sound_event_id,
                                 factory_new, *args, **kwargs):
