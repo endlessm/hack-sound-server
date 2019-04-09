@@ -111,7 +111,6 @@ class Server(Gio.Application):
                           bus_name=bus_name,
                           sound_event_id=self.get_sound(uuid_).sound_event_id,
                           uuid=uuid_)
-        self.get_sound(uuid_).bus_names.add(bus_name)
         self.play(uuid_)
 
     def unref(self, uuid_, bus_name, count=1):
@@ -130,8 +129,6 @@ class Server(Gio.Application):
                                 uuid=uuid_)
             return
         self.registry.refcount[uuid_][bus_name] -= count
-        if self.registry.refcount[uuid_][bus_name] == 0:
-            self.get_sound(uuid_).bus_names.remove(bus_name)
         self.logger.debug("Unreference. Refcount: %d",
                           self.registry.refcount[uuid_][bus_name],
                           bus_name=bus_name,
@@ -206,7 +203,7 @@ class Server(Gio.Application):
             self.cancel_countdown()
             self.hold()
 
-            sound = Sound(self, sound_event_id, options)
+            sound = Sound(self, sender, sound_event_id, options)
             uuid_ = sound.uuid
             self.registry.sounds[uuid_] = sound
 
@@ -383,6 +380,7 @@ class Server(Gio.Application):
         # both cases this means to delete the references to that sound UUID.
         self.logger.debug(
             "Freeing structures because end-of-stream was reached.",
+            bus_name=sound.bus_name,
             sound_event_id=sound.sound_event_id,
             uuid=sound.uuid
         )

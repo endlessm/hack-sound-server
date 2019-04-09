@@ -86,20 +86,15 @@ class SoundFormatter(ObjectFormatter):
         super().__init__(obj, beautify)
 
     def format(self, record):
+        tmpl = "{}: {}: {}: {}"
+        bus_name = apply_style(self.obj.bus_name,
+                               self.beautify and self._DEFAULT_BUS_NAME)
         event_id = apply_style(self.obj.sound_event_id,
                                self.beautify and self._DEFAULT_EVENT_ID_COLOR)
         uuid = apply_style(self.obj.uuid,
                            self.beautify and self._DEFAULT_UUID_COLOR)
 
-        if not self.obj.bus_names:
-            msg_args = (event_id, uuid, record.msg)
-        else:
-            bus_names = \
-                apply_style(", ".join(sorted(list(self.obj.bus_names))),
-                            self.beautify and self._DEFAULT_BUS_NAME)
-            msg_args = (bus_names, event_id, uuid, record.msg)
-
-        record.msg = ": ".join(msg_args)
+        record.msg = tmpl.format(bus_name, event_id, uuid, record.msg)
         msg = super().format(record)
         return msg
 

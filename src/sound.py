@@ -24,13 +24,13 @@ class Sound(GObject.Object):
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
     }
 
-    def __init__(self, server, sound_event_id, metadata_extras=None):
+    def __init__(self, server, bus_name, sound_event_id, metadata_extras=None):
         super().__init__()
         self.server = server
         self.logger = Logger(SoundFormatter, self)
-        # The following attributes (bus_names, sound_event_id and uuid) are
+        # The following attributes (bus_name, sound_event_id and uuid) are
         # used internally by the logger to format the log messages.
-        self.bus_names = set([])
+        self.bus_name = bus_name
         self.sound_event_id = sound_event_id
         self.uuid = str(uuid.uuid4())
 
