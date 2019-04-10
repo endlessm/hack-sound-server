@@ -16,15 +16,19 @@ class UnregisteredUUID(Exception):
     pass
 
 
+class TooManySoundsException(Exception):
+    pass
+
+
+class UnknownSoundEventIDException(Exception):
+    INTERFACE = "com.endlessm.HackSoundServer.UnknownSoundEventID"
+
+
 class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
     OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
     _DBUS_NAME = "com.endlessm.HackSoundServer"
-    _DBUS_UNKNOWN_SOUND_EVENT_ID = \
-        "com.endlessm.HackSoundServer.UnknownSoundEventID"
-    _DBUS_UNKNOWN_OVERLAP_BEHAVIOR = \
-        "com.endlessm.HackSoundServer.UnknownOverlapBehavior"
     _DBUS_XML = """
     <node>
       <interface name='com.endlessm.HackSoundServer'>
@@ -61,12 +65,59 @@ class Server(Gio.Application):
         self._countdown_id = None
         self.registry = Registry()
 
-    def get_sound(self, uuid):
-        sound = self.registry.sounds.get(uuid)
-        if sound is None:
-            raise UnregisteredUUID(f"No sound with UUID {uuid} exists in the "
-                                   "registry.")
-        return sound
+    def get_sound(self, uuid=None, sound_event_id=None, bus_name=None):
+        """
+        Gets an existing sound given its UUID or event id and bus name.
+
+        Optional Arguments:
+            uuid (str): The sound uuid or the sound to look up.
+            sound_event_id (str): The sound event id of the sound to look up.
+                                  If specified, bus_name argument should be
+                                  also specified.
+            bus_name (str): The bus name of the sound to look up.
+
+        Returns:
+            A sound object if found. Otherwise, None.
+
+        Raises:
+            AssertionError: If uuid or sound_event_id and bus_name were not
+                            specified.
+            UnknownSoundEventIDException: If the input sound_event_id is not
+                                          in the registry metadata.
+        """
+
+        if uuid is None and sound_event_id is None:
+            raise AssertionError(
+                "uuid or sound_event_id argument not specified")
+        if sound_event_id is not None and bus_name is None:
+            raise AssertionError("bus_name argument should be specified")
+
+        if uuid is not None:
+            sound = self.registry.sounds.get(uuid)
+            if sound is None:
+                raise UnregisteredUUID(
+                    f"No sound with UUID {uuid} exists in the registry.")
+            return sound
+
+        # Try to find if a non-overlapping sound already existed.
+        if sound_event_id not in self.metadata:
+            self.logger.info("This sound event id does not exist.",
+                             sound_event_id=sound_event_id)
+            raise UnknownSoundEventIDException("sound event with id %s does "
+                                               "not exist" % sound_event_id)
+
+        overlap_behavior = \
+            self.metadata[sound_event_id].get("overlap-behavior", "overlap")
+        if overlap_behavior == "overlap":
+            return None
+
+        uuids = self.registry.sound_events.get_uuids(sound_event_id, bus_name)
+        assert len(uuids) <= 1
+        if len(uuids) == 0:
+            return None
+        uuid = next(iter(uuids))
+
+        return self.get_sound(uuid=uuid)
 
     def refcount(self, sound):
         """
@@ -167,55 +218,50 @@ class Server(Gio.Application):
         self._countdown_id = GLib.timeout_add_seconds(
             self._TIMEOUT_S, release, priority=GLib.PRIORITY_LOW)
 
-    def play_sound(self, sound_event_id, connection, sender, path, iface,
-                   invocation, options=None):
-        if sound_event_id not in self.metadata:
-            self.logger.info("This sound event id does not exist.",
-                             sound_event_id=sound_event_id)
-            invocation.return_dbus_error(
-                self._DBUS_UNKNOWN_SOUND_EVENT_ID,
-                "sound event with id %s does not exist" % sound_event_id)
-            return
+    def new_sound(self, sound_klass, *args, **kwargs):
+        self.cancel_countdown()
+        self.hold()
+        return sound_klass(*args, **kwargs)
 
-        try:
-            uuid_ = self.do_overlap_behaviour(sender, sound_event_id)
-            sound = self.get_sound(uuid_)
-        except UnregisteredUUID as ex:
-            self.logger.critical("A new sound will be created, because an "
-                                 "error ocurred: %s", ex,
-                                 bus_name=sender,
-                                 sound_event_id=sound_event_id)
-            sound = None
-
-        if sound is None:
-            if self.check_too_many_sounds(sound_event_id):
-                invocation.return_value(GLib.Variant("(s)", ("", )))
-                return
-            self.cancel_countdown()
-            self.hold()
-            sound = Sound(self, sender, sound_event_id, options)
-
+    def _play_sound(self, sound):
         sound_to_pause = self.registry.add_sound(sound)
         self.watch_sound_bus_name(sound)
         self.ref(sound)
         if sound_to_pause is not None:
             sound_to_pause.pause_with_fade_out()
         sound.play()
-        invocation.return_value(GLib.Variant("(s)", (sound.uuid, )))
+        return sound
 
-    def check_too_many_sounds(self, sound_event_id):
+    def play_sound(self, sound_event_id, connection, sender, path, iface,
+                   invocation, options=None):
+        try:
+            self.ensure_not_too_many_sounds(sound_event_id)
+            sound = self.get_sound(sound_event_id=sound_event_id,
+                                   bus_name=sender)
+            if sound is not None:
+                self.try_overlap_behaviour(sound)
+            else:
+                sound = self.new_sound(Sound, self, sender, sound_event_id,
+                                       metadata_extras=options)
+            self._play_sound(sound)
+            invocation.return_value(GLib.Variant("(s)", (sound.uuid, )))
+        except UnknownSoundEventIDException as ex:
+            invocation.return_dbus_error(ex.INTERFACE, str(ex))
+        except TooManySoundsException:
+            invocation.return_value(GLib.Variant("(s)", ("", )))
+
+    def ensure_not_too_many_sounds(self, sound_event_id):
         # Use before creating a sound.
         if not self.registry.sound_events.has_sound_event_id(sound_event_id):
             n_instances = 0
         else:
             n_instances = \
                 len(self.registry.sound_events.get_uuids(sound_event_id))
-        if n_instances < self._MAX_SIMULTANEOUS_SOUNDS:
-            return False
-        self.logger.info("Sound is already playing %d times, ignoring.",
-                         self._MAX_SIMULTANEOUS_SOUNDS,
-                         sound_event_id=sound_event_id)
-        return True
+        if n_instances >= self._MAX_SIMULTANEOUS_SOUNDS:
+            self.logger.info("Sound is already playing %d times, ignoring.",
+                             self._MAX_SIMULTANEOUS_SOUNDS,
+                             sound_event_id=sound_event_id)
+            raise TooManySoundsException
 
     def watch_sound_bus_name(self, sound):
         """
@@ -260,26 +306,15 @@ class Server(Gio.Application):
         Gio.bus_unwatch_name(watcher_id)
         del self.registry.watcher_by_bus_name[bus_name]
 
-    def do_overlap_behaviour(self, bus_name, sound_event_id):
-        overlap_behavior = \
-            self.metadata[sound_event_id].get("overlap-behavior", "overlap")
-        if overlap_behavior == "overlap":
-            return None
-
-        uuids = self.registry.sound_events.get_uuids(sound_event_id, bus_name)
-        assert len(uuids) <= 1
-        if len(uuids) == 0:
-            return None
-        uuid_ = next(iter(uuids))
-
+    def try_overlap_behaviour(self, sound):
+        overlap_behavior = self.metadata[sound.sound_event_id].get(
+            "overlap-behavior", "overlap")
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
-            self.get_sound(uuid_).reset()
-            return uuid_
+            sound.reset()
         elif overlap_behavior == "ignore":
             # If a sound is already playing, then ignore the new one.
-            return uuid_
-        return None
+            pass
 
     def terminate_sound_for_sender(self, uuid_or_event_id, connection, sender,
                                    invocation, term_sound=False):
