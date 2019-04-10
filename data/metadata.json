@@ -634,6 +634,42 @@
     "hack-toolbox/update-gui": {
         "sound-file": "toolbox/liveTextToGUI.webm"
     },
+    "hackdex1/bg": {
+        "sound-file": "hackdex1/bg/roster-select.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "hackdex1/bg/characters/ada": {
+        "sound-file": "hackdex1/bg/characters/ada_aut.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "hackdex1/bg/characters/estelle": {
+        "sound-file": "hackdex1/bg/characters/Estelle.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "hackdex1/bg/characters/faber": {
+        "sound-file": "hackdex1/bg/characters/Maker.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "hackdex1/bg/characters/riley": {
+        "sound-file": "hackdex1/bg/characters/Rileys_song.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "hackdex1/bg/characters/saniel": {
+        "sound-file": "hackdex1/bg/characters/Saniel2.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "hackdex1/corrupted": {
         "sound-file": "hackdex1/roster-crash.webm"
     },
