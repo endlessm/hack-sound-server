@@ -459,7 +459,7 @@ class HackSoundServer(Gio.Application):
         self._refcount = {}
         self._watcher_by_bus_name = {}
         # Only useful for sounds tagged with "overlap-behavior":
-        self._uuid_by_event_id = {}
+        self._uuids_by_event_id = {}
         self._background_players = []
 
     def play(self, uuid_):
@@ -595,8 +595,8 @@ class HackSoundServer(Gio.Application):
             return invocation.return_dbus_error(
                 self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
                 msg % overlap_behavior)
-        if not self._uuid_by_event_id.get(sound_event_id):
-            self._uuid_by_event_id[sound_event_id] = set()
+        if not self._uuids_by_event_id.get(sound_event_id):
+            self._uuids_by_event_id[sound_event_id] = set()
 
         uuid_ = self._do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
@@ -614,7 +614,7 @@ class HackSoundServer(Gio.Application):
             self.players[uuid_] = HackSoundPlayer(sound_event_id,
                                                   uuid_, metadata, options)
             # Insert the uuid in the dictionary organized by sound event id.
-            self._uuid_by_event_id[sound_event_id].add(uuid_)
+            self._uuids_by_event_id[sound_event_id].add(uuid_)
 
             self.players[uuid_].connect("released", self.__player_released_cb,
                                         sound_event_id, uuid_)
@@ -628,7 +628,7 @@ class HackSoundServer(Gio.Application):
 
     def _check_too_many_sounds(self, invocation, sound_event_id,
                                overlap_behavior):
-        n_instances = len(self._uuid_by_event_id[sound_event_id])
+        n_instances = len(self._uuids_by_event_id[sound_event_id])
         if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
@@ -669,7 +669,7 @@ class HackSoundServer(Gio.Application):
     def _do_overlap_behaviour(self, sound_event_id, overlap_behavior):
         if overlap_behavior == "overlap":
             return None
-        uuids = self._uuid_by_event_id.get(sound_event_id)
+        uuids = self._uuids_by_event_id.get(sound_event_id)
         assert len(uuids) <= 1
         if len(uuids) == 0:
             return None
@@ -700,11 +700,11 @@ class HackSoundServer(Gio.Application):
                                refcount by 1. If set to True, then the refcount
                                is set to 0.
         """
-        assert not (uuid_ in self.players and uuid_ in self._uuid_by_event_id)
+        assert not (uuid_ in self.players and uuid_ in self._uuids_by_event_id)
         # xor: With the exception that the case of both cases being True will
         # never happen because we never define an UUID in the metadata file.
         if not ((uuid_ not in self.players) ^
-                (uuid_ not in self._uuid_by_event_id)):
+                (uuid_ not in self._uuids_by_event_id)):
             self.logger.info("Sound {} was supposed to be stopped, but did "
                              "not exist".format(uuid_))
         elif (uuid_ in self.players and (uuid_ not in self._refcount or
@@ -715,9 +715,9 @@ class HackSoundServer(Gio.Application):
         else:
             if uuid_ in self.players:
                 self._unref_on_stop(uuid_, sender, term_sound)
-            elif uuid_ in self._uuid_by_event_id:
+            elif uuid_ in self._uuids_by_event_id:
                 sound_event_id = uuid_
-                for uuid_ in self._uuid_by_event_id[sound_event_id]:
+                for uuid_ in self._uuids_by_event_id[sound_event_id]:
                     self._unref_on_stop(uuid_, sender, term_sound)
         invocation.return_value(None)
 
@@ -818,10 +818,10 @@ class HackSoundServer(Gio.Application):
     def __free_registry(self, sound_event_id, uuid_):
         self._resume_last_bg_player(uuid_)
         del self.players[uuid_]
-        if sound_event_id in self._uuid_by_event_id:
-            self._uuid_by_event_id[sound_event_id].remove(uuid_)
-            if len(self._uuid_by_event_id[sound_event_id]) == 0:
-                del self._uuid_by_event_id[sound_event_id]
+        if sound_event_id in self._uuids_by_event_id:
+            self._uuids_by_event_id[sound_event_id].remove(uuid_)
+            if len(self._uuids_by_event_id[sound_event_id]) == 0:
+                del self._uuids_by_event_id[sound_event_id]
         for bus_name in self._refcount[uuid_]:
             if bus_name in self._watcher_by_bus_name:
                 self._watcher_by_bus_name[bus_name].uuids.remove(uuid_)
