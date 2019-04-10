@@ -4,7 +4,7 @@ from gi.repository import Gio
 from gi.repository import GLib
 from collections import namedtuple
 from hack_sound_server.registry import Registry
-from hack_sound_server.sound import Sound
+from hack_sound_server.sound import ServerSoundFactory
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import ServerFormatter
 
@@ -12,13 +12,19 @@ from hack_sound_server.utils.loggable import ServerFormatter
 DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
 
 
+class TooManySoundsException(Exception):
+    pass
+
+
+class UnknownSoundEventIDException(Exception):
+    INTERFACE = "com.endlessm.HackSoundServer.UnknownSoundEventID"
+
+
 class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
     OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
     _DBUS_NAME = "com.endlessm.HackSoundServer"
-    _DBUS_UNKNOWN_SOUND_EVENT_ID = \
-        "com.endlessm.HackSoundServer.UnknownSoundEventID"
     _DBUS_UNKNOWN_OVERLAP_BEHAVIOR = \
         "com.endlessm.HackSoundServer.UnknownOverlapBehavior"
     _DBUS_XML = """
@@ -56,6 +62,7 @@ class Server(Gio.Application):
         self.metadata = metadata
         self._countdown_id = None
         self.registry = Registry()
+        self.sound_factory = ServerSoundFactory(self)
 
     def get_sound(self, uuid_):
         try:
@@ -148,26 +155,22 @@ class Server(Gio.Application):
         self._countdown_id = GLib.timeout_add_seconds(
             self._TIMEOUT_S, self.release, priority=GLib.PRIORITY_LOW)
 
-    def play_sound(self, sound_event_id, connection, sender, path, iface,
-                   invocation, options=None):
+    def play_sound_with_factory(self, bus_name, sound_event_id,
+                                factory_new, *args, **kwargs):
         if sound_event_id not in self.metadata:
             self.logger.info("This sound event id does not exist.",
                              sound_event_id=sound_event_id)
-            invocation.return_dbus_error(
-                self._DBUS_UNKNOWN_SOUND_EVENT_ID,
-                "sound event with id %s does not exist" % sound_event_id)
-            return
-
-        uuid_ = self.do_overlap_behaviour(sender, sound_event_id)
+            raise UnknownSoundEventIDException("sound event with id %s does "
+                                               "not exist" % sound_event_id)
+        uuid_ = self.do_overlap_behaviour(bus_name, sound_event_id)
         if uuid_ is not None:
             sound = self.get_sound(uuid_)
         else:
             if self.check_too_many_sounds(sound_event_id):
-                invocation.return_value(GLib.Variant("(s)", ("", )))
-                return
+                raise TooManySoundsException()
             self.cancel_countdown()
             self.hold()
-            sound = Sound(self, sender, sound_event_id, options)
+            sound = factory_new(*args, **kwargs)
 
         sound_to_pause = self.registry.add_sound(sound)
         self.watch_bus_name(sound.bus_name)
@@ -175,7 +178,20 @@ class Server(Gio.Application):
         if sound_to_pause is not None:
             sound_to_pause.pause_with_fade_out()
         sound.play()
-        invocation.return_value(GLib.Variant('(s)', (sound.uuid, )))
+        return sound
+
+    def play_sound(self, sound_event_id, connection, sender, path, iface,
+                   invocation, options=None):
+        try:
+            sound = self.play_sound_with_factory(sender, sound_event_id,
+                                                 self.sound_factory.new,
+                                                 sender, sound_event_id,
+                                                 metadata_extras=options)
+            invocation.return_value(GLib.Variant('(s)', (sound.uuid, )))
+        except UnknownSoundEventIDException as ex:
+            invocation.return_dbus_error(ex.INTERFACE, str(ex))
+        except TooManySoundsException:
+            invocation.return_value(GLib.Variant("(s)", ("", )))
 
     def check_too_many_sounds(self, sound_event_id):
         # Use before creating a sound.

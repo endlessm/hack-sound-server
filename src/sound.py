@@ -10,6 +10,15 @@ from gi.repository import Gst
 from gi.repository import GstController
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import SoundFormatter
+from hack_sound_server.utils.misc import Factory
+
+
+class ServerSoundFactory(Factory):
+    def __init__(self, server):
+        self.server = server
+
+    def new(self, *args, **kwargs):
+        return Sound(self.server, *args, **kwargs)
 
 
 class Sound(GObject.Object):
