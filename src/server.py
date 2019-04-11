@@ -178,12 +178,13 @@ class Server(Gio.Application):
         invocation.return_value(GLib.Variant('(s)', (sound.uuid, )))
 
     def check_too_many_sounds(self, sound_event_id):
+        # Use before creating a sound.
         if sound_event_id not in self.registry.sound_events.get_event_ids():
             n_instances = 0
         else:
             n_instances = \
                 len(self.registry.sound_events.get_uuids(sound_event_id))
-        if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
+        if n_instances < self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
                          self._MAX_SIMULTANEOUS_SOUNDS,
