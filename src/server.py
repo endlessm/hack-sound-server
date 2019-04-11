@@ -200,8 +200,6 @@ class Server(Gio.Application):
 
         overlap_behavior = \
             self.metadata[sound_event_id].get("overlap-behavior", "overlap")
-        if not self.registry.uuids_by_event_id.get(sound_event_id):
-            self.registry.uuids_by_event_id[sound_event_id] = set()
 
         uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
@@ -220,14 +218,19 @@ class Server(Gio.Application):
             self.registry.sounds[uuid_] = sound
 
             # Insert the uuid in the dictionary organized by sound event id.
-            self.registry.uuids_by_event_id[sound_event_id].add(uuid_)
+
+            self.registry.sound_events.add_sound(sound)
             # Plays the sound.
             self.watch_bus_name(sound)
 
         return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
 
     def check_too_many_sounds(self, sound_event_id, overlap_behavior):
-        n_instances = len(self.registry.uuids_by_event_id[sound_event_id])
+        if sound_event_id not in self.registry.sound_events.get_event_ids():
+            n_instances = 0
+        else:
+            n_instances = \
+                len(self.registry.sound_events.get_uuids(sound_event_id))
         if n_instances <= self._MAX_SIMULTANEOUS_SOUNDS:
             return False
         self.logger.info("Sound is already playing %d times, ignoring.",
@@ -265,7 +268,7 @@ class Server(Gio.Application):
     def do_overlap_behaviour(self, sound_event_id, overlap_behavior):
         if overlap_behavior == "overlap":
             return None
-        uuids = self.registry.uuids_by_event_id.get(sound_event_id)
+        uuids = self.registry.sound_events.get_uuids(sound_event_id)
         assert len(uuids) <= 1
         if len(uuids) == 0:
             return None
@@ -296,12 +299,14 @@ class Server(Gio.Application):
                                refcount by 1. If set to True, then the refcount
                                is set to 0.
         """
+        events_registry = self.registry.sound_events
+
         assert not (uuid_or_event_id in self.registry.sounds and
-                    uuid_or_event_id in self.registry.uuids_by_event_id)
+                    events_registry.has_sound_event_id(uuid_or_event_id))
         # xor: With the exception that the case of both cases being True will
         # never happen because we never define an UUID in the metadata file.
         if not ((uuid_or_event_id not in self.registry.sounds) ^
-                (uuid_or_event_id not in self.registry.uuids_by_event_id)):
+                (not events_registry.has_sound_event_id(uuid_or_event_id))):
             self.logger.info("Sound {} was supposed to be stopped, but did "
                              "not exist".format(uuid_or_event_id))
         elif (uuid_or_event_id in self.registry.sounds and
@@ -315,10 +320,11 @@ class Server(Gio.Application):
                 # Stop by UUID.
                 uuid_ = uuid_or_event_id
                 self.unref_on_stop(self.get_sound(uuid_), term_sound)
-            elif uuid_or_event_id in self.registry.uuids_by_event_id:
+            elif events_registry.has_sound_event_id(uuid_or_event_id):
                 # Stop by sound event id.
                 sound_event_id = uuid_or_event_id
-                for uuid_ in self.registry.uuids_by_event_id[uuid_or_event_id]:
+                uuids = self.registry.sound_events.get_uuids(sound_event_id)
+                for uuid_ in uuids:
                     sound = self.get_sound(uuid_)
                     # Don't unreference sounds instantiated from other apps.
                     if sound.bus_name != sender:
@@ -415,12 +421,8 @@ class Server(Gio.Application):
 
     def __free_registry(self, sound):
         self._resume_last_bg_sound(sound.uuid)
+        self.registry.sound_events.remove_sound(sound)
         del self.registry.sounds[sound.uuid]
-        if sound.sound_event_id in self.registry.uuids_by_event_id:
-            self.registry.uuids_by_event_id[sound.sound_event_id].remove(
-                sound.uuid)
-            if len(self.registry.uuids_by_event_id[sound.sound_event_id]) == 0:
-                del self.registry.uuids_by_event_id[sound.sound_event_id]
         if sound.bus_name in self.registry.watcher_by_bus_name:
             uuids = self.registry.watcher_by_bus_name[sound.bus_name].uuids
             if sound.uuid in uuids:
