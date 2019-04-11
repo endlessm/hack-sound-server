@@ -135,3 +135,52 @@ class Registry:
             previous_bg_sound = self.background_sounds[-1]
             self.background_sounds.append(sound)
         return previous_bg_sound
+
+    def _get_sound_to_resume(self, sound):
+        if sound not in self.background_sounds:
+            return None
+        assert sound.type_ == "bg"
+
+        self.background_sounds.remove(sound)
+        if len(self.background_sounds) == 0:
+            return None
+
+        previous_bg_sound = self.background_sounds[-1]
+        sound.server.logger.info(
+            "Resuming sound.",
+            sound_event_id=previous_bg_sound.sound_event_id,
+            uuid=previous_bg_sound.uuid
+        )
+        if self.refcount[previous_bg_sound.uuid] == 0:
+            sound.server.logger.info(
+                "Cannot resume this sound because its owning apps have "
+                "dissapeared from the bus.",
+                sound_event_id=previous_bg_sound.sound_event_id,
+                uuid=previous_bg_sound.uuid
+            )
+            return None
+        return previous_bg_sound
+
+    def remove_sound(self, sound):
+        """
+        Removes a sound from the registry.
+
+        Args:
+            sound (Sound): The sound to remove.
+
+        Returns:
+            The `Sound` to resume if any. Otherwise, `None`.
+        """
+        if sound.uuid not in self.sounds:
+            return
+
+        sound_to_resume = self._get_sound_to_resume(sound)
+
+        self.sound_events.remove_sound(sound)
+        del self.sounds[sound.uuid]
+        if sound.bus_name in self.watcher_by_bus_name:
+            uuids = self.watcher_by_bus_name[sound.bus_name].uuids
+            if sound.uuid in uuids:
+                uuids.remove(sound.uuid)
+        del self.refcount[sound.uuid]
+        return sound_to_resume
