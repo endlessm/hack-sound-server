@@ -58,3 +58,55 @@ class Registry:
         self.watcher_by_bus_name = {}
         self.sound_events = SoundEventsRegistry(self)
         self.background_sounds = []
+        # The following variables are used in API v2.
+        self.players_by_bus_name = {}
+
+    def add_bg_uuid(self, uuid):
+        """
+        Adds a sound to the list of background sounds safety.
+
+        The following rule applies for 'bg' sounds: whenever a new 'bg' sound
+        starts to play back, if any previous 'bg' sound was already playing,
+        then pause that previous sound and play the new one. If this last sound
+        finishes, then the last sound is resumed.
+
+        Args:
+            uuid (str): The sound UUID.
+
+        Returns:
+            A `Sound` object representing the target sound to pause. `None` can
+            be returned in case of error, or if there is no sound to pause.
+        """
+        sound_to_pause = None
+
+        sound = self.sounds.get(uuid)
+        if sound is None or sound.type_ != "bg":
+            return None
+        # The following rule applies for 'bg' sounds: whenever a new 'bg'
+        # sound starts to play back, if any previous 'bg' sound was already
+        # playing, then pause that previous sound and play the new one. If
+        # this last sound finishes, then the last sound is resumed.
+
+        # Reorder the list of background sounds if necessary.
+        if len(self.background_sounds) > 0:
+            overlap_behavior = sound.server.metadata[sound.sound_event_id].get(
+                "overlap-behavior", "overlap")
+
+            # Sounds with overlap behavior 'ignore' or 'restart' are unique
+            # so just need to move the incoming sound to the head/top of
+            # the list/stack.
+            if (overlap_behavior in ("ignore", "restart") and
+                    sound in self.background_sounds):
+                last_sound = self.background_sounds[-1]
+                if last_sound != sound:
+                    sound_to_pause = last_sound
+                # Reorder.
+                self.background_sounds.remove(sound)
+                self.background_sounds.append(sound)
+
+        if len(self.background_sounds) == 0:
+            self.background_sounds.append(sound)
+        elif self.background_sounds[-1] != sound:
+            sound_to_pause = self.background_sounds[-1]
+            self.background_sounds.append(sound)
+        return sound_to_pause

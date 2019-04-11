@@ -60,33 +60,9 @@ class Server(Gio.Application):
     def play(self, uuid_):
         sound = self.registry.sounds[uuid_]
         if sound.type_ == "bg":
-            # The following rule applies for 'bg' sounds: whenever a new 'bg'
-            # sound starts to play back, if any previous 'bg' sound was already
-            # playing, then pause that previous sound and play the new one. If
-            # this last sound finishes, then the last sound is resumed.
-            overlap_behavior =\
-                self.metadata[sound.sound_event_id].get("overlap-behavior",
-                                                        "overlap")
-
-            # Reorder the list of background sounds if necessary.
-            if len(self.registry.background_sounds) > 0:
-                # Sounds with overlap behavior 'ignore' or 'restart' are unique
-                # so just need to move the incoming sound to the head/top of
-                # the list/stack.
-                if (overlap_behavior in ("ignore", "restart") and
-                        sound in self.registry.background_sounds):
-                    last_sound = self.registry.background_sounds[-1]
-                    if last_sound != sound:
-                        last_sound.pause_with_fade_out()
-                    # Reorder.
-                    self.registry.background_sounds.remove(sound)
-                    self.registry.background_sounds.append(sound)
-
-            if len(self.registry.background_sounds) == 0:
-                self.registry.background_sounds.append(sound)
-            elif self.registry.background_sounds[-1] != sound:
-                self.registry.background_sounds[-1].pause_with_fade_out()
-                self.registry.background_sounds.append(sound)
+            sound_to_pause = self.registry.add_bg_uuid(sound.uuid)
+            if sound_to_pause is not None:
+                sound_to_pause.pause_with_fade_out()
         sound.play()
 
     def get_sound(self, uuid_):
