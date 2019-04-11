@@ -172,14 +172,11 @@ class Server(Gio.Application):
                 "sound event with id %s does not exist" % sound_event_id)
             return
 
-        overlap_behavior = \
-            self.metadata[sound_event_id].get("overlap-behavior", "overlap")
-
-        uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
+        uuid_ = self.do_overlap_behaviour(sender, sound_event_id)
         if uuid_ is not None:
             sound = self.get_sound(uuid_)
         else:
-            if self.check_too_many_sounds(sound_event_id, overlap_behavior):
+            if self.check_too_many_sounds(sound_event_id):
                 invocation.return_value(GLib.Variant("(s)", ("", )))
                 return
             self.cancel_countdown()
@@ -195,7 +192,7 @@ class Server(Gio.Application):
         self.play(sound.uuid)
         invocation.return_value(GLib.Variant("(s)", (sound.uuid, )))
 
-    def check_too_many_sounds(self, sound_event_id, overlap_behavior):
+    def check_too_many_sounds(self, sound_event_id):
         if sound_event_id not in self.registry.sound_events.get_event_ids():
             n_instances = 0
         else:
@@ -245,10 +242,13 @@ class Server(Gio.Application):
         Gio.bus_unwatch_name(watcher_id)
         del self.registry.watcher_by_bus_name[bus_name]
 
-    def do_overlap_behaviour(self, sound_event_id, overlap_behavior):
+    def do_overlap_behaviour(self, bus_name, sound_event_id):
+        overlap_behavior = \
+            self.metadata[sound_event_id].get("overlap-behavior", "overlap")
         if overlap_behavior == "overlap":
             return None
-        uuids = self.registry.sound_events.get_uuids(sound_event_id)
+
+        uuids = self.registry.sound_events.get_uuids(sound_event_id, bus_name)
         assert len(uuids) <= 1
         if len(uuids) == 0:
             return None
