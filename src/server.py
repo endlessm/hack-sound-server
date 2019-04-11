@@ -179,11 +179,7 @@ class Server(Gio.Application):
         uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
             sound = self.get_sound(uuid_)
-            self.watch_bus_name(sound.bus_name)
-            self.ref(sound)
-            self.play(uuid_)
-
-        if uuid_ is None:
+        else:
             if self.check_too_many_sounds(sound_event_id, overlap_behavior):
                 invocation.return_value(GLib.Variant("(s)", ("", )))
                 return
@@ -191,18 +187,15 @@ class Server(Gio.Application):
             self.hold()
 
             sound = Sound(self, sender, sound_event_id, options)
-            uuid_ = sound.uuid
-            self.registry.sounds[uuid_] = sound
+            self.registry.sounds[sound.uuid] = sound
 
             # Insert the uuid in the dictionary organized by sound event id.
             self.registry.sound_events.add_uuid(sound.sound_event_id,
                                                 sound.uuid, sound.bus_name)
-
-            self.watch_bus_name(sound.bus_name)
-            self.ref(sound)
-            self.play(uuid_)
-
-        return invocation.return_value(GLib.Variant('(s)', (uuid_, )))
+        self.watch_bus_name(sound.bus_name)
+        self.ref(sound)
+        self.play(sound.uuid)
+        invocation.return_value(GLib.Variant('(s)', (sound.uuid, )))
 
     def check_too_many_sounds(self, sound_event_id, overlap_behavior):
         if sound_event_id not in self.registry.sound_events.get_event_ids():
