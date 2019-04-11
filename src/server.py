@@ -284,12 +284,10 @@ class Server(Gio.Application):
             elif uuid_ in self.registry.sound_events.get_event_ids():
                 # Stop by sound event id.
                 sound_event_id = uuid_
-                uuids = self.registry.sound_events.get_uuids(sound_event_id)
-                for uuid_ in uuids:
-                    sound = self.get_sound(uuid_)
-                    # Don't unreference sounds instantiated from other apps.
-                    if sound.bus_name != sender:
-                        continue
+                bus_name_uuids = \
+                    self.registry.sound_events.get_uuids(sound_event_id,
+                                                         sender)
+                for uuid_ in bus_name_uuids:
                     self.unref_on_stop(self.get_sound(uuid_), term_sound)
         invocation.return_value(None)
 

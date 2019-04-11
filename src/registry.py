@@ -18,6 +18,11 @@ class SoundEventRegistry:
         if len(self._uuids_by_bus_name[sound.bus_name]) == 0:
             del self._uuids_by_bus_name[sound.bus_name]
 
+    def get_uuids(self, bus_name=None):
+        if bus_name is not None:
+            return self._uuids_by_bus_name.get(bus_name, set([]))
+        return self._uuids
+
     @property
     def uuids(self):
         return self._uuids
@@ -40,11 +45,11 @@ class SoundEventsRegistry:
         if not self._sound_events[sound.sound_event_id].uuids:
             del self._sound_events[sound.sound_event_id]
 
-    def get_uuids(self, sound_event_id):
+    def get_uuids(self, sound_event_id=None, bus_name=None):
         sound_event = self._sound_events.get(sound_event_id)
         if not sound_event:
             return set([])
-        return sound_event.uuids
+        return sound_event.get_uuids(bus_name)
 
     def get_event_ids(self):
         return iter(self._sound_events)
