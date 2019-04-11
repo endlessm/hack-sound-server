@@ -115,7 +115,7 @@ class Registry:
         self.sound_events = SoundEventsRegistry()
         self.background_sounds = []
 
-    def try_add_bg_sound(self, sound):
+    def _try_add_bg_sound(self, sound):
         """
         Adds a sound to the list of background sounds.
 
@@ -183,6 +183,22 @@ class Registry:
             )
             return None
         return previous_bg_sound
+
+    def add_sound(self, sound):
+        """
+        Adds a sound to the registry.
+
+        Args:
+            sound (Sound): The sound to add to the registry.
+
+        Returns:
+            In the case of a bg sound, the previously playing background
+            `Sound` object, or `None` if there was no background sound already
+            playing or if the given sound is not a bg sound.
+        """
+        self.sounds[sound.uuid] = sound
+        self.sound_events.add_sound(sound)
+        return self._try_add_bg_sound(sound)
 
     def remove_sound(self, sound):
         """
