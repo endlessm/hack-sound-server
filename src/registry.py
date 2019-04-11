@@ -61,7 +61,7 @@ class Registry:
         # The following variables are used in API v2.
         self.players_by_bus_name = {}
 
-    def add_bg_uuid(self, uuid):
+    def _add_bg_uuid(self, uuid):
         """
         Adds a sound to the list of background sounds safety.
 
@@ -133,6 +133,18 @@ class Registry:
                                      uuid=last_sound.uuid)
             return None
         return last_sound
+
+    def add_sound(self, sound):
+        """
+        Adds a sound to the registry.
+
+        Returns:
+            The `Sound` object to pause if any. Otherwise, `None`.
+        """
+        self.sounds[sound.uuid] = sound
+        self.sound_events.add_uuid(sound.sound_event_id, sound.uuid,
+                                   sound.bus_name)
+        return self._add_bg_uuid(sound.uuid)
 
     def remove_uuid(self, uuid):
         """

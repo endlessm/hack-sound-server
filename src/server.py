@@ -57,14 +57,6 @@ class Server(Gio.Application):
         self._countdown_id = None
         self.registry = Registry()
 
-    def play(self, uuid_):
-        sound = self.registry.sounds[uuid_]
-        if sound.type_ == "bg":
-            sound_to_pause = self.registry.add_bg_uuid(sound.uuid)
-            if sound_to_pause is not None:
-                sound_to_pause.pause_with_fade_out()
-        sound.play()
-
     def get_sound(self, uuid_):
         try:
             return self.registry.sounds[uuid_]
@@ -185,16 +177,14 @@ class Server(Gio.Application):
                 return
             self.cancel_countdown()
             self.hold()
-
             sound = Sound(self, sender, sound_event_id, options)
-            self.registry.sounds[sound.uuid] = sound
 
-            # Insert the uuid in the dictionary organized by sound event id.
-            self.registry.sound_events.add_uuid(sound.sound_event_id,
-                                                sound.uuid, sound.bus_name)
+        sound_to_pause = self.registry.add_sound(sound)
         self.watch_bus_name(sound.bus_name)
         self.ref(sound)
-        self.play(sound.uuid)
+        if sound_to_pause is not None:
+            sound_to_pause.pause_with_fade_out()
+        sound.play()
         invocation.return_value(GLib.Variant('(s)', (sound.uuid, )))
 
     def check_too_many_sounds(self, sound_event_id, overlap_behavior):
