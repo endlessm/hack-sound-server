@@ -1,23 +1,46 @@
 class SoundEventUUIDInfo:
     """
-    Tracks the UUIDs related to a specific sound event id.
+    Tracks UUIDs (classified by bus name) related to a specific sound event id.
     """
     def __init__(self):
+        # _uuids_by_bus_name and _uuids contain the same UUIDs.
+        self._uuids_by_bus_name = {}
         self._uuids = set()
 
     def add_sound(self, sound):
         """
         Adds the sound uuid to the set of uuids (per sound event id).
         """
+        if sound.bus_name not in self._uuids_by_bus_name:
+            self._uuids_by_bus_name[sound.bus_name] = set()
         self._uuids.add(sound.uuid)
+        self._uuids_by_bus_name[sound.bus_name].add(sound.uuid)
 
     def remove_sound(self, sound):
         """
         Removes the sound uuid from the set of uuids (per sound event id).
         """
-        if sound.uuid not in self._uuids:
-            return
-        self._uuids.remove(sound.uuid)
+        if sound.uuid in self.uuids:
+            self._uuids.remove(sound.uuid)
+        if sound.bus_name in self._uuids_by_bus_name:
+            if sound.uuid in self._uuids_by_bus_name[sound.bus_name]:
+                self._uuids_by_bus_name[sound.bus_name].remove(sound.uuid)
+            if len(self._uuids_by_bus_name[sound.bus_name]) == 0:
+                del self._uuids_by_bus_name[sound.bus_name]
+
+    def get_uuids(self, bus_name):
+        """
+        Gets the UUIDs filtering them by bus name.
+
+        Args:
+            bus_name (str): A bus name to filter UUIDs.
+
+        Returns:
+            set: A set containing the UUIDs.
+        """
+        if bus_name is not None:
+            return self._uuids_by_bus_name.get(bus_name, set())
+        return self._uuids
 
     @property
     def uuids(self):
@@ -52,7 +75,7 @@ class SoundEventsRegistry:
         if not self._sound_events[sound.sound_event_id].uuids:
             del self._sound_events[sound.sound_event_id]
 
-    def get_uuids(self, sound_event_id):
+    def get_uuids(self, sound_event_id, bus_name=None):
         """
         Gets the UUIDs for a given sound event id.
 
@@ -62,7 +85,7 @@ class SoundEventsRegistry:
         sound_event = self._sound_events.get(sound_event_id)
         if not sound_event:
             return set()
-        return sound_event.uuids
+        return sound_event.get_uuids(bus_name)
 
     def get_event_ids(self):
         """
