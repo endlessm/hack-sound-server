@@ -91,3 +91,47 @@ class Registry:
         self.watcher_by_bus_name = {}
         self.sound_events = SoundEventsRegistry()
         self.background_sounds = []
+
+    def try_add_bg_sound(self, sound):
+        """
+        Adds a sound to the list of background sounds.
+
+        The following rule applies for 'bg' sounds: whenever a new 'bg' sound
+        starts to play back, if any previous 'bg' sound was already playing,
+        then pause that previous sound and play the new one. If this last sound
+        finishes, then the last sound is resumed.
+
+        Args:
+            sound (Sound): The sound to add.
+
+        Returns:
+            Previously playing background `Sound` object, or `None` if there
+            was no background sound already playing or no action is required.
+        """
+        if sound.type_ != "bg":
+            return None
+
+        previous_bg_sound = None
+        # Reorder the list of background sounds if necessary.
+        if len(self.background_sounds) > 0:
+            overlap_behavior = sound.server.metadata[sound.sound_event_id].get(
+                "overlap-behavior", "overlap")
+
+            # Sounds with overlap behavior 'ignore' or 'restart' are unique
+            # so just need to move the incoming sound to the head/top of
+            # the list/stack.
+            if (overlap_behavior in ("ignore", "restart") and
+                    sound in self.background_sounds):
+                last_sound = self.background_sounds[-1]
+                if last_sound != sound:
+                    previous_bg_sound = last_sound
+                # Reorder.
+                self.background_sounds.remove(sound)
+                self.background_sounds.append(sound)
+
+        if len(self.background_sounds) == 0:
+            self.background_sounds.append(sound)
+        elif self.background_sounds[-1] != sound:
+            previous_bg_sound = self.background_sounds[-1]
+            self.background_sounds.append(sound)
+        return previous_bg_sound
