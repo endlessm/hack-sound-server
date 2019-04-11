@@ -340,33 +340,6 @@ class Server(Gio.Application):
                 Gio.dbus_error_quark(), Gio.DBusError.UNKNOWN_METHOD,
                 "Method '%s' not available" % method)
 
-    def _resume_last_bg_sound(self, uuid_):
-        sound = self.get_sound(uuid_)
-        if sound not in self.registry.background_sounds:
-            return
-        assert sound.type_ == "bg"
-
-        try:
-            self.registry.background_sounds.remove(sound)
-            sound.release()
-        except ValueError:
-            self.logger.warning(
-                "Sound %s sound was supposed to be in the list of "
-                "background sounds, but this isn't", uuid_)
-
-        if len(self.registry.background_sounds) > 0:
-            last_sound = self.registry.background_sounds[-1]
-            self.logger.info("Resuming sound.",
-                             sound_event_id=last_sound.sound_event_id,
-                             uuid=last_sound.uuid)
-            if self.refcount(last_sound) == 0:
-                self.logger.info("Cannot resume this sound because its "
-                                 "owning apps have dissapeared from the bus.",
-                                 sound_event_id=last_sound.sound_event_id,
-                                 uuid=last_sound.uuid)
-                return
-            last_sound.play()
-
     def sound_released_cb(self, sound):
         # This method is only called when a sound naturally reaches
         # end-of-stream or when an application ordered to stop the sound. In
@@ -393,15 +366,9 @@ class Server(Gio.Application):
         self.__free_registry_with_countdown(sound)
 
     def __free_registry(self, sound):
-        self._resume_last_bg_sound(sound.uuid)
-        if sound.sound_event_id in self.registry.sound_events.get_event_ids():
-            self.registry.sound_events.remove_uuid(sound.uuid)
-        del self.registry.sounds[sound.uuid]
-        if sound.bus_name in self.registry.watcher_by_bus_name:
-            uuids = self.registry.watcher_by_bus_name[sound.bus_name].uuids
-            if sound.uuid in uuids:
-                uuids.remove(sound.uuid)
-        del self.registry.refcount[sound.uuid]
+        sound_to_resume = self.registry.remove_uuid(sound.uuid)
+        if sound_to_resume is not None:
+            sound_to_resume.play()
 
     def __free_registry_with_countdown(self, sound):
         self.__free_registry(sound)
