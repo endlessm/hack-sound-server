@@ -160,13 +160,6 @@ class Server(Gio.Application):
 
         overlap_behavior = \
             self.metadata[sound_event_id].get("overlap-behavior", "overlap")
-        if overlap_behavior not in self.OVERLAP_BEHAVIOR_CHOICES:
-            msg = "'%s' is not a valid option for 'overlap-behavior'."
-            self.logger.info(msg, overlap_behavior,
-                             sound_event_id=sound_event_id)
-            return invocation.return_dbus_error(
-                self._DBUS_UNKNOWN_OVERLAP_BEHAVIOR,
-                msg % overlap_behavior)
 
         uuid_ = self.do_overlap_behaviour(sound_event_id, overlap_behavior)
         if uuid_ is not None:
