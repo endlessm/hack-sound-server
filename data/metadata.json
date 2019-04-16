@@ -871,10 +871,12 @@
     "quests/episode3/activatetrap/transcoding-init/pulse": {
         "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
         "delay": 2300,
+        "fade-out": 5000,
         "loop": true
     },
     "quests/episode3/activatetrap/transcoding/pulse": {
         "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
+        "fade-out": 5000,
         "loop": true
     },
     "quests/faber-theme": {
