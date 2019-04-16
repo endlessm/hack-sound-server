@@ -865,6 +865,18 @@
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
     },
+    "quests/episode3/activatetrap/transcoding-init/blowup": {
+        "sound-file": "quests/episode3/activatetrap/ep3-box-blowup.webm"
+    },
+    "quests/episode3/activatetrap/transcoding-init/pulse": {
+        "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
+        "delay": 2300,
+        "loop": true
+    },
+    "quests/episode3/activatetrap/transcoding/pulse": {
+        "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
+        "loop": true
+    },
     "quests/faber-theme": {
         "sound-file": "quests/Faber-theme.webm",
         "loop": true,
