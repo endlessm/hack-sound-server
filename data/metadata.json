@@ -877,6 +877,9 @@
         "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
         "loop": true
     },
+    "quests/episode3/trap/animations/panels": {
+        "sound-file": "fizzics/Collision_goal.webm"
+    },
     "quests/faber-theme": {
         "sound-file": "quests/Faber-theme.webm",
         "loop": true,
