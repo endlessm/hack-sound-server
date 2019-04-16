@@ -878,12 +878,10 @@
     },
     "quests/episode3/activatetrap/transcoding-init/pulse": {
         "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
-        "delay": 2300,
-        "loop": true
+        "delay": 2300
     },
     "quests/episode3/activatetrap/transcoding/pulse": {
-        "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm",
-        "loop": true
+        "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm"
     },
     "quests/faber-theme": {
         "sound-file": "quests/Faber-theme.webm",
