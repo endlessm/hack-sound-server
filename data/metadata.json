@@ -865,6 +865,9 @@
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
     },
+    "quests/episode3/trap/animations/panels": {
+        "sound-file": "fizzics/Collision_goal.webm"
+    },
     "quests/faber-theme": {
         "sound-file": "quests/Faber-theme.webm",
         "loop": true,
