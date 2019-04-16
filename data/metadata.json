@@ -135,6 +135,14 @@
         ],
         "delay": 250
     },
+    "clubhouse/riley/mood/talk_glitched": {
+        "sound-files": [
+            "clubhouse/characters/riley/moods/talk_glitched/Riley_glitch1.webm",
+            "clubhouse/characters/riley/moods/talk_glitched/Riley_glitch2.webm",
+            "clubhouse/characters/riley/moods/talk_glitched/Riley_glitch3.webm"
+        ],
+        "delay": 250
+    },
     "clubhouse/saniel/mood/talk": {
         "sound-files": [
             "clubhouse/characters/saniel/moods/talk/Saniel_bobble1.webm",
