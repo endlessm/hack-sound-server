@@ -897,6 +897,9 @@
     "quests/fob2": {
         "sound-file": "quests/Key-fob2-more-glow.webm"
     },
+    "quests/fob3": {
+        "sound-file": "quests/Key-fob1-glow.webm"
+    },
     "quests/hi-hat-start": {
         "sound-file": "quests/hihat-sneaker.webm",
         "loop": true,
