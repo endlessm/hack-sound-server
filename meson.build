@@ -11,6 +11,7 @@ endif
 
 install_data(
     join_paths('service', 'com.endlessm.HackSoundServer.service'),
+    join_paths('service', 'com.endlessm.HackSoundServer2.service'),
     install_dir: session_bus_services_dir
 )
 
