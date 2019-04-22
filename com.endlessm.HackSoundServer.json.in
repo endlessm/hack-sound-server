@@ -6,7 +6,9 @@
     "sdk": "org.gnome.Sdk",
     "finish-args": [
         "--share=ipc",
-        "--socket=pulseaudio"
+        "--socket=pulseaudio",
+        "--socket=session-bus",
+        "--own-name=com.endlessm.HackSoundServer2"
     ],
     "modules": [
         {
