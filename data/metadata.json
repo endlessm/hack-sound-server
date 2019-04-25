@@ -926,7 +926,7 @@
         "sound-file": "quests/quest_challenge_completed.webm"
     },
     "quests/quest-given": {
-        "sound-file": "quests/quest_accepted.webm"
+        "sound-file": "quests/quest_accept.webm"
     },
     "quests/quest-march-start": {
         "sound-file": "quests/quest_march.webm",
