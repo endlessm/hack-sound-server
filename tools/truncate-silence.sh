@@ -17,6 +17,20 @@ usage() {
     exit 1
 }
 
+reverse()
+{
+    local tmp_file=$(dirname "$input_file")/tmp-$(basename "$input_file")
+    ffmpeg -y -i "$input_file" -af "areverse" "$tmp_file"
+    mv "$tmp_file" "$input_file"
+}
+
+silence()
+{
+    local tmp_file=$(dirname "$input_file")/tmp-$(basename "$input_file")
+    ffmpeg -y -i "$input_file" -af silenceremove=1:0:$ratio "$tmp_file"
+    mv "$tmp_file" "$input_file"
+}
+
 input_file=
 truncate_start=false
 truncate_end=false
@@ -60,11 +74,11 @@ if [ -z "$input_file" ]; then
 fi
 
 if ${truncate_start}; then
-    ffmpeg -y -i "$input_file" -af silenceremove=1:0:$ratio "$input_file"
+    silence
 fi
 
 if ${truncate_end}; then
-    ffmpeg -y -i "$input_file" -af "areverse" "$input_file"
-    ffmpeg -y -i "$input_file" -af silenceremove=1:0:$ratio "$input_file"
-    ffmpeg -y -i "$input_file" -af "areverse" "$input_file"
+    reverse
+    silence
+    reverse
 fi
