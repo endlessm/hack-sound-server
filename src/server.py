@@ -45,6 +45,7 @@ class HackSoundPlayer(GObject.Object):
         self._is_initial_seek = False
         self._pending_state_change = None
         self._releasing = False
+        self._error = False
 
         self.pipeline = self._build_pipeline()
         bus = self.pipeline.get_bus()
@@ -52,6 +53,8 @@ class HackSoundPlayer(GObject.Object):
         bus.connect("message", self.__bus_message_cb)
 
     def release(self):
+        if self._error:
+            return
         # Otherwise, GStreamer complains with a WARNING indicating that
         # g_idle_add should be used.
         self.logger.debug("Releasing.")
@@ -396,6 +399,7 @@ class HackSoundPlayer(GObject.Object):
             self.logger.warning("Error from %s: %s (%s)", message.src, error,
                                 debug)
             self.pipeline.set_state(Gst.State.NULL)
+            self._error = True
             self.emit("error", error, debug)
         elif message.type == Gst.MessageType.STATE_CHANGED:
             if message.src != self.pipeline:
@@ -765,7 +769,6 @@ class HackSoundServer(Gio.Application):
 
         try:
             self._background_players.remove(player)
-            player.release()
         except ValueError:
             self.logger.warning(
                 "Sound %s sound was supposed to be in the list of "
