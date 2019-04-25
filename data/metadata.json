@@ -1074,23 +1074,11 @@
     "shell/tracking-button/flip-inverse/enter": {
         "sound-file": "MouseEnter_Inverse.webm"
     },
-    "shell/tracking-button/flip-inverse/hover": {
-        "sound-file": "Hover_InverseFlip.webm",
-        "fade-in": 100,
-        "fade-out": 100,
-        "loop": true
-    },
     "shell/tracking-button/flip/click": {
         "sound-file": "MouseClick_Flip.webm"
     },
     "shell/tracking-button/flip/enter": {
         "sound-file": "MouseEnter_Flip.webm"
-    },
-    "shell/tracking-button/flip/hover": {
-        "sound-file": "Hover_Flip.webm",
-        "fade-in": 100,
-        "fade-out": 100,
-        "loop": true
     },
     "system/background/back": {
         "sound-file": "system/Theater_backside.webm",
