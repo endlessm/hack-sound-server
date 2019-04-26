@@ -106,7 +106,10 @@ class HackSoundPlayer(GObject.Object):
             return
         self._stop_loop = False
         self.pipeline.set_state(Gst.State.PLAYING)
-        self._add_fade_in()
+        try:
+            self._add_fade_in()
+        except ValueError:
+            self.logger.warning("Fade in effect could not be applied.")
         return GLib.SOURCE_REMOVE
 
     def stop(self):
@@ -134,7 +137,10 @@ class HackSoundPlayer(GObject.Object):
         # Reset keyframes.
         self._fade_control.unset_all()
         self._rate_control.unset_all()
-        self._add_fade_in()
+        try:
+            self._add_fade_in()
+        except ValueError:
+            self.logger.warning("Fade in effect could not be applied.")
 
     def update_properties(self, transition_time_ms, options):
         if "volume" in options:
@@ -159,9 +165,14 @@ class HackSoundPlayer(GObject.Object):
             self.logger.warning("Cannot update the property '%s'.", prop_name)
             return
         time_end = current_time + transition_time_ms * Gst.MSECOND
-        self._add_keyframe_pair(control, current_time, current_value,
-                                time_end, prop_value, consider_duration=False,
-                                consider_delay=False)
+        try:
+            self._add_keyframe_pair(control, current_time, current_value,
+                                    time_end, prop_value,
+                                    consider_duration=False,
+                                    consider_delay=False)
+        except ValueError:
+            self.logger.warning("Cannot update the property '%s'.", prop_name)
+            return
 
     def seek(self, position=None, flags=None):
         if flags is None:
