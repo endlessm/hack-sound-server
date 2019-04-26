@@ -1078,7 +1078,7 @@
         "sound-file": "Hover_InverseFlip.webm",
         "fade-in": 100,
         "fade-out": 100,
-        "loop": true
+        "volume": 0
     },
     "shell/tracking-button/flip/click": {
         "sound-file": "MouseClick_Flip.webm"
@@ -1090,7 +1090,7 @@
         "sound-file": "Hover_Flip.webm",
         "fade-in": 100,
         "fade-out": 100,
-        "loop": true
+        "volume": 0
     },
     "system/background/back": {
         "sound-file": "system/Theater_backside.webm",
