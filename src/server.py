@@ -184,6 +184,9 @@ class HackSoundPlayer(GObject.Object):
     def get_duration(self):
         ok, duration = self.pipeline.query_duration(Gst.Format.TIME)
         if not ok:
+            self.logger.info("Cannot get the current position. "
+                             "Current state is '%s'. ",
+                             Gst.Element.state_get_name(self.get_state()))
             raise ValueError('error querying duration')
         return duration
 
