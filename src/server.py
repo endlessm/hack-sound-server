@@ -171,6 +171,9 @@ class HackSoundPlayer(GObject.Object):
     def get_current_position(self):
         ok, current_time = self.pipeline.query_position(Gst.Format.TIME)
         if not ok:
+            self.logger.info("Cannot get the current position. "
+                             "Current state is '%s'. ",
+                             Gst.Element.state_get_name(self.get_state()))
             raise ValueError('error querying position')
         return current_time
 
@@ -271,10 +274,7 @@ class HackSoundPlayer(GObject.Object):
         except ValueError:
             # This is the first call to play the sound and it should fade in
             # from the time 0.
-            self.logger.info("Cannot get the current position. "
-                             "Current state is '%s'. "
-                             "Assume first PlaySound call. Current time=0.",
-                             Gst.Element.state_get_name(self.get_state()))
+            self.logger.info("Assume first PlaySound call. Current time=0.")
             current_time = 0
         current_volume = self.pipeline.get_by_name("volume").props.volume
         end_time = current_time + self.fade_in * Gst.MSECOND
