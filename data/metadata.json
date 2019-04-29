@@ -858,6 +858,12 @@
         "overlap-behavior": "ignore",
         "type": "bg"
     },
+    "quests/cat-loop": {
+        "sound-file": "quests/cat-glitch-loop.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/clarifying": {
         "sound-file": "quests/clarifying.webm",
         "loop": true,
@@ -898,8 +904,17 @@
     "quests/fob3": {
         "sound-file": "quests/Key-fob1-glow.webm"
     },
+    "quests/glitch-meow": {
+        "sound-file": "quests/cat-sfx1.webm"
+    },
     "quests/hi-hat-start": {
         "sound-file": "quests/hihat-sneaker.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/horse-tale": {
+        "sound-file": "quests/horse-tale.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
@@ -1049,6 +1064,12 @@
         "type": "bg",
         "volume": 0.5
     },
+    "quests/san-backstory": {
+        "sound-file": "quests/san-backstory.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/saniel-angry": {
         "sound-file": "quests/saniel_angry_choir.webm"
     },
@@ -1067,6 +1088,21 @@
         "sound-file": "quests/system_shutdown.webm",
         "loop": true,
         "overlap-behavior": "ignore"
+    },
+    "quests/teaching": {
+        "sound-file": "quests/teacher.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/transcoding-loop": {
+        "sound-file": "quests/transcoding-loop.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/transfer-complete": {
+        "sound-file": "quests/transfer-complete.webm"
     },
     "shell/tracking-button/flip-inverse/click": {
         "sound-file": "MouseClick_Invert.webm"
