@@ -98,6 +98,11 @@
         "loop": true,
         "type": "bg"
     },
+    "clubhouse/ending/episode4": {
+        "sound-file": "clubhouse/ending/episode4.webm",
+        "loop": true,
+        "type": "bg"
+    },
     "clubhouse/entry/close": {
         "sound-file": "clubhouse/clubhouse_close.webm"
     },
