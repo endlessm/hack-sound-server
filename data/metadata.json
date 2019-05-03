@@ -127,6 +127,14 @@
         ],
         "delay": 250
     },
+    "clubhouse/felixnet/mood/talk": {
+        "sound-files": [
+            "clubhouse/characters/felixnet/moods/talk/cat-sfx1.webm",
+            "clubhouse/characters/felixnet/moods/talk/cat-sfx2.webm",
+            "clubhouse/characters/felixnet/moods/talk/cat-sfx3.webm"
+        ],
+        "delay": 250
+    },
     "clubhouse/riley/mood/talk": {
         "sound-files": [
             "clubhouse/characters/riley/moods/talk/Riley_bobble1.webm",
