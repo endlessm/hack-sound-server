@@ -1,10 +1,18 @@
 #!/bin/bash
 
+ffmpeg_missing_msg()
+{
+    echo "Please install a build of ffmpeg with the 'webm muxer' and 'libopus encoder'"
+    echo "Check the documentation for your distribution or visit https://ffbinaries.com/downloads"
+}
+
 check_ffmpeg() {
     if command -v ffmpeg > /dev/null; then
         return 0
     fi
     echo "ffmpeg is not installed in PATH."
+    echo
+    ffmpeg_missing_msg
 
     return 1
 }
@@ -20,8 +28,7 @@ check_ffmpeg_codecs() {
     if [[ -z "$webm_available" || -z "$libopus_available" ]]; then
         echo "Your ffmpeg build doesn't have the proper codecs"
         echo
-        echo "Please install a build of ffmpeg with the 'webm muxer' and 'libopus encoder'"
-        echo "Check the documentation for your distribution or visit https://ffbinaries.com/downloads"
+        ffmpeg_missing_msg
         return 1
     fi
     return 0
