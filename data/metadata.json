@@ -617,6 +617,15 @@
     "hack-toolbox/lockscreen/open/lock.lightspeed.1": {
         "sound-file": "toolbox/lightspeed_unlock.webm"
     },
+    "hack-toolbox/lockscreen/open/lock.sidetrack.1": {
+        "sound-file": "toolbox/sidetrack-lockscreen-main.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.sidetrack.2": {
+        "sound-file": "toolbox/sidetrack-lockscreen-topic.webm"
+    },
+    "hack-toolbox/lockscreen/open/lock.sidetrack.3": {
+        "sound-file": "toolbox/sidetrack-lockscreen-topic.webm"
+    },
     "hack-toolbox/lockscreen/trap/alarm": {
         "sound-file": "toolbox/trap_alarm_loop.webm",
         "loop": true
