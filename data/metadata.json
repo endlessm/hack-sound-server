@@ -879,6 +879,36 @@
     "quests/end-sting": {
         "sound-file": "quests/ricky_rescued.webm"
     },
+    "quests/ep4end1": {
+        "sound-file": "quests/ep4end - 1 last level.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/ep4end2": {
+        "sound-file": "quests/ep4end - 2 stalked.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/ep4end3": {
+        "sound-file": "quests/ep4end - 3 riley escape.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/ep4end4": {
+        "sound-file": "quests/ep4end - 4 cooldown.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
+    "quests/ep4end5": {
+        "sound-file": "quests/ep4end - 5 AI concerns.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
+    },
     "quests/episode3/activatetrap/transcoding-init/blowup": {
         "sound-file": "quests/episode3/activatetrap/ep3-box-blowup.webm"
     },
