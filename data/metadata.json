@@ -716,15 +716,57 @@
         "loop": true,
         "type": "bg"
     },
+    "hackdex2/cat_purring1": {
+        "sound-file": "hackdex2/cat_purring1.webm",
+        "loop": true
+    },
+    "hackdex2/cat_purring2": {
+        "sound-file": "hackdex2/cat_purring2.webm",
+        "loop": true
+    },
+    "hackdex2/cat_purring3": {
+        "sound-file": "hackdex2/cat_purring3.webm",
+        "loop": true
+    },
+    "hackdex2/cat_screaming": {
+        "sound-file": "hackdex2/cat_screaming.webm",
+        "loop": true
+    },
     "hackdex2/click": {
         "sound-file": "hackdex2/timpani-start-win.webm"
     },
     "hackdex2/close-article": {
         "sound-file": "hackdex2/collision_gem_get.webm"
     },
+    "hackdex2/dobroide1": {
+        "sound-file": "hackdex2/dobroide1.webm"
+    },
+    "hackdex2/dobroide2": {
+        "sound-file": "hackdex2/dobroide2.webm"
+    },
+    "hackdex2/dobroide3": {
+        "sound-file": "hackdex2/dobroide3.webm"
+    },
+    "hackdex2/hamface_cat": {
+        "sound-file": "hackdex2/hamface_cat.webm",
+        "loop": true
+    },
+    "hackdex2/hank1": {
+        "sound-file": "hackdex2/hank1.webm"
+    },
+    "hackdex2/hank2": {
+        "sound-file": "hackdex2/hank2.webm"
+    },
     "hackdex2/hover": {
         "sound-file": "hackdex2/leviathan_hover.webm",
         "loop": true
+    },
+    "hackdex2/hungry_cats": {
+        "sound-file": "hackdex2/hungry_cats.webm",
+        "loop": true
+    },
+    "hackdex2/lilpur": {
+        "sound-file": "hackdex2/lilpur.webm"
     },
     "lightspeed/asteroid-crash": {
         "sound-file": "lightspeed/asteroid-crash.webm"
