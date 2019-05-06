@@ -1180,6 +1180,77 @@
         "fade-out": 100,
         "volume": 0
     },
+    "sidetrack/bg/auto_mode": {
+        "sound-file": "sidetrack/bg/bg2.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "sidetrack/bg/bonus_mode": {
+        "sound-file": "sidetrack/bg/bg3.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "sidetrack/bg/lobby_loop": {
+        "sound-file": "sidetrack/bg/lobby_loop.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "sidetrack/bg/manual_mode": {
+        "sound-file": "sidetrack/bg/bg1.webm",
+        "loop": true,
+        "type": "bg"
+    },
+    "sidetrack/sfx/failure": {
+        "sound-file": "sidetrack/sfx/failure.webm"
+    },
+    "sidetrack/sfx/felix_smash": {
+        "sound-file": "sidetrack/sfx/felix_smash.webm"
+    },
+    "sidetrack/sfx/instruction_drag": {
+        "sound-file": "sidetrack/sfx/instruction_drag.webm"
+    },
+    "sidetrack/sfx/instruction_drop": {
+        "sound-file": "sidetrack/sfx/instruction_drop.webm"
+    },
+    "sidetrack/sfx/instruction_grab": {
+        "sound-file": "sidetrack/sfx/instruction_grab.webm"
+    },
+    "sidetrack/sfx/move_down": {
+        "sound-file": "sidetrack/sfx/move_down.webm"
+    },
+    "sidetrack/sfx/move_fwd": {
+        "sound-file": "sidetrack/sfx/move_fwd.webm"
+    },
+    "sidetrack/sfx/move_jump": {
+        "sound-file": "sidetrack/sfx/move_jump.webm"
+    },
+    "sidetrack/sfx/move_up": {
+        "sound-file": "sidetrack/sfx/move_up.webm"
+    },
+    "sidetrack/sfx/pit_fall": {
+        "sound-file": "sidetrack/sfx/failure.webm"
+    },
+    "sidetrack/sfx/push_arrive": {
+        "sound-file": "sidetrack/sfx/push_arrive.webm"
+    },
+    "sidetrack/sfx/push_default": {
+        "sound-file": "sidetrack/sfx/push_default.webm"
+    },
+    "sidetrack/sfx/push_depart": {
+        "sound-file": "sidetrack/sfx/push_depart.webm"
+    },
+    "sidetrack/sfx/robot": {
+        "sound-file": "sidetrack/sfx/robot.webm"
+    },
+    "sidetrack/sfx/start_chime": {
+        "sound-file": "sidetrack/sfx/start_chime.webm"
+    },
+    "sidetrack/sfx/success": {
+        "sound-file": "sidetrack/sfx/success.webm"
+    },
+    "sidetrack/sfx/wall_bump": {
+        "sound-file": "sidetrack/sfx/failure.webm"
+    },
     "system/background/back": {
         "sound-file": "system/Theater_backside.webm",
         "loop": true
