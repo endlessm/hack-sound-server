@@ -9,4 +9,4 @@ install:
 
 script:
   - flake8 bin/hack-sound-server.in .
-  - jsonschema -i data/metadata.json ci/metadata.schema.json
+  - python3 tools/check-metadata.py --check-sorted --check-files
