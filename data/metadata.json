@@ -677,7 +677,7 @@
         "type": "bg"
     },
     "hackdex1/bg/characters/estelle": {
-        "sound-file": "hackdex1/bg/characters/Estelle.webm",
+        "sound-file": "common/Estelle.webm",
         "loop": true,
         "overlap-behavior": "ignore",
         "type": "bg"
@@ -982,6 +982,12 @@
     },
     "quests/episode3/activatetrap/transcoding/pulse": {
         "sound-file": "quests/episode3/activatetrap/ep3-box-pulse.webm"
+    },
+    "quests/estelle-theme": {
+        "sound-file": "common/Estelle.webm",
+        "loop": true,
+        "overlap-behavior": "ignore",
+        "type": "bg"
     },
     "quests/faber-theme": {
         "sound-file": "quests/Faber-theme.webm",
