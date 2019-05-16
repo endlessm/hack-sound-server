@@ -136,6 +136,10 @@ class Server(Gio.Application):
                                 sound_event_id=sound.sound_event_id,
                                 uuid=sound.uuid)
             return
+
+        if count >= self.refcount(sound):
+            count = self.refcount(sound)
+
         self.registry.refcount[sound.uuid] -= count
         self.logger.debug("Unreference. Refcount: %d",
                           self.registry.refcount[sound.uuid],
