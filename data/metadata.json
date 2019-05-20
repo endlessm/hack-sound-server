@@ -1235,7 +1235,7 @@
         "sound-file": "sidetrack/bg/bg2.webm",
         "loop": true,
         "type": "bg",
-	"volume": 0.6
+        "volume": 0.6
     },
     "sidetrack/bg/bonus_mode": {
         "sound-file": "sidetrack/bg/bg3.webm",
