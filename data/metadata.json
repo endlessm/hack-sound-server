@@ -613,6 +613,9 @@
     "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
         "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
     },
+    "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_two.1": {
+        "sound-file": "toolbox/leviathan-unlock.webm"
+    },
     "hack-toolbox/lockscreen/open/lock.fizzics.1": {
         "sound-file": "toolbox/Lockscreen_fizzics1_open.webm"
     },
