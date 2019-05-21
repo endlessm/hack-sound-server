@@ -1260,6 +1260,9 @@
         "loop": true,
         "type": "bg"
     },
+    "sidetrack/sfx/explosion": {
+        "sound-file": "sidetrack/sfx/explosion.webm"
+    },
     "sidetrack/sfx/failure": {
         "sound-file": "sidetrack/sfx/failure.webm"
     },
