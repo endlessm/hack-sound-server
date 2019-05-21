@@ -124,6 +124,14 @@
         "note": "Instead of using the silence.wav sound from David, set volume to 0",
         "volume": 0
     },
+    "clubhouse/estelle/mood/talk": {
+        "sound-files": [
+            "clubhouse/characters/estelle/moods/talk/Estelle_bobble1.webm",
+            "clubhouse/characters/estelle/moods/talk/Estelle_bobble2.webm",
+            "clubhouse/characters/estelle/moods/talk/Estelle_bobble3.webm"
+        ],
+        "delay": 250
+    },
     "clubhouse/faber/mood/talk": {
         "sound-files": [
             "clubhouse/characters/faber/moods/talk/Faber_bobble1.webm",
