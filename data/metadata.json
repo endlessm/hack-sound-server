@@ -613,6 +613,9 @@
     "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_one.1": {
         "sound-file": "toolbox/Lockscreen_hackdex_ch1_open.webm"
     },
+    "hack-toolbox/lockscreen/open/lock.com.endlessm.Hackdex_chapter_two.1": {
+        "sound-file": "toolbox/leviathan-unlock.webm"
+    },
     "hack-toolbox/lockscreen/open/lock.fizzics.1": {
         "sound-file": "toolbox/Lockscreen_fizzics1_open.webm"
     },
@@ -1232,7 +1235,7 @@
         "sound-file": "sidetrack/bg/bg2.webm",
         "loop": true,
         "type": "bg",
-	"volume": 0.6
+        "volume": 0.6
     },
     "sidetrack/bg/bonus_mode": {
         "sound-file": "sidetrack/bg/bg3.webm",
