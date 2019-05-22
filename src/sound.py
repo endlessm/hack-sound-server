@@ -74,7 +74,33 @@ class Sound(GObject.Object):
         return self.pipeline.get_state(timeout=0).state
 
     def play(self):
-        self._play()
+        self.logger.info("Playing.")
+        if self._releasing:
+            self.logger.info("Cannot play because being released.")
+            return
+        self._stop_loop = False
+        self.pipeline.set_state(Gst.State.PLAYING)
+
+    def mute(self, fades=True):
+        self.logger.debug("Muting. Current state is %s.",
+                          Gst.Element.state_get_name(self.get_state()))
+        muter_elem = self.pipeline.get_by_name("muter")
+        if fades:
+            self._add_fade_out()
+        else:
+            muter_elem.props.volume = 0.0
+
+    def unmute(self):
+        self.logger.debug("Unmuting. Current state is %s.",
+                          Gst.Element.state_get_name(self.get_state()))
+        if not self.fade_in:
+            muter_elem = self.pipeline.get_by_name("muter")
+            muter_elem.props.volume = self.volume
+        else:
+            try:
+                self._add_fade_in()
+            except ValueError:
+                self.logger.warning("Fade in effect could not be applied.")
 
     def pause_with_fade_out(self):
         self.logger.info("Pausing.")
@@ -85,8 +111,8 @@ class Sound(GObject.Object):
             self.logger.info("Cannot pause because being stopped.")
             return
 
-        volume_elem = self.pipeline.get_by_name("volume")
-        if volume_elem.props.volume == 0:
+        muter_elem = self.pipeline.get_by_name("volume")
+        if muter_elem.props.volume == 0:
             self.pipeline.set_state(Gst.State.PAUSED)
             self._pending_state_change = None
         else:
@@ -99,19 +125,6 @@ class Sound(GObject.Object):
                                     "Pausing.")
                 self.pipeline.set_state(Gst.State.PAUSED)
                 self._pending_state_change = None
-
-    def _play(self):
-        self.logger.info("Playing.")
-        if self._releasing:
-            self.logger.info("Cannot play because being released.")
-            return
-        self._stop_loop = False
-        self.pipeline.set_state(Gst.State.PLAYING)
-        try:
-            self._add_fade_in()
-        except ValueError:
-            self.logger.warning("Fade in effect could not be applied.")
-        return GLib.SOURCE_REMOVE
 
     def stop(self):
         if not self.loop:
@@ -295,12 +308,12 @@ class Sound(GObject.Object):
             # from the time 0.
             self.logger.info("Assume first PlaySound call. Current time=0.")
             current_time = 0
-        current_volume = self.pipeline.get_by_name("volume").props.volume
+        current_volume = self.pipeline.get_by_name("muter").props.volume
         end_time = current_time + self.fade_in * Gst.MSECOND
         consider_delay = current_time == 0
-        self._add_keyframe_pair(self._fade_control,
+        self._add_keyframe_pair(self._muter_control,
                                 current_time, current_volume,
-                                end_time, self.volume, False, consider_delay)
+                                end_time, 1, False, consider_delay)
 
     def _add_fade_out(self):
         # This method may raise a ValueError usually if the pipeline is in
@@ -319,9 +332,9 @@ class Sound(GObject.Object):
             self.logger.warning("Cannot fade out while in an in-progress "
                                 "delay.")
             raise AssertionError
-        current_volume = self.pipeline.get_by_name("volume").props.volume
+        current_volume = self.pipeline.get_by_name("muter").props.volume
         end_time = current_time + self.fade_out * Gst.MSECOND
-        self._add_keyframe_pair(self._fade_control,
+        self._add_keyframe_pair(self._muter_control,
                                 current_time, current_volume,
                                 end_time, 0,
                                 consider_delay=False)
@@ -354,6 +367,7 @@ class Sound(GObject.Object):
             "audioconvert",
             "pitch name=pitch pitch={} rate={}".format(*pitch_args),
             "volume name=volume volume={}".format(self.volume),
+            "volume name=muter volume=0",
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
@@ -362,10 +376,15 @@ class Sound(GObject.Object):
         volume_elem = pipeline.get_by_name("volume")
         assert volume_elem is not None
         # Set the initial volume to 0 for looping sounds that fade in.
-        if self.loop and self.fade_in > 0:
-            volume_elem.props.volume = 0
-        volume_elem.connect("notify::volume", self.__volume_cb)
+        # if self.loop and self.fade_in > 0:
+        #     volume_elem.props.volume = 0
+        # volume_elem.connect("notify::volume", self.__volume_cb)
         self._fade_control = self._create_control(volume_elem, "volume")
+
+        muter_elem = pipeline.get_by_name("muter")
+        assert muter_elem is not None
+        muter_elem.connect("notify::volume", self.__muter_cb)
+        self._muter_control = self._create_control(muter_elem, "volume")
 
         pitch_elem = pipeline.get_by_name("pitch")
         assert pitch_elem is not None
@@ -384,10 +403,10 @@ class Sound(GObject.Object):
             return
         pad.set_offset(self.delay * Gst.MSECOND)
 
-    def __volume_cb(self, volume_element, unused_volume):
+    def __muter_cb(self, muter_element, unused_volume):
         # In case of fade-out effects, release the pipeline as soon volume
         # reaches 0.
-        if volume_element.props.volume == 0:
+        if muter_element.props.volume == 0:
             if self._pending_state_change is not None:
                 self.pipeline.set_state(self._pending_state_change)
                 self._pending_state_change = None

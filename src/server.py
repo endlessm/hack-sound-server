@@ -3,6 +3,7 @@ gi.require_version('GLib', '2.0')  # noqa
 from gi.repository import Gio
 from gi.repository import GLib
 from collections import namedtuple
+from hack_sound_server.dbus.misc import FocusWatcher
 from hack_sound_server.registry import Registry
 from hack_sound_server.sound import Sound
 from hack_sound_server.utils.loggable import Logger
@@ -56,6 +57,21 @@ class Server(Gio.Application):
         self.metadata = metadata
         self._countdown_id = None
         self.registry = Registry()
+        self.focus_watcher = FocusWatcher()
+        self.focus_watcher.connect("notify::focused-app",
+                                   self._focused_app_changed_cb)
+
+    def _focused_app_changed_cb(self, *unused_args):
+        bus_name = self.focus_watcher.focused_app
+        self.logger.info("This application has been focused.",
+                         bus_name=bus_name)
+
+        for uuid in self.registry.sounds:
+            sound = self.get_sound(uuid)
+            if sound.bus_name == self.focus_watcher.focused_app:
+                sound.unmute()
+            else:
+                sound.mute()
 
     def get_sound(self, uuid_):
         try:
@@ -179,9 +195,15 @@ class Server(Gio.Application):
         sound_to_pause = self.registry.add_sound(sound)
         self.watch_sound_bus_name(sound)
         self.ref(sound)
+
+        sound.play()
+        if self.focus_watcher.focused_app == sound.bus_name:
+            sound.unmute()
+        else:
+            sound.mute(fades=False)
         if sound_to_pause is not None:
             sound_to_pause.pause_with_fade_out()
-        sound.play()
+
         invocation.return_value(GLib.Variant("(s)", (sound.uuid, )))
 
     def check_too_many_sounds(self, sound_event_id):
