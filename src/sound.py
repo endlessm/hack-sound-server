@@ -74,7 +74,31 @@ class Sound(GObject.Object):
         return self.pipeline.get_state(timeout=0).state
 
     def play(self):
-        self._play()
+        self.logger.info("Playing.")
+        if self._releasing:
+            self.logger.info("Cannot play because being released.")
+            return
+        self._stop_loop = False
+        self.pipeline.set_state(Gst.State.PLAYING)
+
+    def mute(self, fades=True):
+        self.logger.debug("Muting.")
+        volume_elem = self.pipeline.get_by_name("volume")
+        if fades:
+            self._add_fade_out()
+        else:
+            volume_elem.props.volume = 0.0
+
+    def unmute(self):
+        self.logger.info("Unmuting.")
+        if not self.fade_in:
+            volume_elem = self.pipeline.get_by_name("volume")
+            volume_elem.props.volume = self.volume
+        else:
+            try:
+                self._add_fade_in()
+            except ValueError:
+                self.logger.warning("Fade in effect could not be applied.")
 
     def pause_with_fade_out(self):
         self.logger.info("Pausing.")
@@ -99,19 +123,6 @@ class Sound(GObject.Object):
                                     "Pausing.")
                 self.pipeline.set_state(Gst.State.PAUSED)
                 self._pending_state_change = None
-
-    def _play(self):
-        self.logger.info("Playing.")
-        if self._releasing:
-            self.logger.info("Cannot play because being released.")
-            return
-        self._stop_loop = False
-        self.pipeline.set_state(Gst.State.PLAYING)
-        try:
-            self._add_fade_in()
-        except ValueError:
-            self.logger.warning("Fade in effect could not be applied.")
-        return GLib.SOURCE_REMOVE
 
     def stop(self):
         if not self.loop:
@@ -353,7 +364,10 @@ class Sound(GObject.Object):
             "identity single-segment=true",
             "audioconvert",
             "pitch name=pitch pitch={} rate={}".format(*pitch_args),
-            "volume name=volume volume={}".format(self.volume),
+            # Volume will only be changed if a sound is played back when
+            # application owning its bus name is focused. Otherwise, it
+            # will play silently.
+            "volume name=volume volume=0",
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
@@ -361,9 +375,6 @@ class Sound(GObject.Object):
 
         volume_elem = pipeline.get_by_name("volume")
         assert volume_elem is not None
-        # Set the initial volume to 0 for looping sounds that fade in.
-        if self.loop and self.fade_in > 0:
-            volume_elem.props.volume = 0
         volume_elem.connect("notify::volume", self.__volume_cb)
         self._fade_control = self._create_control(volume_elem, "volume")
 
