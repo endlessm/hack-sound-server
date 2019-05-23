@@ -93,12 +93,20 @@ class Server(Gio.Application):
                           sound_event_id=sound.sound_event_id,
                           uuid=sound.uuid)
 
-    def unref(self, sound, count=1):
-        if sound.uuid not in self.registry.refcount:
-            self.logger.warning("This uuid is not registered in the refcount "
-                                "registry.", uuid=sound.uuid)
+    def unref(self, sound, clear_all=False):
+        try:
+            refcount = self.refcount(sound)
+        except AssertionError as ex:
+            self.logger.error("Cannot unref this sound: %s", ex,
+                              bus_name=sound.bus_name,
+                              sound_event_id=sound.sound_event_id,
+                              uuid=sound.uuid)
             return
-        if self.refcount(sound) == 0:
+
+        assert sound.uuid in self.registry.refcount
+        assert refcount >= 0
+
+        if refcount == 0:
             self.logger.warning("Cannot decrease refcount for this sound "
                                 "because it's already 0.",
                                 bus_name=sound.bus_name,
@@ -106,16 +114,14 @@ class Server(Gio.Application):
                                 uuid=sound.uuid)
             return
 
-        if count >= self.refcount(sound):
-            count = self.refcount(sound)
-
+        count = 1 if not clear_all else refcount
         self.registry.refcount[sound.uuid] -= count
         self.logger.debug("Unreference. Refcount: %d",
                           self.registry.refcount[sound.uuid],
                           bus_name=sound.bus_name,
                           sound_event_id=sound.sound_event_id,
                           uuid=sound.uuid)
-        if self.refcount(sound) == 0:
+        if self.registry.refcount[sound.uuid] == 0:
             # Only stop the sound if the last bus name (application) referring
             # to it has been disconnected (closed). The stop method will,
             # indirectly, take care for deleting
@@ -231,7 +237,7 @@ class Server(Gio.Application):
             return
         for uuid_ in self.registry.watcher_by_bus_name[bus_name].uuids:
             sound = self.get_sound(uuid_)
-            self.unref(sound, count=self.refcount(sound))
+            self.unref(sound, clear_all=True)
         # Remove the watcher.
         watcher_id = self.registry.watcher_by_bus_name[bus_name].watcher_id
         Gio.bus_unwatch_name(watcher_id)
@@ -308,8 +314,7 @@ class Server(Gio.Application):
         invocation.return_value(None)
 
     def unref_on_stop(self, sound, term_sound=False):
-        n_unref = 1 if not term_sound else self.refcount(sound)
-        self.unref(sound, n_unref)
+        self.unref(sound, clear_all=term_sound)
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
