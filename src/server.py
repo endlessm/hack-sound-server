@@ -70,6 +70,8 @@ class Server(Gio.Application):
 
         Input sounds are expected to be in the registry.
 
+        Args:
+            sound: A sound object.
         Raises:
             AssertionError: The sound is not in the registry.
 
@@ -306,7 +308,7 @@ class Server(Gio.Application):
         invocation.return_value(None)
 
     def unref_on_stop(self, sound, term_sound=False):
-        n_unref = 1 if not term_sound else self.refcount(sound.uuid)
+        n_unref = 1 if not term_sound else self.refcount(sound)
         self.unref(sound, n_unref)
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
