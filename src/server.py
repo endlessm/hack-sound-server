@@ -191,6 +191,8 @@ class Server(Gio.Application):
             self.cancel_countdown()
             self.hold()
             sound = Sound(self, sender, sound_event_id, options)
+            sound.connect("notify::owned-by-hackable-app",
+                          self._sound_owned_by_hackable_app_changed)
 
         sound_to_pause = self.registry.add_sound(sound)
         self.watch_sound_bus_name(sound)
@@ -205,6 +207,22 @@ class Server(Gio.Application):
             sound_to_pause.pause_with_fade_out()
 
         invocation.return_value(GLib.Variant("(s)", (sound.uuid, )))
+
+    def _sound_owned_by_hackable_app_changed(self, sound, *unused_args):
+        # Sounds owned by a non-hackable app do not follow the focus rule.
+        # Initially, all sounds do not belong to a hackable app, so the focus
+        # rule is ignored for all of them. Also, bg sounds owned by
+        # non-hackable apps are put in the server wide stack of the registry.
+        # However, this situation may change later and very quick. The
+        # FocusWatcher will asyncrhonously tell if the sound bus name is the
+        # owner of a hackable app, and as soon we know that, then the focus
+        # rule should apply and if in the case of bg sound, it should be
+        # removed from the server-wide stack and added to the per-bus stack.
+
+        sound_to_pause = self.registry.refresh_bg_stacks(sound)
+        # TODO
+        # ...
+        pass
 
     def check_too_many_sounds(self, sound_event_id):
         # Use before creating a sound.

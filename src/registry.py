@@ -1,3 +1,6 @@
+from hack_sound_server.utils.loggable import logger
+
+
 class SoundEventUUIDInfo:
     """
     Tracks UUIDs (classified by bus name) related to a specific sound event id.
@@ -106,6 +109,100 @@ class SoundEventsRegistry:
         return sound_event_id in self.get_event_ids()
 
 
+class BGStack:
+    """
+    The following rule applies for 'bg' sounds: whenever a new 'bg' sound
+    starts to play back, if any previous 'bg' sound was already playing, then
+    pause that previous sound and play the new one. If this last sound
+    finishes, then the last sound is resumed.
+    """
+
+    def __init__(self, server):
+        self.server = server
+        self._stack = []
+
+    def push(self, sound):
+        """
+        Adds a sound to the list of background sounds.
+
+        Args:
+            sound (Sound): The sound to add.
+
+        Returns:
+            Previously playing background `Sound` object, or `None` if there
+            was no background sound already playing or no action is required.
+        """
+        if sound.type_ != "bg":
+            self.server.logger.info(
+                "Cannot add a non-bg sound to the bg sounds stack")
+            return None
+
+        previous_bg_sound = None
+        # Reorder the list of background sounds if necessary.
+        if len(self._stack) > 0:
+            overlap_behavior = sound.server.metadata[sound.sound_event_id].get(
+                "overlap-behavior", "overlap")
+
+            # Sounds with overlap behavior 'ignore' or 'restart' are unique
+            # so just need to move the incoming sound to the head/top of
+            # the list/stack.
+            if (overlap_behavior in ("ignore", "restart") and
+                    sound in self._stack):
+                last_sound = self._stack[-1]
+                if last_sound != sound:
+                    previous_bg_sound = last_sound
+                # Reorder.
+                self._stack.remove(sound)
+                self._stack.append(sound)
+
+        if len(self._stack) == 0:
+            self._stack.append(sound)
+        elif self._stack[-1] != sound:
+            previous_bg_sound = self._stack[-1]
+            self._stack.append(sound)
+        return previous_bg_sound
+
+    def remove(self, sound):
+        """
+        Removes a sound from the stack of background sounds.
+
+        Args:
+            sound (Sound): The sound to remove.
+
+        Returns:
+            The `Sound` to resume if any. Otherwise, `None`.
+        """
+        if sound not in self._stack:
+            return None
+        assert sound.type_ == "bg"
+
+        self._stack.remove(sound)
+        if len(self._stack) == 0:
+            return None
+
+        previous_bg_sound = self._stack[-1]
+        self.server.logger.info(
+            "Resuming sound.",
+            sound_event_id=previous_bg_sound.sound_event_id,
+            uuid=previous_bg_sound.uuid
+        )
+        if self.refcount[previous_bg_sound.uuid] == 0:
+            self.server.logger.info(
+                "Cannot resume this sound because its owning apps have "
+                "dissapeared from the bus.",
+                sound_event_id=previous_bg_sound.sound_event_id,
+                uuid=previous_bg_sound.uuid
+            )
+            return None
+        return previous_bg_sound
+
+    def empty(self):
+        return len(self) == 0
+
+    def __len__(self):
+        return len(self._stack)
+
+
 class Registry:
     def __init__(self):
         self.sounds = {}
@@ -113,7 +210,9 @@ class Registry:
         self.refcount = {}
         self.watcher_by_bus_name = {}
         self.sound_events = SoundEventsRegistry()
-        self.background_sounds = []
+
+        self._bg_stack_by_bus_name = {}
+        self._bg_stack_server_wide = BGStack()
 
     def _try_add_bg_sound(self, sound):
         """
@@ -184,6 +283,29 @@ class Registry:
             return None
         return previous_bg_sound
 
+    def refresh_bg_stacks(self, sound):
+        """
+        Moves a sound back to its respective stack.
+
+        Sounds owned by hackable apps should be moved to the per-bus stack
+        while the rest should go to the server-wide stack,
+
+        Args:
+            sound (Sound): The sound to add to the registry.
+
+        Returns:
+            In the case of a bg sound, the previously playing background
+            `Sound` object, or `None` if there was no background sound already
+            playing or if the given sound is not a bg sound.
+        """
+        if sound.owned_by_hackable_app:
+            if sound.bus_name not in self._bg_stack_by_bus_name:
+                self._bg_stack_by_bus_name[sound.bus_name] = BGStack()
+            bg_stack = self._bg_stack_by_bus_name[sound.bus_name]
+        else:
+            bg_stack = self._bg_stack_server_wide
+        return bg_stack.push(sound)
+
     def add_sound(self, sound):
         """
         Adds a sound to the registry.
@@ -198,7 +320,10 @@ class Registry:
         """
         self.sounds[sound.uuid] = sound
         self.sound_events.add_sound(sound)
-        return self._try_add_bg_sound(sound)
+
+        if sound.type_ != "bg":
+            return None=
+        return self.refresh_bg_stacks()
 
     def remove_sound(self, sound):
         """
@@ -213,7 +338,19 @@ class Registry:
         if sound.uuid not in self.sounds:
             return
 
-        sound_to_resume = self._get_sound_to_resume(sound)
+        # Apply bg rule.
+        if sound.owned_by_hackable_app:
+            bg_stack = self._bg_stack_by_bus_name.get(sound.bus_name)
+        else:
+            bg_stack = self._bg_stack_server_wide
+        sound_to_resume = None
+        if bg_stack is not None:
+            maybe_sound_to_resume = bg_stack.remove(sound)
+            # No sound should be resumed back while the server-wide stack is
+            # not empty, at least this sound is from the server-wide stack.
+            if (not self._bg_stack_server_wide.empty() and
+                    bg_stack == self._bg_stack_server_wide):
+                sound_to_resume = maybe_sound_to_resume
 
         self.sound_events.remove_sound(sound)
         del self.sounds[sound.uuid]

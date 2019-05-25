@@ -19,6 +19,10 @@ class Sound(GObject.Object):
     _DEFAULT_FADE_IN_MS = 1000
     _DEFAULT_FADE_OUT_MS = 1000
 
+    owned_by_hackable_app = \
+        GObject.Property(type=bool, default=False,
+                         flags=GObject.ParamFlags.READWRITE)
+
     __gsignals__ = {
         'released': (GObject.SignalFlags.RUN_FIRST, None, ()),
         'error': (GObject.SignalFlags.RUN_FIRST, None, (GLib.Error, str))
