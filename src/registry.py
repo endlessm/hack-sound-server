@@ -123,7 +123,7 @@ class BGStack:
 
     def push(self, sound):
         """
-        Adds a sound to the list of background sounds.
+        Adds or moves a sound to the top of the stack of background sounds.
 
         Args:
             sound (Sound): The sound to add.
@@ -211,8 +211,9 @@ class Registry:
         self.watcher_by_bus_name = {}
         self.sound_events = SoundEventsRegistry()
 
-        self._bg_stack_by_bus_name = {}
-        self._bg_stack_server_wide = BGStack()
+        self._hackable_apps_bg_stack = {}
+        self._non_hackable_apps_bg_stack = BGStack()
+        self._global_bg_stack = BGStack()
 
     def _try_add_bg_sound(self, sound):
         """
@@ -299,12 +300,14 @@ class Registry:
             playing or if the given sound is not a bg sound.
         """
         if sound.owned_by_hackable_app:
-            if sound.bus_name not in self._bg_stack_by_bus_name:
-                self._bg_stack_by_bus_name[sound.bus_name] = BGStack()
-            bg_stack = self._bg_stack_by_bus_name[sound.bus_name]
+            if sound.bus_name not in self._hackable_apps_bg_stack:
+                self._hackable_apps_bg_stack[sound.bus_name] = BGStack()
+            bg_stack = self._hackable_apps_bg_stack[sound.bus_name]
         else:
-            bg_stack = self._bg_stack_server_wide
-        return bg_stack.push(sound)
+            bg_stack = self._non_hackable_apps_bg_stack
+
+        bg_stack.push(sound)
+        return self._global_bg_stack.push(sound)
 
     def add_sound(self, sound):
         """
@@ -322,7 +325,7 @@ class Registry:
         self.sound_events.add_sound(sound)
 
         if sound.type_ != "bg":
-            return None=
+            return None
         return self.refresh_bg_stacks()
 
     def remove_sound(self, sound):
@@ -340,17 +343,19 @@ class Registry:
 
         # Apply bg rule.
         if sound.owned_by_hackable_app:
-            bg_stack = self._bg_stack_by_bus_name.get(sound.bus_name)
+            bg_stack = self._hackable_apps_bg_stack.get(sound.bus_name)
         else:
-            bg_stack = self._bg_stack_server_wide
+            bg_stack = self._non_hackable_apps_bg_stack
         sound_to_resume = None
         if bg_stack is not None:
-            maybe_sound_to_resume = bg_stack.remove(sound)
-            # No sound should be resumed back while the server-wide stack is
-            # not empty, at least this sound is from the server-wide stack.
-            if (not self._bg_stack_server_wide.empty() and
-                    bg_stack == self._bg_stack_server_wide):
-                sound_to_resume = maybe_sound_to_resume
+            bg_stack.remove(sound)
+            try:
+                sound_to_resume = self._global_bg_stack.remove(sound)
+            except ValueError as ex:
+                self.server.logger.error("Sound not in global bg stack.",
+                                         bus_name=sound.bus_name,
+                                         sound_event_id=sound.sound_event_id,
+                                         uuid=sound.uuid)
 
         self.sound_events.remove_sound(sound)
         del self.sounds[sound.uuid]
