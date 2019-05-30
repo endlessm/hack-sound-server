@@ -12,6 +12,10 @@ from hack_sound_server.utils.loggable import ServerFormatter
 DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
 
 
+class UnregisteredUUID(Exception):
+    pass
+
+
 class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
@@ -57,12 +61,12 @@ class Server(Gio.Application):
         self._countdown_id = None
         self.registry = Registry()
 
-    def get_sound(self, uuid_):
-        try:
-            return self.registry.sounds[uuid_]
-        except KeyError:
-            self.logger.critical("This uuid is not assigned to any sound.",
-                                 uuid=uuid_)
+    def get_sound(self, uuid):
+        sound = self.registry.sounds.get(uuid)
+        if sound is None:
+            raise UnregisteredUUID(f"No sound with UUID {uuid} exists in the "
+                                   "registry.")
+        return sound
 
     def refcount(self, sound):
         """
@@ -173,10 +177,17 @@ class Server(Gio.Application):
                 "sound event with id %s does not exist" % sound_event_id)
             return
 
-        uuid_ = self.do_overlap_behaviour(sender, sound_event_id)
-        if uuid_ is not None:
+        try:
+            uuid_ = self.do_overlap_behaviour(sender, sound_event_id)
             sound = self.get_sound(uuid_)
-        else:
+        except UnregisteredUUID as ex:
+            self.logger.critical("A new sound will be created, because an "
+                                 "error ocurred: %s", ex,
+                                 bus_name=sender,
+                                 sound_event_id=sound_event_id)
+            sound = None
+
+        if sound is None:
             if self.check_too_many_sounds(sound_event_id):
                 invocation.return_value(GLib.Variant("(s)", ("", )))
                 return
@@ -236,7 +247,13 @@ class Server(Gio.Application):
         if bus_name not in self.registry.watcher_by_bus_name:
             return
         for uuid_ in self.registry.watcher_by_bus_name[bus_name].uuids:
-            sound = self.get_sound(uuid_)
+            try:
+                sound = self.get_sound(uuid_)
+            except UnregisteredUUID as ex:
+                self.logger.critical("An error ocurred when trying to release "
+                                     "a sound with this uuid: %s. Skipping.",
+                                     ex, uuid=uuid_)
+                continue
             self.unref(sound, clear_all=True)
         # Remove the watcher.
         watcher_id = self.registry.watcher_by_bus_name[bus_name].watcher_id
@@ -280,37 +297,47 @@ class Server(Gio.Application):
                                refcount by 1. If set to True, then the refcount
                                is set to 0.
         """
-        uuid_in_registry = uuid_or_event_id in self.registry.sounds
-        uuid_in_refcount_registry = uuid_or_event_id in self.registry.refcount
-        event_id_in_registry = \
-            self.registry.sound_events.has_sound_event_id(uuid_or_event_id)
+        sounds_to_stop = []
+        try:
+            sound = self.get_sound(uuid_or_event_id)
+            sounds_to_stop = [sound]
+        except UnregisteredUUID:
+            event_id_in_registry = \
+                self.registry.sound_events.has_sound_event_id(uuid_or_event_id)
+            if not event_id_in_registry:
+                self.logger.info("Sound with UUID or event id '%s' was "
+                                 "supposed to be stopped, but did not exist.",
+                                 uuid_or_event_id)
+            else:
+                def uuids_to_sounds(uuids, sound_event_id):
+                    for uuid in uuids:
+                        try:
+                            sound = self.get_sound(uuid)
+                        except UnregisteredUUID as ex:
+                            self.logger.critical(
+                                "Sound with this UUID cannot be stopped. "
+                                "Skipping, because of an error: %s", ex,
+                                uuid=uuid, sound_event_id=sound_event_id)
+                            continue
+                        yield sound
+                    else:
+                        return []
 
-        assert not (uuid_in_registry and event_id_in_registry)
-        # xor: With the exception that the case of both cases being True will
-        # never happen because we never define an UUID in the metadata file.
-        if not ((not uuid_in_registry) ^ (not event_id_in_registry)):
-            self.logger.info("Sound {} was supposed to be stopped, but did "
-                             "not exist".format(uuid_or_event_id))
-        elif (uuid_in_registry and
-              (not uuid_in_refcount_registry or
-               sender != self.get_sound(uuid_or_event_id).bus_name)):
-            self.logger.info("Sound {} was supposed to be "
-                             "refcounted by the bus, name \'{}\' but "
-                             "it wasn\'t.".format(uuid_or_event_id, sender))
-        else:
-            if uuid_in_registry:
-                # Stop by UUID.
-                uuid_ = uuid_or_event_id
-                self.unref_on_stop(self.get_sound(uuid_), term_sound)
-            elif event_id_in_registry:
-                # Stop by sound event id.
                 sound_event_id = uuid_or_event_id
-                bus_name_uuids = \
-                    self.registry.sound_events.get_uuids(sound_event_id,
-                                                         sender)
-                for uuid_ in bus_name_uuids:
-                    sound = self.get_sound(uuid_)
-                    self.unref_on_stop(sound, term_sound)
+                sound_events = self.registry.sound_events
+                bus_name_uuids = sound_events.get_uuids(sound_event_id, sender)
+                sounds_to_stop = uuids_to_sounds(bus_name_uuids,
+                                                 sound_event_id)
+
+        for sound in sounds_to_stop:
+            uuid_in_refcount_registry = sound.uuid in self.registry.refcount
+            if not uuid_in_refcount_registry or sender != sound.bus_name:
+                self.logger.info("Sound with this UUID cannot be stopped. It "
+                                 "was supposed to be refcounted by "
+                                 "the bus name %s but it wasn\'t. Skipping.",
+                                 sender, uuid=sound.uuid)
+                continue
+            self.unref_on_stop(sound, term_sound)
         invocation.return_value(None)
 
     def unref_on_stop(self, sound, term_sound=False):
@@ -318,12 +345,13 @@ class Server(Gio.Application):
 
     def update_properties(self, uuid_, transition_time_ms, options, connection,
                           sender, path, iface, invocation):
-        if uuid_ not in self.registry.sounds:
-            self.logger.info("Properties of sound {} was supposed to be "
-                             "updated, but did not exist".format(uuid_))
-        else:
+
+        try:
             sound = self.get_sound(uuid_)
             sound.update_properties(transition_time_ms, options)
+        except UnregisteredUUID:
+            self.logger.info("Properties of sound {} was supposed to be "
+                             "updated, but did not exist".format(uuid_))
         invocation.return_value(None)
 
     def __method_called_cb(self, connection, sender, path, iface,
