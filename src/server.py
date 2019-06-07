@@ -272,18 +272,17 @@ class Server(Gio.Application):
         Args:
             sound (Sound): A sound object
         """
-        if sound.bus_name in self.registry.watcher_by_bus_name:
-            return
-        watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
-                                        sound.bus_name,
-                                        Gio.DBusProxyFlags.NONE,
-                                        None,
-                                        self._bus_name_disconnect_cb)
+        if sound.bus_name not in self.registry.watcher_by_bus_name:
+            watcher_id = Gio.bus_watch_name(Gio.BusType.SESSION,
+                                            sound.bus_name,
+                                            Gio.DBusProxyFlags.NONE,
+                                            None,
+                                            self._bus_name_disconnect_cb)
 
-        # Tracks a sound UUID called by its respective DBus names.
-        uuids = set()
-        self.registry.watcher_by_bus_name[sound.bus_name] = \
-            DBusWatcher(watcher_id, uuids)
+            # Tracks a sound UUID called by its respective DBus names.
+            uuids = set()
+            self.registry.watcher_by_bus_name[sound.bus_name] = \
+                DBusWatcher(watcher_id, uuids)
         self.registry.watcher_by_bus_name[sound.bus_name].uuids.add(sound.uuid)
 
     def _bus_name_disconnect_cb(self, unused_connection, bus_name):
