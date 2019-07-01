@@ -1,3 +1,6 @@
+from gi.repository import GObject
+
+
 class SoundEventUUIDInfo:
     """
     Tracks UUIDs (classified by bus name) related to a specific sound event id.
@@ -106,14 +109,22 @@ class SoundEventsRegistry:
         return sound_event_id in self.get_event_ids()
 
 
-class Registry:
+class Registry(GObject.Object):
+    __gsignals__ = {
+        "player-added": (GObject.SignalFlags.RUN_FIRST, None, (object, )),
+        "player-removed": (GObject.SignalFlags.RUN_FIRST, None, (object, ))
+    }
+
     def __init__(self):
+        super().__init__()
         self.sounds = {}
         # COunts the references of a sound by UUID and by bus name.
         self.refcount = {}
         self.watcher_by_bus_name = {}
         self.sound_events = SoundEventsRegistry()
         self.background_sounds = []
+        # Used in API v2.
+        self.players_by_bus_name = {}
 
     def _try_add_bg_sound(self, sound):
         """
@@ -223,3 +234,48 @@ class Registry:
                 uuids.remove(sound.uuid)
         del self.refcount[sound.uuid]
         return sound_to_resume
+
+    def get_player(self, app_id, options):
+        """
+        Obtains a player given its app id (a well-known name) and options.
+
+        Arguments:
+            app_id (str): A well known name, ie: "com.endlessm.Fizzics".
+            options (dict): A dictionary with options.
+
+        Returns:
+            A `Player` object if it exists in the registry with the matching
+            options. Otherwise, `None`.
+        """
+        players = self.players_by_bus_name.get(app_id, options)
+        for player in players:
+            if player.options == options:
+                return player
+        return None
+
+    def add_player(self, player):
+        if player.bus_name not in self.players_by_bus_name:
+            self.players_by_bus_name[player.bus_name] = set()
+        self.players_by_bus_name[player.bus_name].add(player)
+        self.emit("player-added", player)
+
+    def remove_player(self, app_id, options):
+        existing_player = self.get_player(app_id, options)
+        if existing_player is None:
+            return
+
+        self.players_by_bus_name[app_id].remove(existing_player)
+        self.emit("player-removed", existing_player)
+
+    def remove_players(self, app_id):
+        players = self.players_by_bus_name.get(app_id)
+        if players is None:
+            return
+
+        del self.players_by_bus_name[app_id]
+        for player in players:
+            self.emit("player-removed", player)
+
+    @property
+    def players(self):
+        return self.players_by_bus_name.items()
