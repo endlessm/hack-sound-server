@@ -9,9 +9,15 @@ if session_bus_services_dir == ''
    session_bus_services_dir = join_paths(get_option('datadir'), 'dbus-1', 'services')
 endif
 
-install_data(
-    join_paths('service', 'com.endlessm.HackSoundServer.service'),
-    install_dir: session_bus_services_dir
+conf = configuration_data()
+conf.set('bindir', join_paths(get_option('prefix'), get_option('bindir')))
+
+configure_file(
+    input: join_paths('service', 'com.endlessm.HackSoundServer.service.in'),
+    output: 'com.endlessm.HackSoundServer.service',
+    install: true,
+    install_dir: session_bus_services_dir,
+    configuration: conf
 )
 
 conf = configuration_data()
