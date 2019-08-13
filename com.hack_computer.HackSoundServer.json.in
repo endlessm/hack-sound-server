@@ -1,5 +1,5 @@
 {
-    "app-id": "com.endlessm.HackSoundServer",
+    "app-id": "com.hack_computer.HackSoundServer",
     "branch": "@BRANCH@",
     "runtime": "org.gnome.Platform",
     "runtime-version": "3.30",
@@ -8,7 +8,7 @@
         "--share=ipc",
         "--socket=pulseaudio",
         "--socket=session-bus",
-        "--own-name=com.endlessm.HackSoundServer2"
+        "--own-name=com.hack_computer.HackSoundServer2"
     ],
     "modules": [
         {

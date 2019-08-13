@@ -22,10 +22,10 @@ BRANCH=${BRANCH:-master}
 
 sed -e "s|@GIT_CLONE_BRANCH@|${GIT_CLONE_BRANCH}|g" \
     -e "s|@BRANCH@|${BRANCH}|g" \
-  com.endlessm.HackSoundServer.json.in > com.endlessm.HackSoundServer.json
+  com.hack_computer.HackSoundServer.json.in > com.hack_computer.HackSoundServer.json
 
 # Add any extra options from the user to the flatpak-builder command (e.g. --install)
-flatpak-builder build --user --force-clean com.endlessm.HackSoundServer.json --repo=${REPO} $@ || ret=$?
+flatpak-builder build --user --force-clean com.hack_computer.HackSoundServer.json --repo=${REPO} $@ || ret=$?
 
 popd
 

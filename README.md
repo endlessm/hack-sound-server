@@ -20,7 +20,7 @@ If a password is requested, input it.
 ## 3. Play a sound!
 Just type this following command in the terminal to play a sound:
 ```
-gdbus call --session --dest com.endlessm.HackSoundServer --object-path /com/endlessm/HackSoundServer --method com.endlessm.HackSoundServer.PlaySound framework/piano/1
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound framework/piano/1
 ```
 
 Sounds are registered internally by a tag known as the "sound event id". The server includes these following sound event ids available:
@@ -104,7 +104,7 @@ This example shows all the options that the metadata file accepts.
 ## Overriding the metadata file
 To override metadata files or add more sounds, you can create your own metadata file. **All the sounds specified there will have the highest priority**.
 
-Create a file in the following path `$HOME/.var/app/com.endlessm.HackSoundServer/data/metadata.json`.
+Create a file in the following path `$HOME/.var/app/com.hack_computer.HackSoundServer/data/metadata.json`.
 > `$HOME` represents your home directory.
 > `.var` is a hidden directory. You can show hidden files with the keys `ctrl` + `h` in the Endless OS file browser.
 
@@ -121,17 +121,17 @@ Once you have created that file, you can add for example the following content:
 ```
 > Beware of closing curly braces properly.
 
-Then you should create the folder `sounds` in `$HOME/.var/app/com.endlessm.HackSoundServer/data/` and put your sounds files there. In this case, you would have to put the sound file `water.wav` and `beep.wav`.
+Then you should create the folder `sounds` in `$HOME/.var/app/com.hack_computer.HackSoundServer/data/` and put your sounds files there. In this case, you would have to put the sound file `water.wav` and `beep.wav`.
 
 ### Playing sounds
 You can test the `water` sound event id when you input this command in a terminal:
 ```
-gdbus call --session --dest com.endlessm.HackSoundServer --object-path /com/endlessm/HackSoundServer --method com.endlessm.HackSoundServer.PlaySound water
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound water
 ```
 
 If you run the following command on a terminal, this will actually play the sound `beep.wav` because it was specified so in your metadata file.
 ```
-gdbus call --session --dest com.endlessm.HackSoundServer --object-path /com/endlessm/HackSoundServer --method com.endlessm.HackSoundServer.PlaySound framework/piano/1
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound framework/piano/1
 ```
 ### Stop a sound
 When you input the previous commands to play a sound you must have seen that something like the following has been output:
@@ -140,7 +140,7 @@ When you input the previous commands to play a sound you must have seen that som
 ```
 This is the identifier of the sound you have told to play and you can use it to stop it.
 ```
-gdbus call --session --dest com.endlessm.HackSoundServer --object-path /com/endlessm/HackSoundServer --method com.endlessm.HackSoundServer.StopSound a72276d2-a856-4531-aac1-59fe1d331fc1
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.StopSound a72276d2-a856-4531-aac1-59fe1d331fc1
 ```
 
 # Logging
@@ -153,12 +153,12 @@ The log level can be set using the environment variable `HACK_SOUND_SERVER_LOGLE
 
 To log everything:
 ```
-HACK_SOUND_SERVER_LOGLEVEL=0 flatpak run com.endlessm.HackSoundServer
+HACK_SOUND_SERVER_LOGLEVEL=0 flatpak run com.hack_computer.HackSoundServer
 ```
 
 Or for example, to log levels from INFO and upper:
 ```
-HACK_SOUND_SERVER_LOGLEVEL=INFO flatpak run com.endlessm.HackSoundServer
+HACK_SOUND_SERVER_LOGLEVEL=INFO flatpak run com.hack_computer.HackSoundServer
 ```
 
 For more information about levels, check the [Python logging system documentation](https://docs.python.org/3/library/logging.html).

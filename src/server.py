@@ -21,17 +21,17 @@ class TooManySoundsException(Exception):
 
 
 class UnknownSoundEventIDException(Exception):
-    INTERFACE = "com.endlessm.HackSoundServer.UnknownSoundEventID"
+    INTERFACE = "com.hack_computer.HackSoundServer.UnknownSoundEventID"
 
 
 class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
     OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
-    _DBUS_NAME = "com.endlessm.HackSoundServer"
+    _DBUS_NAME = "com.hack_computer.HackSoundServer"
     _DBUS_XML = """
     <node>
-      <interface name='com.endlessm.HackSoundServer'>
+      <interface name='com.hack_computer.HackSoundServer'>
         <method name='PlaySound'>
           <arg type='s' name='sound_event' direction='in'/>
           <arg type='s' name='uuid' direction='out'/>
