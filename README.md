@@ -20,7 +20,7 @@ If a password is requested, input it.
 ## 3. Play a sound!
 Just type this following command in the terminal to play a sound:
 ```
-gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound framework/piano/1
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com/hack_computer/HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound framework/piano/1
 ```
 
 Sounds are registered internally by a tag known as the "sound event id". The server includes these following sound event ids available:
@@ -126,12 +126,12 @@ Then you should create the folder `sounds` in `$HOME/.var/app/com.hack_computer.
 ### Playing sounds
 You can test the `water` sound event id when you input this command in a terminal:
 ```
-gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound water
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com/hack_computer/HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound water
 ```
 
 If you run the following command on a terminal, this will actually play the sound `beep.wav` because it was specified so in your metadata file.
 ```
-gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound framework/piano/1
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com/hack_computer/HackSoundServer --method com.hack_computer.HackSoundServer.PlaySound framework/piano/1
 ```
 ### Stop a sound
 When you input the previous commands to play a sound you must have seen that something like the following has been output:
@@ -140,7 +140,7 @@ When you input the previous commands to play a sound you must have seen that som
 ```
 This is the identifier of the sound you have told to play and you can use it to stop it.
 ```
-gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com.hack_computer.HackSoundServer --method com.hack_computer.HackSoundServer.StopSound a72276d2-a856-4531-aac1-59fe1d331fc1
+gdbus call --session --dest com.hack_computer.HackSoundServer --object-path /com/hack_computer/HackSoundServer --method com.hack_computer.HackSoundServer.StopSound a72276d2-a856-4531-aac1-59fe1d331fc1
 ```
 
 # Logging
