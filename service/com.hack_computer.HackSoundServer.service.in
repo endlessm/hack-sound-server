@@ -1,3 +1,3 @@
 [D-BUS Service]
-Name=com.endlessm.HackSoundServer
+Name=com.hack_computer.HackSoundServer
 Exec=@bindir@/hack-sound-server

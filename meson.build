@@ -13,8 +13,8 @@ conf = configuration_data()
 conf.set('bindir', join_paths(get_option('prefix'), get_option('bindir')))
 
 configure_file(
-    input: join_paths('service', 'com.endlessm.HackSoundServer.service.in'),
-    output: 'com.endlessm.HackSoundServer.service',
+    input: join_paths('service', 'com.hack_computer.HackSoundServer.service.in'),
+    output: 'com.hack_computer.HackSoundServer.service',
     install: true,
     install_dir: session_bus_services_dir,
     configuration: conf
@@ -69,7 +69,7 @@ install_subdir(
 data_dir = join_paths(get_option('prefix'), get_option('datadir'))
 
 install_data(
-    'com.endlessm.HackSoundServer.appdata.xml',
+    'com.hack_computer.HackSoundServer.appdata.xml',
     install_dir: join_paths(data_dir, 'appdata')
 )
 
