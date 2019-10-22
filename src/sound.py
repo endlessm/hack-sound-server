@@ -13,11 +13,13 @@ from hack_sound_server.utils.loggable import SoundFormatter
 
 
 class Sound(GObject.Object):
-    _DEFAULT_VOLUME = 1.0
-    _DEFAULT_PITCH = 1.0
-    _DEFAULT_RATE = 1.0
-    _DEFAULT_FADE_IN_MS = 1000
-    _DEFAULT_FADE_OUT_MS = 1000
+    DEFAULT_PROPERTIES = {
+        "volume": 1.0,
+        "pitch": 1.0,
+        "rate": 1.0,
+        "fade-in-ms": 1000,
+        "fade-out-ms": 1000
+    }
 
     __gsignals__ = {
         'released': (GObject.SignalFlags.RUN_FIRST, None, ()),
@@ -37,6 +39,7 @@ class Sound(GObject.Object):
         assert sound_event_id in server.metadata
         self.metadata = server.metadata[sound_event_id]
         self.metadata_extras = metadata_extras or {}
+        self.default_properties = {}
 
         self._stop_loop = False
         self._n_loop = 0
@@ -44,7 +47,11 @@ class Sound(GObject.Object):
         self._pending_state_change = None
         self._releasing = False
         self._error = False
+        self.pipeline = None
 
+    def _setup_pipeline(self):
+        if self.pipeline is not None:
+            return
         self.pipeline = self._build_pipeline()
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
@@ -102,6 +109,8 @@ class Sound(GObject.Object):
 
     def _play(self):
         self.logger.info("Playing.")
+        self._setup_pipeline()
+
         if self._releasing:
             self.logger.info("Cannot play because being released.")
             return
@@ -179,7 +188,8 @@ class Sound(GObject.Object):
         if flags is None:
             flags = Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT
         if position is None:
-            self.pipeline.seek(self._DEFAULT_RATE, Gst.Format.TIME, flags,
+            self.pipeline.seek(Sound.DEFAULT_PROPERTIES["rate"],
+                               Gst.Format.TIME, flags,
                                Gst.SeekType.NONE, -1, Gst.SeekType.NONE, -1)
         else:
             self.pipeline.seek_simple(Gst.Format.TIME, flags, position)
@@ -208,37 +218,33 @@ class Sound(GObject.Object):
 
     @property
     def volume(self):
-        volume = self._get_multipliable_prop("volume")
-        if volume is None:
-            volume = self._DEFAULT_VOLUME
-        return volume
+        return self.get_multipliable_prop("volume")
 
     @property
     def pitch(self):
         """
         Changes pitch while keeping the tempo.
         """
-        return self._get_multipliable_prop("pitch")
+        return self.get_multipliable_prop("pitch")
 
     @property
     def rate(self):
         """
         Changes tempo and pitch.
         """
-        if "rate" in self.metadata:
-            return self.metadata["rate"]
-        return None
+        return self.get_multipliable_prop("rate")
 
     @property
     def fade_in(self):
-        return self.metadata.get("fade-in",
-                                 self._DEFAULT_FADE_IN_MS if self.loop else 0)
+        if "fade-in" in self.metadata:
+            return self.metadata["fade-in"]
+        return Sound.DEFAULT_PROPERTIES["fade-in-ms"] if self.loop else 0
 
     @property
     def fade_out(self):
         pipeline_fade_out = 0
         if self.loop:
-            pipeline_fade_out = self._DEFAULT_FADE_OUT_MS
+            pipeline_fade_out = Sound.DEFAULT_PROPERTIES["fade-out-ms"]
         metadata_fade_out = self.metadata.get("fade-out")
         if metadata_fade_out is not None:
             pipeline_fade_out = metadata_fade_out
@@ -326,13 +332,18 @@ class Sound(GObject.Object):
                                 end_time, 0,
                                 consider_delay=False)
 
-    def _get_multipliable_prop(self, prop_name):
-        value = self.metadata.get(prop_name, None)
+    def get_default_prop(self, prop_name):
+        value = self.default_properties.get(prop_name,
+                                            self.metadata.get(prop_name))
+        if value is None:
+            value = Sound.DEFAULT_PROPERTIES.get(prop_name)
+        return value
+
+    def get_multipliable_prop(self, prop_name):
+        value = self.get_default_prop(prop_name)
+        assert value is not None
         if prop_name in self.metadata_extras:
-            if value is None:
-                value = self.metadata_extras[prop_name]
-            else:
-                value *= self.metadata_extras[prop_name]
+            value *= self.metadata_extras[prop_name]
         return value
 
     def _create_control(self, element, prop):
@@ -345,18 +356,17 @@ class Sound(GObject.Object):
         return fade_control
 
     def _build_pipeline(self):
-        pitch_args = (self.pitch or self._DEFAULT_PITCH,
-                      self.rate or self._DEFAULT_RATE)
         elements = [
             "filesrc name=src location=\"{}\"".format(self.sound_location),
             "decodebin name=decoder",
             "identity single-segment=true",
             "audioconvert",
-            "pitch name=pitch pitch={} rate={}".format(*pitch_args),
+            "pitch name=pitch pitch={} rate={}".format(self.pitch, self.rate),
             "volume name=volume volume={}".format(self.volume),
             "autoaudiosink"
         ]
         spipeline = " ! ".join(elements)
+        self.logger.debug("Pipeline: %s", spipeline)
         pipeline = Gst.parse_launch(spipeline)
 
         volume_elem = pipeline.get_by_name("volume")

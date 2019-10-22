@@ -5,16 +5,19 @@ class SoundEventUUIDInfo:
     def __init__(self):
         # _uuids_by_bus_name and _uuids contain the same UUIDs.
         self._uuids_by_bus_name = {}
-        self._uuids = set()
+        # It may be better for O(1) access to use an ordered set.
+        self._uuids = []
 
     def add_sound(self, sound):
         """
         Adds the sound uuid to the set of uuids (per sound event id).
         """
         if sound.bus_name not in self._uuids_by_bus_name:
-            self._uuids_by_bus_name[sound.bus_name] = set()
-        self._uuids.add(sound.uuid)
-        self._uuids_by_bus_name[sound.bus_name].add(sound.uuid)
+            self._uuids_by_bus_name[sound.bus_name] = []
+        if sound.uuid not in self._uuids:
+            self._uuids.append(sound.uuid)
+        if sound.uuid not in self._uuids_by_bus_name[sound.bus_name]:
+            self._uuids_by_bus_name[sound.bus_name].append(sound.uuid)
 
     def remove_sound(self, sound):
         """
@@ -39,7 +42,7 @@ class SoundEventUUIDInfo:
             set: A set containing the UUIDs.
         """
         if bus_name is not None:
-            return self._uuids_by_bus_name.get(bus_name, set())
+            return self._uuids_by_bus_name.get(bus_name, [])
         return self._uuids
 
     @property
@@ -84,7 +87,7 @@ class SoundEventsRegistry:
         """
         sound_event = self._sound_events.get(sound_event_id)
         if not sound_event:
-            return set()
+            return []
         return sound_event.get_uuids(bus_name)
 
     def get_event_ids(self):

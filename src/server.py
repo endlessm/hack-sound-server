@@ -27,7 +27,7 @@ class UnknownSoundEventIDException(Exception):
 class Server(Gio.Application):
     _TIMEOUT_S = 10
     _MAX_SIMULTANEOUS_SOUNDS = 5
-    OVERLAP_BEHAVIOR_CHOICES = ("overlap", "restart", "ignore")
+    _MULTIPLY_AFTER = 3
     _DBUS_NAME = "com.hack_computer.HackSoundServer"
     _DBUS_XML = """
     <node>
@@ -108,7 +108,7 @@ class Server(Gio.Application):
 
         overlap_behavior = \
             self.metadata[sound_event_id].get("overlap-behavior", "overlap")
-        if overlap_behavior == "overlap":
+        if overlap_behavior in ("overlap", "multiply"):
             return None
 
         uuids = self.registry.sound_events.get_uuids(sound_event_id, bus_name)
@@ -238,11 +238,11 @@ class Server(Gio.Application):
             self.ensure_not_too_many_sounds(sound_event_id)
             sound = self.get_sound(sound_event_id=sound_event_id,
                                    bus_name=sender)
-            if sound is not None:
-                self.try_overlap_behaviour(sound)
-            else:
+            if sound is None:
                 sound = self.new_sound(Sound, self, sender, sound_event_id,
                                        metadata_extras=options)
+
+            self.try_overlap_behaviour(sound)
             self._play_sound(sound)
             invocation.return_value(GLib.Variant("(s)", (sound.uuid, )))
         except UnknownSoundEventIDException as ex:
@@ -308,12 +308,35 @@ class Server(Gio.Application):
     def try_overlap_behaviour(self, sound):
         overlap_behavior = self.metadata[sound.sound_event_id].get(
             "overlap-behavior", "overlap")
+        bus_name_uuids = \
+            self.registry.sound_events.get_uuids(sound.sound_event_id)
+
         if overlap_behavior == "restart":
             # This behavior indicates to restart the sound.
-            sound.reset()
+            assert len(bus_name_uuids) <= 1
+            if len(bus_name_uuids) == 1:
+                sound.reset()
         elif overlap_behavior == "ignore":
             # If a sound is already playing, then ignore the new one.
             pass
+        elif overlap_behavior == "multiply":
+            multiply_after = sound.metadata.get("multiply-after",
+                                                self._MULTIPLY_AFTER)
+            if len(bus_name_uuids) < multiply_after:
+                return
+
+            last_sound = self.get_sound(bus_name_uuids[-1])
+            for prop_name in sound.metadata.get("multiply-properties", []):
+                multiply = sound.metadata["multiply-properties"][prop_name]
+                new_value = \
+                    last_sound.get_multipliable_prop(prop_name) * multiply
+                sound.default_properties[prop_name] = new_value
+
+                self.logger.debug("Updating sound default property "
+                                  "'%s' to '%s'.", prop_name, new_value,
+                                  bus_name=sound.bus_name,
+                                  sound_event_id=sound.sound_event_id,
+                                  uuid=sound.uuid)
 
     def terminate_sound_for_sender(self, uuid_or_event_id, connection, sender,
                                    invocation, term_sound=False):

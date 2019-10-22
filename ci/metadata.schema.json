@@ -23,6 +23,25 @@
                 "description": "Whether to loop the sound until it is stopped",
                 "type": "boolean"
             },
+            "multiply-after": {
+                "description": "Indicates the number of instances of a sound event needed to apply the multiply overlap behavior",
+                "type": "integer"
+            },
+            "multiply-properties": {
+                "description": "Indicates the properties to multiply during a multiply overlap behavior.",
+                "type": "object",
+                "properties": {
+                    "pitch": {
+                        "type": "number"
+                    },
+                    "rate": {
+                        "type": "number"
+                    },
+                    "volume": {
+                        "type": "number"
+                    }
+                }
+            },
             "note": {
                 "description": "Use this for any kind of comment",
                 "type": "string"
@@ -30,7 +49,7 @@
             "overlap-behavior": {
                 "description": "What to do if the sound is played more than once at the same time",
                 "type": "string",
-                "enum": ["overlap", "restart", "ignore"]
+                "enum": ["overlap", "restart", "ignore", "multiply"]
             },
             "sound-file": {
                 "description": "Relative path to the sound file to be played",
