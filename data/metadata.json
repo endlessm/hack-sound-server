@@ -41,7 +41,8 @@
             "clubhouse/characters/ada/moods/talk/Ada_bobble2.webm",
             "clubhouse/characters/ada/moods/talk/Ada_bobble3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "clubhouse/ambient": {
         "sound-file": "clubhouse/clubhouse_ambient.webm",
@@ -130,7 +131,8 @@
             "clubhouse/characters/estelle/moods/talk/Estelle_bobble2.webm",
             "clubhouse/characters/estelle/moods/talk/Estelle_bobble3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "clubhouse/faber/mood/talk": {
         "sound-files": [
@@ -138,7 +140,8 @@
             "clubhouse/characters/faber/moods/talk/Faber_bobble2.webm",
             "clubhouse/characters/faber/moods/talk/Faber_bobble3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "clubhouse/felixnet/mood/talk": {
         "sound-files": [
@@ -146,7 +149,8 @@
             "clubhouse/characters/felixnet/moods/talk/cat-sfx2.webm",
             "clubhouse/characters/felixnet/moods/talk/cat-sfx3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "clubhouse/riley/mood/talk": {
         "sound-files": [
@@ -154,7 +158,8 @@
             "clubhouse/characters/riley/moods/talk/Riley_bobble2.webm",
             "clubhouse/characters/riley/moods/talk/Riley_bobble3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "clubhouse/riley/mood/talk_glitched": {
         "sound-files": [
@@ -162,7 +167,8 @@
             "clubhouse/characters/riley/moods/talk_glitched/Riley_glitch2.webm",
             "clubhouse/characters/riley/moods/talk_glitched/Riley_glitch3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "clubhouse/saniel/mood/talk": {
         "sound-files": [
@@ -170,7 +176,8 @@
             "clubhouse/characters/saniel/moods/talk/Saniel_bobble2.webm",
             "clubhouse/characters/saniel/moods/talk/Saniel_bobble3.webm"
         ],
-        "delay": 250
+        "delay": 250,
+        "overlap-behavior": "ignore"
     },
     "codeview/action/copy": {
         "sound-file": "codeview/keyCombo - copy.webm"
