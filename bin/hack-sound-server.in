@@ -27,6 +27,7 @@ gi.require_version('Gst', '1.0')
 gi.require_version('GLib', '2.0')
 from gi.repository import Gst  # noqa
 from gi.repository import GLib  # noqa
+from setproctitle import setproctitle
 
 
 LIBDIR = "@LIBDIR@"
@@ -56,5 +57,6 @@ def _run_server():
 
 
 if __name__ == "__main__":
+    setproctitle('Hack Sound Server')
     _add_hack_sound_server_path()
     _run_server()
