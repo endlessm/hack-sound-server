@@ -55,6 +55,10 @@ def _run_server():
     server.run(None)
 
 
-if __name__ == "__main__":
+def main():
     _add_hack_sound_server_path()
     _run_server()
+
+
+if __name__ == "__main__":
+    main()

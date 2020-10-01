@@ -28,37 +28,21 @@ conf.set('PACKAGE', meson.project_name())
 pkglibdir = join_paths(get_option('libdir'), meson.project_name())
 install_dir = join_paths(pkglibdir, 'python', 'hack_sound_server')
 
-run_command(
-    python, '-m', 'compileall',
-    join_paths(meson.current_source_dir(), 'hack_sound_server')
-)
-
-install_subdir(
-    'src',
-    exclude_files: 'configure.py.in',
-    install_dir: install_dir,
-    strip_directory: true
-)
-
-configure_file(
-    input: join_paths('src', 'configure.py.in'),
+configure_py = configure_file(
+    input: join_paths('hack_sound_server', 'configure.py.in'),
     output: 'configure.py',
-    install: true,
-    install_dir: install_dir,
     configuration: conf
 )
 
-startup_script = configure_file(
-    input: join_paths('bin', 'hack-sound-server.in'),
-    output: 'hack-sound-server',
+main_py = configure_file(
+    input: join_paths('hack_sound_server', 'main.py.in'),
+    output: 'main.py',
     configuration: conf
 )
 
-install_data(
-    startup_script,
-    install_dir: get_option('bindir'),
-    install_mode: 'rwxr-xr-x'
-)
+run_command('cp', configure_py, join_paths(meson.current_source_dir(), 'hack_sound_server'))
+run_command('cp', main_py, join_paths(meson.current_source_dir(), 'hack_sound_server'))
+run_command(python, 'setup.py', 'install', '--prefix=' + get_option('prefix'))
 
 install_subdir(
     'data',
