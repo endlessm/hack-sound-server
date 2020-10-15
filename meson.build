@@ -69,8 +69,8 @@ install_subdir(
 data_dir = join_paths(get_option('prefix'), get_option('datadir'))
 
 install_data(
-    'com.hack_computer.HackSoundServer.appdata.xml',
-    install_dir: join_paths(data_dir, 'appdata')
+    'com.hack_computer.HackSoundServer.metainfo.xml',
+    install_dir: join_paths(data_dir, 'metainfo')
 )
 
 message('\n'.join([
