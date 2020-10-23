@@ -18,15 +18,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
+
 import gi
-gi.require_version('GLib', '2.0')  # noqa
-from gi.repository import Gio
-from gi.repository import GLib
 from collections import namedtuple
 from hack_sound_server.registry import Registry
 from hack_sound_server.sound import Sound
 from hack_sound_server.utils.loggable import Logger
 from hack_sound_server.utils.loggable import ServerFormatter
+
+gi.require_version('GLib', '2.0')  # noqa
+from gi.repository import Gio  # noqa
+from gi.repository import GLib  # noqa
 
 
 DBusWatcher = namedtuple("DBusWatcher", ["watcher_id", "uuids"])
