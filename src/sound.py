@@ -18,18 +18,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
+
 import gi
 import random
 import uuid
+
+from hack_sound_server.utils.loggable import Logger
+from hack_sound_server.utils.loggable import SoundFormatter
+
 gi.require_version('GLib', '2.0')  # noqa
 gi.require_version('Gst', '1.0')   # noqa
 gi.require_version('GstController', '1.0')  # noqa
-from gi.repository import GLib
-from gi.repository import GObject
-from gi.repository import Gst
-from gi.repository import GstController
-from hack_sound_server.utils.loggable import Logger
-from hack_sound_server.utils.loggable import SoundFormatter
+from gi.repository import GLib  # noqa
+from gi.repository import GObject  # noqa
+from gi.repository import Gst  # noqa
+from gi.repository import GstController  # noqa
 
 
 class Sound(GObject.Object):
